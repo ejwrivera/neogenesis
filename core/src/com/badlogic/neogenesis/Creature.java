@@ -1,0 +1,132 @@
+package com.badlogic.neogenesis;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.ObjectMap.Values;
+import com.badlogic.gdx.utils.ObjectSet;
+
+/**
+ * The Class Creature. Base class of all critters, currently concrete, eventually abstract
+ */
+public class Creature implements Consumable, Mobile, Drawable {
+
+	/** The creature's position. */
+	protected Rectangle position;
+	/** The creature's id. */
+	protected ID id;
+	/** The creature's biomass. */
+	protected Integer biomass;
+	/** The creature's texture. */
+	public Texture texture;
+	
+	/**
+	 * Instantiates a new creature.
+	 * @param startPosAndSize the start pos and size
+	 */
+	public Creature(Rectangle startPosAndSize){
+		position = startPosAndSize;
+		id = IDFactory.getNewID();
+		biomass = 5;
+		texture = TextureMap.getTexture("creature");
+	}
+	
+	/**
+	 * Instantiates a new creature.
+	 * @param startPosAndSize the start pos and size
+	 * @param biomass the biomass
+	 */
+	public Creature(Rectangle startPosAndSize, int biomass){
+		position = startPosAndSize;
+		id = IDFactory.getNewID();
+		this.biomass = biomass;
+		texture = TextureMap.getTexture("creature");
+		position.width=biomass;
+		position.height=biomass;
+	}
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Identifiable#getID()
+	 */
+	@Override
+	public ID getID(){
+		return id;
+	}
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#collidesWith(com.badlogic.gdx.math.Rectangle)
+	 */
+	@Override
+	public Boolean collidesWith(Rectangle other) {
+		return position.overlaps(other);
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Consumable#beConsumed()
+	 */
+	@Override
+	public Food beConsumed() {
+		return new Food(biomass);
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Consumable#getBiomass()
+	 */
+	public int getBiomass() {
+		return biomass;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Consumable#consume(com.badlogic.gdx.utils.ObjectMap.Values)
+	 */
+	@Override
+	public ObjectSet<ID> consume(Values<Consumable> consumables) {
+		position.width=biomass;
+		position.height=biomass;
+		ObjectSet<ID> toRemove = new ObjectSet<ID>();
+		while (consumables.hasNext()) {
+			Consumable consumable = consumables.next();
+			if (!toRemove.contains(consumable.getID()) && id!=consumable.getID() && consumable.collidesWith(position)) {
+				if (biomass>consumable.getBiomass()){
+					consume(consumable.beConsumed());
+					toRemove.add(consumable.getID());
+				}
+			}
+		}
+		return toRemove;
+	}
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Mobile#move()
+	 */
+	@Override
+	public Vector3 move() {
+		float oldX = position.x;
+		float oldY = position.y;
+		position.x += MathUtils.random(-50, 50) * Gdx.graphics.getDeltaTime();
+		position.y += MathUtils.random(-50, 50) * Gdx.graphics.getDeltaTime();
+		return new Vector3(position.x-oldX, position.y-oldY, 0);
+	}
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Drawable#getRectangle()
+	 */
+	@Override
+	public Rectangle getRectangle() {
+		return position;
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Drawable#getTexture()
+	 */
+	@Override
+	public Texture getTexture() {
+		return texture;
+	}
+
+	/**
+	 * Consume. Should be a renamed and possibly for consumer interface, along with consume above
+	 * @param food the food
+	 */
+	public void consume(Food food) {
+		biomass+=food.getNutrition()/10;
+	}
+}
