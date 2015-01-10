@@ -42,6 +42,8 @@ public class GameScreen implements Screen {
 	private int zoomCamera;
 	/** The zoom speed. */
 	private int zoomSpeed;
+	/** The zoom level. */
+	private int zoomLevel;
 	
 	/**
 	 * Instantiates a new game screen.
@@ -49,7 +51,7 @@ public class GameScreen implements Screen {
 	 */
 	public GameScreen(final Neogenesis game) {
 		this.game = game;
-		//DebugValues.debug=true; // set to true to use current debug values
+		// DebugValues.debug=true; // set to true to use current debug values
 		// initialize maps
 		mobs = new ObjectMap<ID, Mobile>();
 		consumables = new ObjectMap<ID, Consumable>();
@@ -68,6 +70,7 @@ public class GameScreen implements Screen {
 		// create a Rectangle to logically represent Eve
 		eve = new Eve(new Rectangle(200, 150, 0, 0), camera, DebugValues.getEveStartingBiomass());
 		addToMaps(eve.getID(), eve);	
+		zoomLevel = (int)eve.getRectangle().getWidth()/32;
 		
 		camera.translate(eve.getRectangle().getWidth()/2, eve.getRectangle().getHeight()/2);
 		camera.zoom*=DebugValues.getCameraZoomStart();
@@ -127,40 +130,39 @@ public class GameScreen implements Screen {
 	 */
 	@Override
 	public void render(float delta) {
+		draw();
+		gameIncrement();
+		orientCamera();
+	}
+	
+	public void draw(){
 		Gdx.gl.glClearColor(0, .2f, .4f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
 		camera.update();
 		// render in the coordinate system specified by the camera.
 		game.batch.setProjectionMatrix(camera.combined);
 		// begin a new batch and draw Eve and all the creatures
 		game.batch.begin();
 		game.font.setScale(camera.zoom);
-		game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-200*camera.zoom, camera.position.y+150*camera.zoom);
-		
+		game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-200*camera.zoom, camera.position.y+150*camera.zoom);	
 		for (Drawable drawable : drawables.values()) {
 			Rectangle drawBox = drawable.getRectangle();
 			game.batch.draw(drawable.getTexture(), drawBox.x, drawBox.y, drawBox.width, drawBox.height);
 		}
 		game.batch.end();
-
+	}
+	
+	public void gameIncrement(){
 		eve.setInput(Gdx.input);
-		
 		// move the creatures
 		for (Mobile mob : mobs.values()) {
 			mob.move();
 		}
-		
 		// check if we need to create a new creature
 		if (TimeUtils.nanoTime()-lastSpawnTime > 200000000/DebugValues.getSpawnRate())
 			spawnCreature();
-		
-		Rectangle eveBox = eve.getRectangle();
-		int oldZoomLevel = (int)eveBox.getWidth()/32;
-		
 		// check for collisions and consume
 		ObjectSet<ID> toRemove = new ObjectSet<ID>();
-		
 		for (ID id: consumables.keys()){
 			if (!toRemove.contains(id)){
 				ObjectSet<ID> newRemove = consumables.get(id).consume (consumables.values());
@@ -170,7 +172,6 @@ public class GameScreen implements Screen {
 				toRemove.addAll(newRemove);
 			}	
 		}
-		
 		for (ID id: toRemove){
 			if (eve.getID()==id){
 				music.stop();
@@ -178,21 +179,20 @@ public class GameScreen implements Screen {
 			}
 			removeFromMaps(id);
 		}
-		
-		while (oldZoomLevel < (int)eveBox.getWidth()/32){
+	}
+
+	public void orientCamera(){
+		while (zoomLevel < (int)eve.getRectangle().getWidth()/32){
 			zoomCamera+=5*zoomSpeed;
-			oldZoomLevel++;
+			zoomLevel++;
 		}
-		
 		if (zoomCamera>0){
 			camera.zoom+=.1/zoomSpeed;
 			zoomCamera--;
 		}
-		
 		camera.translate(eve.getLastMovement());
-		
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see com.badlogic.gdx.Screen#resize(int, int)
 	 */
