@@ -47,7 +47,10 @@ public class GameScreen implements Screen {
 	private int zoomLevel;
 	/** Toggles if the game paused. */
 	private boolean paused;
-
+	/** Toggles the display of the info at the top, biomass and location */
+	private boolean displayHUD;
+	
+	
 	/**
 	 * Instantiates a new game screen.
 	 * @param game the game
@@ -80,6 +83,7 @@ public class GameScreen implements Screen {
 		camera.translate(eve.getRectangle().getWidth()/2, eve.getRectangle().getHeight()/2);
 		camera.zoom*=DebugValues.getCameraZoomStart();
 		paused = false;
+		displayHUD = false;
 		// spawn the first creature
 		spawnCreature();
 	}
@@ -145,13 +149,14 @@ public class GameScreen implements Screen {
 				music.play();
 			}
 		}
+		if (Gdx.input.isKeyJustPressed(Keys.TAB)){
+			displayHUD=!displayHUD;
+		}
 		draw();
 		if (!paused){
 			gameIncrement();
 			orientCamera();
 		}
-		
-		
 	}
 	
 	public void draw(){
@@ -163,8 +168,10 @@ public class GameScreen implements Screen {
 		// begin a new batch and draw Eve and all the creatures
 		game.batch.begin();
 		game.font.setScale(camera.zoom);
-		game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-200*camera.zoom, camera.position.y+150*camera.zoom);
-		game.font.draw(game.batch, "Location: " + eve.getRectangle().x +", "+eve.getRectangle().y, camera.position.x-200*camera.zoom+(200*camera.zoom), camera.position.y+150*camera.zoom);
+		if (displayHUD){
+			game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-200*camera.zoom, camera.position.y+150*camera.zoom);
+			game.font.draw(game.batch, "Location: " + eve.getRectangle().x +", "+eve.getRectangle().y, camera.position.x-200*camera.zoom+(200*camera.zoom), camera.position.y+150*camera.zoom);
+		}
 		for (Drawable drawable : drawables.values()) {
 			Rectangle drawBox = drawable.getRectangle();
 			game.batch.draw(drawable.getTexture(), drawBox.x, drawBox.y, drawBox.width, drawBox.height);
