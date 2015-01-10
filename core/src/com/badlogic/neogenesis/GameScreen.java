@@ -144,7 +144,8 @@ public class GameScreen implements Screen {
 		// begin a new batch and draw Eve and all the creatures
 		game.batch.begin();
 		game.font.setScale(camera.zoom);
-		game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-200*camera.zoom, camera.position.y+150*camera.zoom);	
+		game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-200*camera.zoom, camera.position.y+150*camera.zoom);
+		game.font.draw(game.batch, "Location: " + eve.getRectangle().x +", "+eve.getRectangle().y, camera.position.x-200*camera.zoom+(200*camera.zoom), camera.position.y+150*camera.zoom);
 		for (Drawable drawable : drawables.values()) {
 			Rectangle drawBox = drawable.getRectangle();
 			game.batch.draw(drawable.getTexture(), drawBox.x, drawBox.y, drawBox.width, drawBox.height);
