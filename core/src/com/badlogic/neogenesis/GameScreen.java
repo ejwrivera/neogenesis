@@ -45,9 +45,9 @@ public class GameScreen implements Screen {
 	private int zoomSpeed;
 	/** The zoom level. */
 	private int zoomLevel;
-	/** True if the game is paused. */
+	/** Toggles if the game paused. */
 	private boolean paused;
-	
+
 	/**
 	 * Instantiates a new game screen.
 	 * @param game the game
@@ -145,11 +145,12 @@ public class GameScreen implements Screen {
 				music.play();
 			}
 		}
+		draw();
 		if (!paused){
-			draw();
 			gameIncrement();
 			orientCamera();
 		}
+		
 		
 	}
 	
