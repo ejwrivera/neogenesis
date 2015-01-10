@@ -21,16 +21,16 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	protected Integer biomass;
 	/** The creature's texture. */
 	public Texture texture;
+	/** The biomass in the creature's belly. */
+	protected Integer undigestedBiomass;
+	
 	
 	/**
 	 * Instantiates a new creature.
 	 * @param startPosAndSize the start pos and size
 	 */
 	public Creature(Rectangle startPosAndSize){
-		position = startPosAndSize;
-		id = IDFactory.getNewID();
-		biomass = 5;
-		texture = TextureMap.getTexture("creature");
+		this(startPosAndSize, 5);
 	}
 	
 	/**
@@ -45,6 +45,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 		texture = TextureMap.getTexture("creature");
 		position.width=biomass;
 		position.height=biomass;
+		undigestedBiomass = 0;
 	}
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Identifiable#getID()
@@ -81,6 +82,10 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	 */
 	@Override
 	public ObjectSet<ID> consume(Values<Consumable> consumables) {
+		if (undigestedBiomass > 0){
+			biomass++;
+			undigestedBiomass--;
+		}
 		position.width=biomass;
 		position.height=biomass;
 		ObjectSet<ID> toRemove = new ObjectSet<ID>();
@@ -127,6 +132,6 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	 * @param food the food
 	 */
 	public void consume(Food food) {
-		biomass+=food.getNutrition()/10;
+		undigestedBiomass += food.getNutrition()/10;
 	}
 }

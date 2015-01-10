@@ -2,7 +2,6 @@ package com.badlogic.neogenesis;
 
 import com.badlogic.gdx.math.Rectangle;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Food. For packaging together nutrition information of a given edible delight
  */
@@ -12,6 +11,8 @@ public class Food implements Consumable {
 	private int nutrition;
 	/** The ID. */
 	private ID id;
+	/** Whether or not this food has been consumed. */
+	private boolean consumed;
 	
 	/**
 	 * Instantiates a new food.
@@ -20,6 +21,11 @@ public class Food implements Consumable {
 	public Food(int nutrition){
 		this.nutrition=nutrition;
 		id = IDFactory.getNewID();
+		consumed=false;
+	}
+	
+	public Food(Food food){
+		this(food.getNutrition());
 	}
 	
 	/**
@@ -52,8 +58,8 @@ public class Food implements Consumable {
 	 */
 	@Override
 	public Food beConsumed() {
-		// TODO Auto-generated method stub
-		return null;
+		consumed = true;
+		return this;
 	}
 
 	/* (non-Javadoc)
@@ -62,5 +68,9 @@ public class Food implements Consumable {
 	@Override
 	public int getBiomass() {
 		return 0;
+	}
+	
+	public boolean beenConsumed() {
+		return consumed;
 	}
 }

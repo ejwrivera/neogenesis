@@ -72,7 +72,7 @@ public class Eve extends Creature {
 	 * @see com.badlogic.neogenesis.Creature#consume(com.badlogic.neogenesis.Food)
 	 */
 	public void consume(Food food) {
-		biomass+=food.getNutrition()/5;
+		super.consume(new Food(food.getNutrition()*2));
 	}
 	
 	/* (non-Javadoc)
