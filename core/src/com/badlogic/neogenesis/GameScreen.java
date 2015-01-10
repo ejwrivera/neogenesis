@@ -56,6 +56,7 @@ public class GameScreen implements Screen {
 		this.game = game;
 		
 		// DebugValues.debug=true; // set to true to use current debug values
+		// DebugValues.populateDebugValues(2); // 1 = godzilla mode, 2 = quick start
 		// initialize maps
 		mobs = new ObjectMap<ID, Mobile>();
 		consumables = new ObjectMap<ID, Consumable>();

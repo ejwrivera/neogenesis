@@ -52,8 +52,15 @@ public class DebugValues {
 			// godzilla eve
 			case 1:
 				eveStartingBiomass = 200;
-				spawnRate = 10;
-				cameraZoomStart = 1;
+				spawnRate = 3;
+				cameraZoomStart = 2;
+				cameraZoomRate = 1;
+				break;
+			// quick start
+			case 2:
+				eveStartingBiomass = 30;
+				spawnRate = 1;
+				cameraZoomStart = .5f;
 				cameraZoomRate = 1;
 				break;
 			default:
