@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 /**
  * The Class Creature. Base class of all critters, currently concrete, eventually abstract
  */
-public class Creature implements Consumable, Mobile, Drawable {
+public class Creature implements Consumable, Consumer, Mobile, Drawable {
 
 	/** The creature's position. */
 	protected Rectangle position;

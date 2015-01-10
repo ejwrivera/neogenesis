@@ -31,6 +31,8 @@ public class GameScreen implements Screen {
 	private Eve eve;	
 	/** The mobs. */
 	private ObjectMap<ID, Mobile> mobs;	
+	/** The consumers. */
+	private ObjectMap<ID, Consumer> consumers;
 	/** The consumables. */
 	private ObjectMap<ID, Consumable> consumables;
 	/** The collidables. */
@@ -62,6 +64,7 @@ public class GameScreen implements Screen {
 		// DebugValues.populateDebugValues(2); // 1 = godzilla mode, 2 = quick start
 		// initialize maps
 		mobs = new ObjectMap<ID, Mobile>();
+		consumers = new ObjectMap<ID, Consumer>();
 		consumables = new ObjectMap<ID, Consumable>();
 		collidables = new ObjectMap<ID, Collidable>();
 		drawables = new ObjectMap<ID, Drawable>();
@@ -95,6 +98,7 @@ public class GameScreen implements Screen {
 	 */
 	private void addToMaps(ID id, Creature creature) {
 		mobs.put(creature.getID(), creature);
+		consumers.put(creature.getID(), creature);
 		consumables.put(creature.getID(), creature);
 		collidables.put(creature.getID(), creature);
 		drawables.put(creature.getID(), creature);
@@ -190,9 +194,9 @@ public class GameScreen implements Screen {
 			spawnCreature();
 		// check for collisions and consume
 		ObjectSet<ID> toRemove = new ObjectSet<ID>();
-		for (ID id: consumables.keys()){
+		for (ID id: consumers.keys()){
 			if (!toRemove.contains(id)){
-				ObjectSet<ID> newRemove = consumables.get(id).consume (consumables.values());
+				ObjectSet<ID> newRemove = consumers.get(id).consume(consumables.values());
 				if (newRemove.size!=0){
 					sound.play();
 				}
