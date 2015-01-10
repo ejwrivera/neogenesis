@@ -1,6 +1,7 @@
 package com.badlogic.neogenesis;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -44,6 +45,8 @@ public class GameScreen implements Screen {
 	private int zoomSpeed;
 	/** The zoom level. */
 	private int zoomLevel;
+	/** True if the game is paused. */
+	private boolean paused;
 	
 	/**
 	 * Instantiates a new game screen.
@@ -51,6 +54,7 @@ public class GameScreen implements Screen {
 	 */
 	public GameScreen(final Neogenesis game) {
 		this.game = game;
+		
 		// DebugValues.debug=true; // set to true to use current debug values
 		// initialize maps
 		mobs = new ObjectMap<ID, Mobile>();
@@ -74,6 +78,7 @@ public class GameScreen implements Screen {
 		
 		camera.translate(eve.getRectangle().getWidth()/2, eve.getRectangle().getHeight()/2);
 		camera.zoom*=DebugValues.getCameraZoomStart();
+		paused = false;
 		// spawn the first creature
 		spawnCreature();
 	}
@@ -130,9 +135,21 @@ public class GameScreen implements Screen {
 	 */
 	@Override
 	public void render(float delta) {
-		draw();
-		gameIncrement();
-		orientCamera();
+		if (Gdx.input.isKeyJustPressed(Keys.SPACE)){
+			paused = !paused;
+			if (paused){
+				music.pause();
+			}
+			else {
+				music.play();
+			}
+		}
+		if (!paused){
+			draw();
+			gameIncrement();
+			orientCamera();
+		}
+		
 	}
 	
 	public void draw(){
