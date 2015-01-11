@@ -1,6 +1,6 @@
 package com.badlogic.neogenesis;
 
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Circle;
 
 /**
  * The Class Food. For packaging together nutrition information of a given edible delight
@@ -40,7 +40,7 @@ public class Food implements Consumable {
 	 * @see com.badlogic.neogenesis.Collidable#collidesWith(com.badlogic.gdx.math.Rectangle)
 	 */
 	@Override
-	public Boolean collidesWith(Rectangle other) {
+	public Boolean collidesWith(Circle other) {
 		// TODO Auto-generated method stub
 		return null;
 	}

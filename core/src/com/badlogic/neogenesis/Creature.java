@@ -3,7 +3,7 @@ package com.badlogic.neogenesis;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ObjectMap.Values;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 public class Creature implements Consumable, Consumer, Mobile, Drawable {
 
 	/** The creature's position. */
-	protected Rectangle position;
+	protected Circle position;
 	/** The creature's id. */
 	protected ID id;
 	/** The creature's biomass. */
@@ -29,7 +29,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	 * Instantiates a new creature.
 	 * @param startPosAndSize the start pos and size
 	 */
-	public Creature(Rectangle startPosAndSize){
+	public Creature(Circle startPosAndSize){
 		this(startPosAndSize, 5);
 	}
 	
@@ -38,13 +38,12 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	 * @param startPosAndSize the start pos and size
 	 * @param biomass the biomass
 	 */
-	public Creature(Rectangle startPosAndSize, int biomass){
+	public Creature(Circle startPosAndSize, int biomass){
 		position = startPosAndSize;
 		id = IDFactory.getNewID();
 		this.biomass = biomass;
 		texture = TextureMap.getTexture("creature");
-		position.width=biomass;
-		position.height=biomass;
+		position.radius=biomass;
 		undigestedBiomass = 0;
 	}
 	/* (non-Javadoc)
@@ -55,10 +54,10 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 		return id;
 	}
 	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Collidable#collidesWith(com.badlogic.gdx.math.Rectangle)
+	 * @see com.badlogic.neogenesis.Collidable#collidesWith(com.badlogic.gdx.math.Circle)
 	 */
 	@Override
-	public Boolean collidesWith(Rectangle other) {
+	public Boolean collidesWith(Circle other) {
 		return position.overlaps(other);
 	}
 	
@@ -86,8 +85,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 			biomass++;
 			undigestedBiomass--;
 		}
-		position.width=biomass;
-		position.height=biomass;
+		position.radius=biomass/2;
 		ObjectSet<ID> toRemove = new ObjectSet<ID>();
 		while (consumables.hasNext()) {
 			Consumable consumable = consumables.next();
@@ -112,10 +110,10 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 		return new Vector3(position.x-oldX, position.y-oldY, 0);
 	}
 	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Drawable#getRectangle()
+	 * @see com.badlogic.neogenesis.Drawable#getCircle()
 	 */
 	@Override
-	public Rectangle getRectangle() {
+	public Circle getCircle() {
 		return position;
 	}
 	

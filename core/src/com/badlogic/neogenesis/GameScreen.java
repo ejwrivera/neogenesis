@@ -8,7 +8,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -60,8 +60,8 @@ public class GameScreen implements Screen {
 	public GameScreen(final Neogenesis game) {
 		this.game = game;
 		
-		// DebugValues.debug=true; // set to true to use current debug values
-		// DebugValues.populateDebugValues(2); // 1 = godzilla mode, 2 = quick start
+		 DebugValues.debug=true; // set to true to use current debug values
+		 DebugValues.populateDebugValues(2); // 1 = godzilla mode, 2 = quick start
 		// initialize maps
 		mobs = new ObjectMap<ID, Mobile>();
 		consumers = new ObjectMap<ID, Consumer>();
@@ -78,12 +78,12 @@ public class GameScreen implements Screen {
 		camera.setToOrtho(false, 400, 300);
 		zoomCamera=0;
 		zoomSpeed=10*DebugValues.getCameraZoomRate();
-		// create a Rectangle to logically represent Eve
-		eve = new Eve(new Rectangle(200, 150, 0, 0), camera, DebugValues.getEveStartingBiomass());
+		// create a Circle to logically represent Eve
+		eve = new Eve(new Circle(200, 150, 0), camera, DebugValues.getEveStartingBiomass());
 		addToMaps(eve.getID(), eve);	
-		zoomLevel = (int)eve.getRectangle().getWidth()/32;
+		zoomLevel = (int)eve.getCircle().radius/16;
 		
-		camera.translate(eve.getRectangle().getWidth()/2, eve.getRectangle().getHeight()/2);
+		camera.translate(eve.getCircle().radius/4, eve.getCircle().radius/4);
 		camera.zoom*=DebugValues.getCameraZoomStart();
 		paused = false;
 		displayHUD = false;
@@ -132,8 +132,8 @@ public class GameScreen implements Screen {
 		else{
 			size = MathUtils.random(2, 3)*5;
 		}
-		Creature creature = new Creature(new Rectangle(MathUtils.random(0, 2400), MathUtils.random(0, 1800), 0, 0), size);
-		if (!creature.collidesWith(eve.getRectangle())){
+		Creature creature = new Creature(new Circle(MathUtils.random(0, 2400), MathUtils.random(0, 1800), 0), size);
+		if (!creature.collidesWith(eve.getCircle())){
 			addToMaps(creature.getID(), creature);
 		}
 		lastSpawnTime = TimeUtils.nanoTime();
@@ -174,11 +174,14 @@ public class GameScreen implements Screen {
 		game.font.setScale(camera.zoom);
 		if (displayHUD){
 			game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-200*camera.zoom, camera.position.y+150*camera.zoom);
-			game.font.draw(game.batch, "Location: " + eve.getRectangle().x +", "+eve.getRectangle().y, camera.position.x-200*camera.zoom+(200*camera.zoom), camera.position.y+150*camera.zoom);
+			game.font.draw(game.batch, "Location: " + eve.getCircle().x +", "+eve.getCircle().y, camera.position.x-200*camera.zoom+(200*camera.zoom), camera.position.y+150*camera.zoom);
+			if (zoomCamera>0){
+				game.font.draw(game.batch, "Zooming", camera.position.x-200*camera.zoom+(100*camera.zoom), camera.position.y+150*camera.zoom);
+			}
 		}
 		for (Drawable drawable : drawables.values()) {
-			Rectangle drawBox = drawable.getRectangle();
-			game.batch.draw(drawable.getTexture(), drawBox.x, drawBox.y, drawBox.width, drawBox.height);
+			Circle drawBox = drawable.getCircle();
+			game.batch.draw(drawable.getTexture(), drawBox.x-drawBox.radius, drawBox.y-drawBox.radius, drawBox.radius*2, drawBox.radius*2);
 		}
 		game.batch.end();
 	}
@@ -213,7 +216,7 @@ public class GameScreen implements Screen {
 	}
 
 	public void orientCamera(){
-		while (zoomLevel < (int)eve.getRectangle().getWidth()/32){
+		while (zoomLevel < (int)eve.getCircle().radius/16){
 			zoomCamera+=5*zoomSpeed;
 			zoomLevel++;
 		}

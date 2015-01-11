@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
@@ -25,7 +25,7 @@ public class Eve extends Creature {
 	 * @param startPosAndSize the start pos and size
 	 * @param camera the camera
 	 */
-	public Eve(Rectangle startPosAndSize, OrthographicCamera camera){
+	public Eve(Circle startPosAndSize, OrthographicCamera camera){
 		super(startPosAndSize);
 		this.camera = camera;
 		biomass = 10;
@@ -38,10 +38,11 @@ public class Eve extends Creature {
 	 * @param camera the camera
 	 * @param biomass the biomass
 	 */
-	public Eve(Rectangle startPosAndSize, OrthographicCamera camera, int biomass){
+	public Eve(Circle startPosAndSize, OrthographicCamera camera, int biomass){
 		super(startPosAndSize, biomass);
 		this.camera = camera;
 		this.biomass = biomass;
+		position.radius=biomass/2;
 		texture = TextureMap.getTexture("eve");
 	}
 	
@@ -59,13 +60,6 @@ public class Eve extends Creature {
 	 */
 	public Vector2 getLastMovement(){
 		return lastMovement;
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Creature#getRectangle()
-	 */
-	public Rectangle getRectangle() {
-		return position;
 	}
 	
 	/* (non-Javadoc)
