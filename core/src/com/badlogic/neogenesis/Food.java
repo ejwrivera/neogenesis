@@ -73,4 +73,9 @@ public class Food implements Consumable {
 	public boolean beenConsumed() {
 		return consumed;
 	}
+
+	@Override
+	public int getMagnitude() {
+		return -1;
+	}
 }

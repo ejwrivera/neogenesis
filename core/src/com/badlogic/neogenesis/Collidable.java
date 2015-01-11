@@ -13,4 +13,5 @@ public interface Collidable extends Identifiable {
 	 * @return returns true if there is an overlap between this collidable's bounding box and the passed in box
 	 */
 	public Boolean collidesWith(Circle other);
+	public int getMagnitude();
 }

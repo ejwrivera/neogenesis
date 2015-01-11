@@ -1,14 +1,14 @@
 package com.badlogic.neogenesis;
 
 import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.ObjectMap.Values;
 
-public interface Consumer {
+public interface Consumer extends Collidable {
 
 	/**
 	 * Consume.
-	 * @param consumables the consumables that may be eaten
+	 * @param appropriatelySizedConsumables the consumables that may be eaten
 	 * @return the set of ids that have been consumed
 	 */
-	public ObjectSet<ID> consume (Values<Consumable> consumables);
+	public ObjectSet<ID> consume (ObjectSet<Consumable> appropriatelySizedConsumables);
+	
 }

@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -47,6 +48,8 @@ public class GameScreen implements Screen {
 	private int zoomSpeed;
 	/** The zoom level. */
 	private int zoomLevel;
+	/** Toggles whether magnitude is checked for consuming */
+	private boolean magnitudeConsuming;
 	/** Toggles if the game paused. */
 	private boolean paused;
 	/** Toggles the display of the info at the top, biomass and location */
@@ -60,8 +63,8 @@ public class GameScreen implements Screen {
 	public GameScreen(final Neogenesis game) {
 		this.game = game;
 		
-		 DebugValues.debug=true; // set to true to use current debug values
-		 DebugValues.populateDebugValues(2); // 1 = godzilla mode, 2 = quick start
+		// DebugValues.debug=true; // set to true to use current debug values
+		// DebugValues.populateDebugValues(2); // 1 = godzilla mode, 2 = quick start
 		// initialize maps
 		mobs = new ObjectMap<ID, Mobile>();
 		consumers = new ObjectMap<ID, Consumer>();
@@ -87,6 +90,7 @@ public class GameScreen implements Screen {
 		camera.zoom*=DebugValues.getCameraZoomStart();
 		paused = false;
 		displayHUD = false;
+		magnitudeConsuming = DebugValues.getMagnitudeConsuming();
 		// spawn the first creature
 		spawnCreature();
 	}
@@ -197,14 +201,42 @@ public class GameScreen implements Screen {
 			spawnCreature();
 		// check for collisions and consume
 		ObjectSet<ID> toRemove = new ObjectSet<ID>();
-		for (ID id: consumers.keys()){
-			if (!toRemove.contains(id)){
-				ObjectSet<ID> newRemove = consumers.get(id).consume(consumables.values());
-				if (newRemove.size!=0){
-					sound.play();
+		
+		if (magnitudeConsuming){
+			IntMap<ObjectSet<Consumable>> magnitudeMap = generateConsumableMagnitudeMap();
+			
+			for (ID id: consumers.keys()){
+				if (!toRemove.contains(id)){
+					
+					ObjectSet<Consumable> appropriatelySizedConsumables = new ObjectSet<Consumable>();
+					for (int ii = -1; ii <= 0; ii++){
+						if (magnitudeMap.containsKey(consumers.get(id).getMagnitude()+ii)){
+							appropriatelySizedConsumables.addAll(magnitudeMap.get(consumers.get(id).getMagnitude()+ii));
+						}
+					}
+					
+					ObjectSet<ID> newRemove = consumers.get(id).consume(appropriatelySizedConsumables);
+					if (newRemove.size!=0){
+						sound.play();
+					}
+					toRemove.addAll(newRemove);
+				}	
+			}
+		}
+		else{
+			for (ID id: consumers.keys()){
+				if (!toRemove.contains(id)){	
+					ObjectSet<Consumable> validConsumables = new ObjectSet<Consumable>();
+					while (consumables.values().hasNext()){
+						validConsumables.add(consumables.values().next());
+					}
+					ObjectSet<ID> newRemove = consumers.get(id).consume(validConsumables);
+					if (newRemove.size!=0){
+						sound.play();
+					}
+					toRemove.addAll(newRemove);
 				}
-				toRemove.addAll(newRemove);
-			}	
+			}
 		}
 		for (ID id: toRemove){
 			if (eve.getID()==id){
@@ -213,6 +245,18 @@ public class GameScreen implements Screen {
 			}
 			removeFromMaps(id);
 		}
+	}
+
+	private IntMap<ObjectSet<Consumable>> generateConsumableMagnitudeMap() {
+		IntMap<ObjectSet<Consumable>> magnitudeMap = new IntMap<ObjectSet<Consumable>>();
+		for (Consumable consumable: consumables.values()){
+			int magnitude = consumable.getMagnitude();
+			if (!magnitudeMap.containsKey(magnitude)){
+				magnitudeMap.put(magnitude, new ObjectSet<Consumable>());
+			}
+			magnitudeMap.get(magnitude).add(consumable);
+		}
+		return magnitudeMap;
 	}
 
 	public void orientCamera(){

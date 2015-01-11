@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.ObjectMap.Values;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.ObjectSet.ObjectSetIterator;
 
 /**
  * The Class Creature. Base class of all critters, currently concrete, eventually abstract
@@ -60,6 +60,13 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	public Boolean collidesWith(Circle other) {
 		return position.overlaps(other);
 	}
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#getMagnitude()
+	 */
+	@Override
+	public int getMagnitude() {
+		return biomass/500;
+	}
 	
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Consumable#beConsumed()
@@ -77,16 +84,17 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Consumable#consume(com.badlogic.gdx.utils.ObjectMap.Values)
+	 * @see com.badlogic.neogenesis.Consumer#consume(com.badlogic.gdx.utils.ObjectSet)
 	 */
 	@Override
-	public ObjectSet<ID> consume(Values<Consumable> consumables) {
+	public ObjectSet<ID> consume (ObjectSet<Consumable> appropriatelySizedConsumables){
 		if (undigestedBiomass > 0){
 			biomass++;
 			undigestedBiomass--;
 		}
 		position.radius=biomass/2;
 		ObjectSet<ID> toRemove = new ObjectSet<ID>();
+		ObjectSetIterator<Consumable> consumables = appropriatelySizedConsumables.iterator();
 		while (consumables.hasNext()) {
 			Consumable consumable = consumables.next();
 			if (!toRemove.contains(consumable.getID()) && id!=consumable.getID() && consumable.collidesWith(position)) {

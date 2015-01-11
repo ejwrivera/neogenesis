@@ -18,6 +18,8 @@ public class DebugValues {
 	private static float cameraZoomStart = 2;
 	/** The camera zoom rate. */
 	private static int cameraZoomRate = 1;
+	/** Toggls magnitude checks for consuming */
+	private static boolean magnitudeConsuming = false;
 	// default values
 	/** The default eve starting biomass. */
 	private static int defaultEveStartingBiomass = 10;
@@ -27,7 +29,8 @@ public class DebugValues {
 	private static float defaultCameraZoomStart = .5f;
 	/** The default camera zoom rate. */
 	private static int defaultCameraZoomRate = 1;
-	
+	/** Toggls magnitude checks for consuming */
+	private static boolean defaultMagnitudeConsuming = true;
 	
 	/**
 	 * Populate debug values.  For programmatically setting debug values
@@ -36,11 +39,12 @@ public class DebugValues {
 	 * @param cameraStart set the starting camera zoom factor
 	 * @param cameraRate set the camera zoom rate
 	 */
-	public static void populateDebugValues(int eveStartBio, int spawn, float cameraStart, int cameraRate){
+	public static void populateDebugValues(int eveStartBio, int spawn, float cameraStart, int cameraRate, boolean magnitudeEat){
 		eveStartingBiomass=eveStartBio;
 		spawnRate = spawn;
 		cameraZoomStart = cameraStart;
 		cameraZoomRate = cameraRate;
+		magnitudeConsuming = magnitudeEat;
 	}
 	
 	/**
@@ -55,6 +59,7 @@ public class DebugValues {
 				spawnRate = 3;
 				cameraZoomStart = 2;
 				cameraZoomRate = 1;
+				magnitudeConsuming = false;
 				break;
 			// quick start
 			case 2:
@@ -62,6 +67,7 @@ public class DebugValues {
 				spawnRate = 1;
 				cameraZoomStart = .5f;
 				cameraZoomRate = 1;
+				magnitudeConsuming = true;
 				break;
 			default:
 		}
@@ -97,6 +103,10 @@ public class DebugValues {
 	 */
 	public static int getCameraZoomRate() {
 		return debug ? cameraZoomRate : defaultCameraZoomRate;
+	}
+
+	public static boolean getMagnitudeConsuming() {
+		return debug ? magnitudeConsuming : defaultMagnitudeConsuming;
 	}
 	
 }
