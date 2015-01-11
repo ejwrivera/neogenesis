@@ -208,6 +208,7 @@ public class GameScreen implements Screen {
 		// begin a new batch and draw Eve and all the creatures
 		game.batch.begin();
 		game.font.setScale(camera.zoom);
+		game.font.setUseIntegerPositions(false);
 		if (displayHUD){
 			game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-200*camera.zoom, camera.position.y+150*camera.zoom);
 			game.font.draw(game.batch, "Location: " + eve.getCircle().x +", "+eve.getCircle().y, camera.position.x-200*camera.zoom+(200*camera.zoom), camera.position.y+150*camera.zoom);
@@ -220,6 +221,7 @@ public class GameScreen implements Screen {
 			game.batch.draw(drawable.getTexture(), drawBox.x-drawBox.radius, drawBox.y-drawBox.radius, drawBox.radius*2, drawBox.radius*2);
 		}
 		game.batch.end();
+		
 	}
 	
 	public void gameIncrement(){
