@@ -13,10 +13,8 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.TimeUtils;
-// TODO: Auto-generated Javadoc
-// for displaying the primary game screen - should be as logic-less as possible
 /**
- * The Class GameScreen.
+ * The Class GameScreen. For displaying the primary game screen - should be as logic-less as possible.
  */
 public class GameScreen implements Screen {
 	
@@ -56,7 +54,6 @@ public class GameScreen implements Screen {
 	private boolean paused;
 	/** Toggles the display of the info at the top, biomass and location */
 	private boolean displayHUD;
-	
 	
 	/**
 	 * Instantiates a new game screen.
@@ -211,9 +208,10 @@ public class GameScreen implements Screen {
 		game.font.setUseIntegerPositions(false);
 		if (displayHUD){
 			game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-200*camera.zoom, camera.position.y+150*camera.zoom);
-			game.font.draw(game.batch, "Location: " + eve.getCircle().x +", "+eve.getCircle().y, camera.position.x-200*camera.zoom+(200*camera.zoom), camera.position.y+150*camera.zoom);
+			game.font.draw(game.batch, "Location: " + MathUtils.ceil(eve.getCircle().x) +", "+MathUtils.ceil(eve.getCircle().y), camera.position.x-200*camera.zoom+(250*camera.zoom), camera.position.y+150*camera.zoom);
+			game.font.draw(game.batch, "FPS: " + MathUtils.ceil(1/Gdx.graphics.getDeltaTime()), camera.position.x-200*camera.zoom+(250*camera.zoom), camera.position.y+150*camera.zoom-(20*camera.zoom));
 			if (zoomCamera>0){
-				game.font.draw(game.batch, "Zooming", camera.position.x-200*camera.zoom+(100*camera.zoom), camera.position.y+150*camera.zoom);
+				game.font.draw(game.batch, "Zooming", camera.position.x-200*camera.zoom+(150*camera.zoom), camera.position.y+150*camera.zoom);
 			}
 		}
 		for (Drawable drawable : drawables.values()) {

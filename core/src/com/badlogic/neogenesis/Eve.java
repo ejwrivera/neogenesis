@@ -73,25 +73,51 @@ public class Eve extends Creature {
 		// process user input
 		float oldX = position.x;
 		float oldY = position.y;
-				
+		/*
 		if (input.isTouched()) {
 			Vector3 touchPos = new Vector3();
 			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 			camera.unproject(touchPos);
 			position.x = touchPos.x - 64 / 2;
 			position.y = touchPos.y - 64 / 2;
-		}
-		if (input.isKeyPressed(Keys.LEFT))
-			position.x -= 300 * Gdx.graphics.getDeltaTime();
-		if (input.isKeyPressed(Keys.RIGHT))
-			position.x += 300 * Gdx.graphics.getDeltaTime();
-		if (input.isKeyPressed(Keys.UP))
-			position.y += 300 * Gdx.graphics.getDeltaTime();
-		if (input.isKeyPressed(Keys.DOWN))
-			position.y -= 300 * Gdx.graphics.getDeltaTime();
-				
+		}*/
+		
+		// calculate the change in X
+		position.x += deltaX();
+		// calculate the change in Y
+		position.y += deltaY();
+
 		lastMovement = new Vector2(position.x-oldX, position.y-oldY);
 		
 		return new Vector3(lastMovement, 0);
 	}
+	
+	private float deltaX(){
+		float delta=lastMovement.x;
+		if (input.isKeyPressed(Keys.LEFT)||input.isKeyPressed(Keys.RIGHT)){   
+			delta += input.isKeyPressed(Keys.LEFT) ? -10 * Gdx.graphics.getDeltaTime() : 10 * Gdx.graphics.getDeltaTime();
+		}
+		delta += applyFriction(delta);
+		return maxVelocityLimited(delta);
+	}
+	private float deltaY(){
+		float delta=lastMovement.y;
+		if (input.isKeyPressed(Keys.DOWN)||input.isKeyPressed(Keys.UP)){   
+			delta += input.isKeyPressed(Keys.DOWN) ? -10 * Gdx.graphics.getDeltaTime() : 10 * Gdx.graphics.getDeltaTime();
+		}
+		delta += applyFriction(delta);
+		return maxVelocityLimited(delta);
+	}
+	
+	private float applyFriction (float magnitude){
+		return magnitude > 0 ? -2 * Gdx.graphics.getDeltaTime() : 2 * Gdx.graphics.getDeltaTime();
+	}
+	
+	private float maxVelocityLimited(float magnitude){
+		return maxVelocityLimited(magnitude, 7);
+	}
+	private float maxVelocityLimited(float magnitude, float maxSpeed){
+		return magnitude > maxSpeed ? maxSpeed : magnitude < -maxSpeed ? -maxSpeed : magnitude;
+	}
+	
 }
