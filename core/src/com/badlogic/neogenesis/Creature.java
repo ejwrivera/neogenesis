@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.ObjectSet.ObjectSetIterator;
@@ -15,6 +16,8 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 
 	/** The creature's position. */
 	protected Circle position;
+	/** The last movement. */
+	protected Vector2 lastMovement;
 	/** The creature's id. */
 	protected ID id;
 	/** The creature's biomass. */
@@ -24,6 +27,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	/** The biomass in the creature's belly. */
 	protected Integer undigestedBiomass;
 	
+	protected AI AI;
 	
 	/**
 	 * Instantiates a new creature.
@@ -43,8 +47,10 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 		id = IDFactory.getNewID();
 		this.biomass = biomass;
 		texture = TextureMap.getTexture("creature");
+		lastMovement = new Vector2(0, 0);
 		position.radius=biomass;
 		undigestedBiomass = 0;
+		AI = new HerbivoreAI();
 	}
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Identifiable#getID()
@@ -111,12 +117,18 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	 */
 	@Override
 	public Vector3 move() {
-		float oldX = position.x;
-		float oldY = position.y;
-		position.x += MathUtils.random(-50, 50) * Gdx.graphics.getDeltaTime();
-		position.y += MathUtils.random(-50, 50) * Gdx.graphics.getDeltaTime();
-		return new Vector3(position.x-oldX, position.y-oldY, 0);
+		if (MathUtils.random(1,20)==20){
+			AI.amble(position);
+		}else {
+			lastMovement = AI.forage(position);
+			position.x+=lastMovement.x;
+			position.y+=lastMovement.y;
+		}
+		return new Vector3(lastMovement, 0);
 	}
+	
+	
+	
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Drawable#getCircle()
 	 */

@@ -65,8 +65,8 @@ public class GameScreen implements Screen {
 	public GameScreen(final Neogenesis game) {
 		this.game = game;
 		
-		// DebugValues.debug=true; // set to true to use current debug values
-		// DebugValues.populateDebugValues(2); // 1 = godzilla mode, 2 = quick start
+		 DebugValues.debug=true; // set to true to use current debug values
+		 DebugValues.populateDebugValues(2); // 1 = godzilla mode, 2 = quick start
 		// initialize maps
 		mobs = new ObjectMap<ID, Mobile>();
 		consumers = new ObjectMap<ID, Consumer>();

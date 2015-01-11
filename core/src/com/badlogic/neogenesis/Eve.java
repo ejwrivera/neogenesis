@@ -15,8 +15,6 @@ public class Eve extends Creature {
 
 	/** The input. */
 	private Input input;
-	/** The last movement. */
-	private Vector2 lastMovement;
 	/** The camera. */
 	private OrthographicCamera camera;
 	
@@ -61,7 +59,6 @@ public class Eve extends Creature {
 	public Vector2 getLastMovement(){
 		return lastMovement;
 	}
-	
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Creature#consume(com.badlogic.neogenesis.Food)
 	 */
