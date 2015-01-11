@@ -1,11 +1,12 @@
 package com.badlogic.neogenesis;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 
 /**
  * The Class Food. For packaging together nutrition information of a given edible delight
  */
-public class Food implements Consumable {
+public class Food implements Consumable, Drawable {
 
 	/** The nutrition. */
 	private int nutrition;
@@ -13,19 +14,29 @@ public class Food implements Consumable {
 	private ID id;
 	/** Whether or not this food has been consumed. */
 	private boolean consumed;
+	/** The texture. */
+	private Texture texture;
+	/** The position. */
+	private Circle position;
 	
 	/**
 	 * Instantiates a new food.
 	 * @param nutrition the nutrition
 	 */
-	public Food(int nutrition){
+	public Food(int nutrition, Circle position){
 		this.nutrition=nutrition;
+		this.position=position;
 		id = IDFactory.getNewID();
 		consumed=false;
+		texture = TextureMap.getTexture("food");
+	}
+	
+	public Food(int nutrition){
+		this(nutrition, new Circle());
 	}
 	
 	public Food(Food food){
-		this(food.getNutrition());
+		this(food.getNutrition(), new Circle());
 	}
 	
 	/**
@@ -41,8 +52,7 @@ public class Food implements Consumable {
 	 */
 	@Override
 	public Boolean collidesWith(Circle other) {
-		// TODO Auto-generated method stub
-		return null;
+		return position.overlaps(other);
 	}
 
 	/* (non-Javadoc)
@@ -77,5 +87,15 @@ public class Food implements Consumable {
 	@Override
 	public int getMagnitude() {
 		return -1;
+	}
+
+	@Override
+	public Circle getCircle() {
+		return position;
+	}
+
+	@Override
+	public Texture getTexture() {
+		return texture;
 	}
 }

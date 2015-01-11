@@ -67,7 +67,7 @@ public class DebugValues {
 				spawnRate = 1;
 				cameraZoomStart = .5f;
 				cameraZoomRate = 1;
-				magnitudeConsuming = true;
+				magnitudeConsuming = false;
 				break;
 			default:
 		}

@@ -10,6 +10,8 @@ public class TextureMap {
 	
 	/** The creature image. */
 	private static Texture creatureImage;
+	/** The food image. */
+	private static Texture foodImage;
 	/** The eve image. */
 	private static Texture eveImage;
 	
@@ -22,6 +24,7 @@ public class TextureMap {
 		}
 		creatureImage = new Texture(Gdx.files.internal("creature.png"));
 		eveImage = new Texture(Gdx.files.internal("eve.png"));
+		foodImage = new Texture(Gdx.files.internal("food.png"));
 	}
 	
 	/**
@@ -34,6 +37,9 @@ public class TextureMap {
 		lazyLoadTextures();
 		if (textureName.equals("creature")){
 			return creatureImage;
+		}
+		else if (textureName.equals("food")){
+			return foodImage;
 		}
 		else {
 			return eveImage;

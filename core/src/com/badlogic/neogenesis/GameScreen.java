@@ -48,6 +48,8 @@ public class GameScreen implements Screen {
 	private int zoomSpeed;
 	/** The zoom level. */
 	private int zoomLevel;
+	/** The starting amount of Food. */
+	private int foodAmount;
 	/** Toggles whether magnitude is checked for consuming */
 	private boolean magnitudeConsuming;
 	/** Toggles if the game paused. */
@@ -83,7 +85,7 @@ public class GameScreen implements Screen {
 		zoomSpeed=10*DebugValues.getCameraZoomRate();
 		// create a Circle to logically represent Eve
 		eve = new Eve(new Circle(200, 150, 0), camera, DebugValues.getEveStartingBiomass());
-		addToMaps(eve.getID(), eve);	
+		addToMaps(eve);	
 		zoomLevel = (int)eve.getCircle().radius/16;
 		
 		camera.translate(eve.getCircle().radius/4, eve.getCircle().radius/4);
@@ -91,8 +93,12 @@ public class GameScreen implements Screen {
 		paused = false;
 		displayHUD = false;
 		magnitudeConsuming = DebugValues.getMagnitudeConsuming();
+		foodAmount = 50;
 		// spawn the first creature
 		spawnCreature();
+		for (int ii = 0; ii < foodAmount; ii++){
+			spawnFood();
+		}
 	}
 
 	/**
@@ -100,23 +106,45 @@ public class GameScreen implements Screen {
 	 * @param id the id of the creature
 	 * @param creature the creature
 	 */
-	private void addToMaps(ID id, Creature creature) {
+	private void addToMaps(Creature creature) {
 		mobs.put(creature.getID(), creature);
 		consumers.put(creature.getID(), creature);
 		consumables.put(creature.getID(), creature);
 		collidables.put(creature.getID(), creature);
 		drawables.put(creature.getID(), creature);
 	}
-
+	/**
+	 * Adds a food to the maps.
+	 * @param id the id of the creature
+	 * @param creature the creature
+	 */
+	private void addToMaps(Food food) {
+		consumables.put(food.getID(), food);
+		collidables.put(food.getID(), food);
+		drawables.put(food.getID(), food);
+	}
+	
+	
 	/**
 	 * Removes a creature from the maps.
 	 * @param id the id of the creature
 	 */
 	private void removeFromMaps(ID id) {
-		mobs.remove(id);
-		consumables.remove(id);
-		collidables.remove(id);
-		drawables.remove(id);
+		if (mobs.containsKey(id)){
+			mobs.remove(id);
+		}
+		if (consumers.containsKey(id)){
+			consumers.remove(id);
+		}
+		if (consumables.containsKey(id)){
+			consumables.remove(id);
+		}
+		if (collidables.containsKey(id)){
+			collidables.remove(id);
+		}
+		if (drawables.containsKey(id)){
+			drawables.remove(id);
+		}	
 	}
 	
 	/**
@@ -138,9 +166,13 @@ public class GameScreen implements Screen {
 		}
 		Creature creature = new Creature(new Circle(MathUtils.random(0, 2400), MathUtils.random(0, 1800), 0), size);
 		if (!creature.collidesWith(eve.getCircle())){
-			addToMaps(creature.getID(), creature);
+			addToMaps(creature);
 		}
 		lastSpawnTime = TimeUtils.nanoTime();
+	}
+	
+	private void spawnFood() {
+		addToMaps(new Food(5, new Circle(MathUtils.random(0, 2400), MathUtils.random(0, 1800), 4)));
 	}
 
 	/* (non-Javadoc)
@@ -224,13 +256,11 @@ public class GameScreen implements Screen {
 			}
 		}
 		else{
+			ObjectSet<Consumable> validConsumables = new ObjectSet<Consumable>();
+			validConsumables.addAll(consumables.values().toArray());
 			for (ID id: consumers.keys()){
 				if (!toRemove.contains(id)){	
-					ObjectSet<Consumable> validConsumables = new ObjectSet<Consumable>();
-					while (consumables.values().hasNext()){
-						validConsumables.add(consumables.values().next());
-					}
-					ObjectSet<ID> newRemove = consumers.get(id).consume(validConsumables);
+					ObjectSet<ID> newRemove = consumers.get(id).consume(new ObjectSet<Consumable>(validConsumables));
 					if (newRemove.size!=0){
 						sound.play();
 					}
