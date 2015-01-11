@@ -7,8 +7,11 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -54,6 +57,13 @@ public class GameScreen implements Screen {
 	private boolean paused;
 	/** Toggles the display of the info at the top, biomass and location */
 	private boolean displayHUD;
+	/** The shader */
+	private ShaderProgram shader;
+	/** The shader attributes */
+	private ShaderAttributes shaderAttributes;
+	/** The sprite batch */
+	private SpriteBatch batch;
+	
 	
 	/**
 	 * Instantiates a new game screen.
@@ -62,26 +72,35 @@ public class GameScreen implements Screen {
 	public GameScreen(final Neogenesis game) {
 		this.game = game;
 		
-		 DebugValues.debug=true; // set to true to use current debug values
-		 DebugValues.populateDebugValues(2); // 1 = godzilla mode, 2 = quick start
+		DebugValues.debug=true; // set to true to use current debug values
+		DebugValues.populateDebugValues(2); // 1 = godzilla mode, 2 = quick start
+		
+		// load the sound effect and music
+				sound = Gdx.audio.newSound(Gdx.files.internal("sound.wav"));
+				music = Gdx.audio.newMusic(Gdx.files.internal("music.wav"));
+				music.setLooping(true);
+		
+		// shader init
+		shaderAttributes = new ShaderAttributes();
+		shader = shaderAttributes.shader;
+		
+		batch = new SpriteBatch(1000, shader);
+		batch.setShader(shader);
+		
 		// initialize maps
 		mobs = new ObjectMap<ID, Mobile>();
 		consumers = new ObjectMap<ID, Consumer>();
 		consumables = new ObjectMap<ID, Consumable>();
 		collidables = new ObjectMap<ID, Collidable>();
 		drawables = new ObjectMap<ID, Drawable>();
-		// load the sound effect and music
-		sound = Gdx.audio.newSound(Gdx.files.internal("sound.wav"));
-		music = Gdx.audio.newMusic(Gdx.files.internal("music.wav"));
-		music.setLooping(true);
 		
 		// create the camera and the SpriteBatch
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 400, 300);
+		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		zoomCamera=0;
 		zoomSpeed=10*DebugValues.getCameraZoomRate();
 		// create a Circle to logically represent Eve
-		eve = new Eve(new Circle(200, 150, 0), camera, DebugValues.getEveStartingBiomass());
+		eve = new Eve(new Circle(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 0), camera, DebugValues.getEveStartingBiomass());
 		addToMaps(eve);	
 		zoomLevel = (int)eve.getCircle().radius/16;
 		
@@ -90,9 +109,10 @@ public class GameScreen implements Screen {
 		paused = false;
 		displayHUD = false;
 		magnitudeConsuming = DebugValues.getMagnitudeConsuming();
-		foodAmount = 50;
+		
+		foodAmount = 100;
 		// spawn the first creature
-		spawnCreature();
+		while (!spawnCreature(1000));
 		for (int ii = 0; ii < foodAmount; ii++){
 			spawnFood();
 		}
@@ -147,8 +167,9 @@ public class GameScreen implements Screen {
 	/**
 	 * Spawn creature.
 	 */
-	private void spawnCreature() {
+	private boolean spawnCreature() {
 		int size;
+		
 		if (MathUtils.random(1,100)==100){
 			size = MathUtils.random(50, 400)*5;
 		}
@@ -161,11 +182,18 @@ public class GameScreen implements Screen {
 		else{
 			size = MathUtils.random(2, 3)*5;
 		}
+		return spawnCreature (size);
+	}
+	
+	private boolean spawnCreature (int size){
+		boolean spawned = false;
 		Creature creature = new Creature(new Circle(MathUtils.random(0, 2400), MathUtils.random(0, 1800), 0), size);
 		if (!creature.collidesWith(eve.getCircle())){
 			addToMaps(creature);
+			spawned = true;
+			lastSpawnTime = TimeUtils.nanoTime();
 		}
-		lastSpawnTime = TimeUtils.nanoTime();
+		return spawned;
 	}
 	
 	private void spawnFood() {
@@ -207,11 +235,11 @@ public class GameScreen implements Screen {
 		game.font.setScale(camera.zoom);
 		game.font.setUseIntegerPositions(false);
 		if (displayHUD){
-			game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-200*camera.zoom, camera.position.y+150*camera.zoom);
-			game.font.draw(game.batch, "Location: " + MathUtils.ceil(eve.getCircle().x) +", "+MathUtils.ceil(eve.getCircle().y), camera.position.x-200*camera.zoom+(250*camera.zoom), camera.position.y+150*camera.zoom);
-			game.font.draw(game.batch, "FPS: " + MathUtils.ceil(1/Gdx.graphics.getDeltaTime()), camera.position.x-200*camera.zoom+(250*camera.zoom), camera.position.y+150*camera.zoom-(20*camera.zoom));
+			game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-300*camera.zoom, camera.position.y+220*camera.zoom);
+			game.font.draw(game.batch, "Location: " + MathUtils.ceil(eve.getCircle().x) +", "+MathUtils.ceil(eve.getCircle().y), camera.position.x-300*camera.zoom+(230*camera.zoom), camera.position.y+220*camera.zoom);
+			game.font.draw(game.batch, "FPS: " + MathUtils.ceil(1/Gdx.graphics.getDeltaTime()), camera.position.x-200*camera.zoom+(400*camera.zoom), camera.position.y+220*camera.zoom);
 			if (zoomCamera>0){
-				game.font.draw(game.batch, "Zooming", camera.position.x-200*camera.zoom+(150*camera.zoom), camera.position.y+150*camera.zoom);
+				game.font.draw(game.batch, "Zooming", camera.position.x-300*camera.zoom+(230*camera.zoom), camera.position.y+220*camera.zoom-(20*camera.zoom));
 			}
 		}
 		for (Drawable drawable : drawables.values()) {
@@ -306,6 +334,7 @@ public class GameScreen implements Screen {
 	 */
 	@Override
 	public void resize(int width, int height) {
+		
 	}
 
 	/* (non-Javadoc)

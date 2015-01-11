@@ -15,7 +15,7 @@ public class DebugValues {
 	/** The spawn rate. */
 	private static int spawnRate = 2;
 	/** The initial camera zoom factor. */
-	private static float cameraZoomStart = 2;
+	private static float cameraZoomStart = 1;
 	/** The camera zoom rate. */
 	private static int cameraZoomRate = 1;
 	/** Toggls magnitude checks for consuming */
@@ -26,7 +26,7 @@ public class DebugValues {
 	/** The default spawn rate. */
 	private static int defaultSpawnRate = 1;
 	/** The default initial camera zoom. */
-	private static float defaultCameraZoomStart = .5f;
+	private static float defaultCameraZoomStart = .25f;
 	/** The default camera zoom rate. */
 	private static int defaultCameraZoomRate = 1;
 	/** Toggls magnitude checks for consuming */
@@ -65,7 +65,7 @@ public class DebugValues {
 			case 2:
 				eveStartingBiomass = 30;
 				spawnRate = 1;
-				cameraZoomStart = .5f;
+				cameraZoomStart = .25f;
 				cameraZoomRate = 1;
 				magnitudeConsuming = false;
 				break;

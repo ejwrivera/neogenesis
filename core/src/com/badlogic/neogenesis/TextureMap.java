@@ -53,6 +53,6 @@ public class TextureMap {
 	public static void dispose(){
 		creatureImage.dispose();
 		eveImage.dispose();
+		foodImage.dispose();
 	}
-	
 }
