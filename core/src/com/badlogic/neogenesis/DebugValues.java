@@ -20,6 +20,9 @@ public class DebugValues {
 	private static int cameraZoomRate = 1;
 	/** Toggls magnitude checks for consuming */
 	private static boolean magnitudeConsuming = false;
+	/** The default amount of starting food */
+	private static int foodAmount = 500;
+	
 	// default values
 	/** The default eve starting biomass. */
 	private static int defaultEveStartingBiomass = 10;
@@ -31,6 +34,8 @@ public class DebugValues {
 	private static int defaultCameraZoomRate = 1;
 	/** Toggls magnitude checks for consuming */
 	private static boolean defaultMagnitudeConsuming = true;
+	/** The default amount of starting food */
+	private static int defaultFoodAmount = 200;
 	
 	/**
 	 * Populate debug values.  For programmatically setting debug values
@@ -60,6 +65,7 @@ public class DebugValues {
 				cameraZoomStart = 2;
 				cameraZoomRate = 1;
 				magnitudeConsuming = false;
+				foodAmount = 500;
 				break;
 			// quick start
 			case 2:
@@ -68,6 +74,7 @@ public class DebugValues {
 				cameraZoomStart = .25f;
 				cameraZoomRate = 1;
 				magnitudeConsuming = false;
+				foodAmount = 200;
 				break;
 			default:
 		}
@@ -107,6 +114,10 @@ public class DebugValues {
 
 	public static boolean getMagnitudeConsuming() {
 		return debug ? magnitudeConsuming : defaultMagnitudeConsuming;
+	}
+	
+	public static int getFoodAmount(){
+		return debug ? foodAmount : defaultFoodAmount;
 	}
 	
 }

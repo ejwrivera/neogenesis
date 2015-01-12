@@ -95,7 +95,7 @@ public class GameScreen implements Screen {
 		displayHUD = false;
 		magnitudeConsuming = DebugValues.getMagnitudeConsuming();
 		
-		foodAmount = 200;
+		foodAmount = DebugValues.getFoodAmount();
 		// spawn the first mega creatures
 		while (!spawnCreature(1000));
 		while (!spawnCreature(2000));
