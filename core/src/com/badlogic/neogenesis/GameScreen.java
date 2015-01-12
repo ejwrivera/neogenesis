@@ -7,11 +7,8 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -57,12 +54,7 @@ public class GameScreen implements Screen {
 	private boolean paused;
 	/** Toggles the display of the info at the top, biomass and location */
 	private boolean displayHUD;
-	/** The shader */
-	private ShaderProgram shader;
-	/** The shader attributes */
-	private ShaderAttributes shaderAttributes;
-	/** The sprite batch */
-	private SpriteBatch batch;
+	
 	
 	
 	/**
@@ -76,16 +68,9 @@ public class GameScreen implements Screen {
 		DebugValues.populateDebugValues(2); // 1 = godzilla mode, 2 = quick start
 		
 		// load the sound effect and music
-				sound = Gdx.audio.newSound(Gdx.files.internal("sound.wav"));
-				music = Gdx.audio.newMusic(Gdx.files.internal("music.wav"));
-				music.setLooping(true);
-		
-		// shader init
-		shaderAttributes = new ShaderAttributes();
-		shader = shaderAttributes.shader;
-		
-		batch = new SpriteBatch(1000, shader);
-		batch.setShader(shader);
+		sound = Gdx.audio.newSound(Gdx.files.internal("sound.wav"));
+		music = Gdx.audio.newMusic(Gdx.files.internal("music.wav"));
+		music.setLooping(true);
 		
 		// initialize maps
 		mobs = new ObjectMap<ID, Mobile>();
@@ -104,15 +89,16 @@ public class GameScreen implements Screen {
 		addToMaps(eve);	
 		zoomLevel = (int)eve.getCircle().radius/16;
 		
-		camera.translate(eve.getCircle().radius/4, eve.getCircle().radius/4);
+		//camera.translate(eve.getCircle().radius/4, eve.getCircle().radius/4);
 		camera.zoom*=DebugValues.getCameraZoomStart();
 		paused = false;
 		displayHUD = false;
 		magnitudeConsuming = DebugValues.getMagnitudeConsuming();
 		
-		foodAmount = 100;
-		// spawn the first creature
+		foodAmount = 200;
+		// spawn the first mega creatures
 		while (!spawnCreature(1000));
+		while (!spawnCreature(2000));
 		for (int ii = 0; ii < foodAmount; ii++){
 			spawnFood();
 		}
@@ -187,7 +173,7 @@ public class GameScreen implements Screen {
 	
 	private boolean spawnCreature (int size){
 		boolean spawned = false;
-		Creature creature = new Creature(new Circle(MathUtils.random(0, 2400), MathUtils.random(0, 1800), 0), size);
+		Creature creature = new Creature(new Circle(MathUtils.random(0, 4800), MathUtils.random(0, 3600), 0), size);
 		if (!creature.collidesWith(eve.getCircle())){
 			addToMaps(creature);
 			spawned = true;
@@ -242,6 +228,13 @@ public class GameScreen implements Screen {
 				game.font.draw(game.batch, "Zooming", camera.position.x-300*camera.zoom+(230*camera.zoom), camera.position.y+220*camera.zoom-(20*camera.zoom));
 			}
 		}
+				
+		ShaderAttributes.LIGHT_POS.x=.38f;
+		ShaderAttributes.LIGHT_POS.y=.34f;	
+		//send a Vector4f to GLSL
+		game.shader.setUniformf("LightPos", ShaderAttributes.LIGHT_POS);
+		
+		
 		for (Drawable drawable : drawables.values()) {
 			Circle drawBox = drawable.getCircle();
 			game.batch.draw(drawable.getTexture(), drawBox.x-drawBox.radius, drawBox.y-drawBox.radius, drawBox.radius*2, drawBox.radius*2);
@@ -334,7 +327,8 @@ public class GameScreen implements Screen {
 	 */
 	@Override
 	public void resize(int width, int height) {
-		
+		game.batch.setProjectionMatrix(camera.combined);
+		game.shaderResize(width, height);
 	}
 
 	/* (non-Javadoc)

@@ -44,8 +44,8 @@ public class MainMenuScreen implements Screen {
 	public MainMenuScreen(final Neogenesis game) {
 		this.game = game;
 		camera = new OrthographicCamera();
-		winWidth = 800;
-		winHeight = 600;
+		winWidth = 640;
+		winHeight = 480;
 		camera.setToOrtho(false, winWidth, winHeight);
 	}
 
@@ -62,10 +62,10 @@ public class MainMenuScreen implements Screen {
 		camera.update();
 		game.batch.setProjectionMatrix(camera.combined);
 
-		game.batch.begin();
-		game.font.draw(game.batch, String.valueOf(clocktick), 100, 550);
-		game.font.draw(game.batch, "Neogenesis ", 100, 150);
-		game.font.draw(game.batch, "---", 100, 100);
+		game.batch.begin(); 
+		game.font.draw(game.batch, String.valueOf(clocktick), 80, 440);
+		game.font.draw(game.batch, "Neogenesis ", 80, 120);
+		game.font.draw(game.batch, "---", 80, 80);
 		clocktick++;
 		game.batch.end();
 	}
