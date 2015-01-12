@@ -9,37 +9,47 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.TimeUtils;
 
+/**
+ * The Class GameWorld.
+ */
 public class GameWorld {
 	/** The eve. */
 	private Eve eve;	
-	/** The mobs. */
+	/** The mobile objects. */
 	private ObjectMap<ID, Mobile> mobs;	
 	/** The consumers. */
 	private ObjectMap<ID, Consumer> consumers;
 	/** The consumables. */
 	private ObjectMap<ID, Consumable> consumables;
-	/** The collidables. */
+	/** Things to check for collision. */
 	private ObjectMap<ID, Collidable> collidables;
-	/** The drawables. */
+	/** Things to draw. */
 	private ObjectMap<ID, Drawable> drawables;
 	/** The last spawn time. */
 	private long lastSpawnTime;
 	/** The starting amount of Food. */
 	private int foodAmount;
-	/** Toggles whether magnitude is checked for consuming */
+	
+	/**  Toggles whether magnitude is checked for consuming. */
 	private boolean magnitudeConsuming;
-	/** Toggles the display of the info at the top, biomass and location */
+	
+	/**  Toggles the display of the info at the top, biomass and location. */
 	public boolean displayHUD;
 	/** Toggles if the game paused. */
 	public boolean paused;
+	/** Used to determine when the game is over. */
 	public boolean gameOver;
+	/** Used to determine when the game is exited. */
 	public boolean gameExit;
 	
+	/** The sound stack. */
 	public int soundStack;
 
 	/**
 	 * Instantiates a new game screen.
+	 *
 	 * @param game the game
+	 * @param loadGame the load game
 	 */
 	public GameWorld(final Neogenesis game, boolean loadGame) {
 		DebugValues.debug=true; // set to true to use current debug values
@@ -52,18 +62,13 @@ public class GameWorld {
 		collidables = new ObjectMap<ID, Collidable>();
 		drawables = new ObjectMap<ID, Drawable>();
 		
-		// create a Circle to logically represent Eve
-		int biomass;
-		if (loadGame){
-			biomass = game.saveManager.loadDataValue("biomass",int.class);
-		}
-		else {
-			biomass = DebugValues.getEveStartingBiomass();
-		}
+		// create Eve
+		int biomass = (Integer) (loadGame ? game.saveManager.loadDataValue("biomass",int.class) : DebugValues.getEveStartingBiomass());
 		
 		eve = new Eve(new Circle(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 0), biomass);
 		addToMaps(eve);	
 	
+		// initialize flags
 		displayHUD = false;
 		paused = false;
 		gameOver = false;
@@ -75,6 +80,7 @@ public class GameWorld {
 		// spawn the first mega creatures
 		while (!spawnCreature(1000));
 		while (!spawnCreature(2000));
+		// spawn the food
 		for (int ii = 0; ii < foodAmount; ii++){
 			spawnFood();
 		}
@@ -83,7 +89,7 @@ public class GameWorld {
 
 	/**
 	 * Adds a creature to the maps.
-	 * @param id the id of the creature
+	 *
 	 * @param creature the creature
 	 */
 	private void addToMaps(Creature creature) {
@@ -93,18 +99,17 @@ public class GameWorld {
 		collidables.put(creature.getID(), creature);
 		drawables.put(creature.getID(), creature);
 	}
+	
 	/**
 	 * Adds a food to the maps.
-	 * @param id the id of the creature
-	 * @param creature the creature
+	 *
+	 * @param food the food
 	 */
 	private void addToMaps(Food food) {
 		consumables.put(food.getID(), food);
 		collidables.put(food.getID(), food);
 		drawables.put(food.getID(), food);
 	}
-	
-	
 	/**
 	 * Removes a creature from the maps.
 	 * @param id the id of the creature
@@ -129,6 +134,8 @@ public class GameWorld {
 	
 	/**
 	 * Spawn creature.
+	 *
+	 * @return true, if successful
 	 */
 	private boolean spawnCreature() {
 		int size;
@@ -148,6 +155,12 @@ public class GameWorld {
 		return spawnCreature (size);
 	}
 	
+	/**
+	 * Spawn creature.
+	 *
+	 * @param size the size
+	 * @return true, if successful
+	 */
 	private boolean spawnCreature (int size){
 		boolean spawned = false;
 		Creature creature = new Creature(new Circle(MathUtils.random(0, 4800), MathUtils.random(0, 3600), 0), size);
@@ -159,14 +172,19 @@ public class GameWorld {
 		return spawned;
 	}
 	
+	/**
+	 * Spawn food.
+	 */
 	private void spawnFood() {
 		addToMaps(new Food(5, new Circle(MathUtils.random(0, 2400), MathUtils.random(0, 1800), 4)));
 	}
 
+	/**
+	 * Game loop.
+	 */
 	public void gameLoop(){
 		if (Gdx.input.isKeyJustPressed(Keys.SPACE)){
 			paused = !paused;
-			System.out.println("EVE WHEN PAUSED IN GAMESCREEN:" + eve.position.x+","+eve.position.y);
 		}
 		if (Gdx.input.isKeyJustPressed(Keys.TAB)){
 			displayHUD=!displayHUD;
@@ -179,6 +197,9 @@ public class GameWorld {
 		}
 	}
 	
+	/**
+	 * Game increment.
+	 */
 	public void gameIncrement(){
 		eve.setInput(Gdx.input);
 		// move the creatures
@@ -233,6 +254,11 @@ public class GameWorld {
 		}
 	}
 
+	/**
+	 * Generate consumable magnitude map.
+	 *
+	 * @return the map of integer to consumables in that size class
+	 */
 	private IntMap<ObjectSet<Consumable>> generateConsumableMagnitudeMap() {
 		IntMap<ObjectSet<Consumable>> magnitudeMap = new IntMap<ObjectSet<Consumable>>();
 		for (Consumable consumable: consumables.values()){
@@ -245,11 +271,20 @@ public class GameWorld {
 		return magnitudeMap;
 	}
 	
+	/**
+	 * Gets the drawables.
+	 *
+	 * @return the drawables for rendering
+	 */
 	public ObjectMap<ID, Drawable> getDrawables(){
 		return drawables;
 	}
-
-
+	
+	/**
+	 * Gets the eve.
+	 *
+	 * @return the eve
+	 */
 	public Eve getEve() {
 		return eve;
 	}
