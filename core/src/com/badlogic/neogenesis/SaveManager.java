@@ -23,7 +23,6 @@ public class SaveManager {
     
     private Save getSave(){
         Save save = new Save();
-        System.out.println(save);
         if(file.exists()){
 	        Json json = new Json();
 	        if(encoded)save = json.fromJson(Save.class, Base64Coder.decodeString(file.readString()));
@@ -40,7 +39,7 @@ public class SaveManager {
     }
     
     @SuppressWarnings("unchecked")
-    public <T> T loadDataValue(String key, Class type){
+    public <T> T loadDataValue(String key, Class<?> type){
         if(save.data.containsKey(key))return (T) save.data.get(key);
         else return null;   //this if() avoids and exception, but check for null on load.
     }
