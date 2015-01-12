@@ -3,7 +3,6 @@ package com.badlogic.neogenesis;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -15,17 +14,14 @@ public class Eve extends Creature {
 
 	/** The input. */
 	private Input input;
-	/** The camera. */
-	private OrthographicCamera camera;
 	
 	/**
 	 * Instantiates a new eve.
 	 * @param startPosAndSize the start pos and size
 	 * @param camera the camera
 	 */
-	public Eve(Circle startPosAndSize, OrthographicCamera camera){
+	public Eve(Circle startPosAndSize){
 		super(startPosAndSize);
-		this.camera = camera;
 		biomass = 10;
 		texture = TextureMap.getTexture("eve");
 	}
@@ -36,9 +32,8 @@ public class Eve extends Creature {
 	 * @param camera the camera
 	 * @param biomass the biomass
 	 */
-	public Eve(Circle startPosAndSize, OrthographicCamera camera, int biomass){
+	public Eve(Circle startPosAndSize, int biomass){
 		super(startPosAndSize, biomass);
-		this.camera = camera;
 		this.biomass = biomass;
 		position.radius=biomass/2;
 		texture = TextureMap.getTexture("eve");
@@ -73,14 +68,6 @@ public class Eve extends Creature {
 		// process user input
 		float oldX = position.x;
 		float oldY = position.y;
-		/*
-		if (input.isTouched()) {
-			Vector3 touchPos = new Vector3();
-			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-			camera.unproject(touchPos);
-			position.x = touchPos.x - 64 / 2;
-			position.y = touchPos.y - 64 / 2;
-		}*/
 		
 		// calculate the change in X
 		position.x += deltaX();
