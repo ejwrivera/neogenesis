@@ -203,6 +203,10 @@ public class GameScreen implements Screen {
 		if (Gdx.input.isKeyJustPressed(Keys.TAB)){
 			displayHUD=!displayHUD;
 		}
+		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)){
+			music.stop();
+			game.setScreen(new MainMenuScreen(game));
+		}
 		draw();
 		if (!paused){
 			gameIncrement();
