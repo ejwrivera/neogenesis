@@ -19,6 +19,8 @@ public class Neogenesis extends Game {
 	/** The shader attributes */
 	private ShaderAttributes shaderAttributes;
 	
+	public SaveManager saveManager;
+	
 	/* (non-Javadoc)
 	 * @see com.badlogic.gdx.ApplicationListener#create()
 	 */
@@ -33,6 +35,7 @@ public class Neogenesis extends Game {
 		// Use LibGDX's default Arial font.
 		font = new BitmapFont();
 		this.setScreen(new MainMenuScreen(this));
+		saveManager = new SaveManager(false);
 	}
 
 	/* (non-Javadoc)

@@ -61,7 +61,7 @@ public class GameScreen implements Screen {
 	 * Instantiates a new game screen.
 	 * @param game the game
 	 */
-	public GameScreen(final Neogenesis game) {
+	public GameScreen(final Neogenesis game, boolean loadGame) {
 		this.game = game;
 		
 		DebugValues.debug=true; // set to true to use current debug values
@@ -85,7 +85,15 @@ public class GameScreen implements Screen {
 		zoomCamera=0;
 		zoomSpeed=10*DebugValues.getCameraZoomRate();
 		// create a Circle to logically represent Eve
-		eve = new Eve(new Circle(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 0), camera, DebugValues.getEveStartingBiomass());
+		int biomass;
+		if (loadGame){
+			biomass = game.saveManager.loadDataValue("biomass",int.class);
+		}
+		else {
+			biomass = DebugValues.getEveStartingBiomass();
+		}
+		
+		eve = new Eve(new Circle(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 0), camera, biomass);
 		addToMaps(eve);	
 		zoomLevel = (int)eve.getCircle().radius/16;
 		
@@ -205,6 +213,7 @@ public class GameScreen implements Screen {
 		}
 		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)){
 			music.stop();
+			game.saveManager.saveDataValue("biomass", eve.getBiomass());
 			game.setScreen(new MainMenuScreen(game));
 		}
 		draw();

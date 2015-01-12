@@ -27,7 +27,8 @@ public class MainMenuScreen implements Screen {
 	/** The skin. */
 	private Skin skin = new Skin(Gdx.files.internal("uiskin.json"), new TextureAtlas(Gdx.files.internal("uiskin.atlas")));
 	/** The play an exit buttons */
-	private TextButton  buttonPlay = new TextButton("Play", skin),
+	private TextButton  buttonPlay = new TextButton("Begin", skin),
+						buttonContinue = new TextButton("Continue", skin),
 						buttonExit = new TextButton("Exit", skin);
 	/** The window width. */
 	private final int winWidth;
@@ -85,7 +86,13 @@ public class MainMenuScreen implements Screen {
 		buttonPlay.addListener(new ClickListener(){
 	        @Override
 	        public void clicked(InputEvent event, float x, float y) {
-	            ((Game)Gdx.app.getApplicationListener()).setScreen(new GameScreen(game));
+	            ((Game)Gdx.app.getApplicationListener()).setScreen(new GameScreen(game, false));
+	        }
+	    });
+		buttonContinue.addListener(new ClickListener(){
+	        @Override
+	        public void clicked(InputEvent event, float x, float y) {
+	        	((Game)Gdx.app.getApplicationListener()).setScreen(new GameScreen(game, true));
 	        }
 	    });
 	    buttonExit.addListener(new ClickListener(){
@@ -96,6 +103,7 @@ public class MainMenuScreen implements Screen {
 	    });
         //The buttons are displayed in this order from top to bottom
         table.add(buttonPlay).row();
+        table.add(buttonContinue).row();
         table.add(buttonExit).row();
 
         table.setFillParent(true);
