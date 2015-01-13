@@ -57,7 +57,7 @@ public class GameScreen implements Screen {
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		zoomCamera=0;
 		zoomSpeed=10*DebugValues.getCameraZoomRate();	
-		zoomLevel = (int)eve.getCircle().radius/16;
+		zoomLevel = 0;
 		
 		camera.zoom*=DebugValues.getCameraZoomStart();
 		paused = false;
@@ -122,12 +122,10 @@ public class GameScreen implements Screen {
 			}
 		}
 		if (eve.hasSense()){
-			System.out.println("LIGHT");
 			ShaderAttributes.LIGHT_POS.x=.38f;
 			ShaderAttributes.LIGHT_POS.y=.34f;	
 		}
 		else {
-			System.out.println("NO LIGHT");
 			ShaderAttributes.LIGHT_POS.x=-1f;
 			ShaderAttributes.LIGHT_POS.y=-1f;
 		}
