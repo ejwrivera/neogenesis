@@ -93,6 +93,8 @@ public class GameScreen implements Screen {
 		}
 		else if (world.gameOver){
 			music.stop();
+			camera.zoom=1;
+			game.font.setScale(camera.zoom);
 			game.setScreen(new GameOverScreen(game));
 		}
 		if (!paused){
@@ -119,9 +121,16 @@ public class GameScreen implements Screen {
 				game.font.draw(game.batch, "Zooming", camera.position.x-300*camera.zoom+(230*camera.zoom), camera.position.y+220*camera.zoom-(20*camera.zoom));
 			}
 		}
-				
-		ShaderAttributes.LIGHT_POS.x=.38f;
-		ShaderAttributes.LIGHT_POS.y=.34f;	
+		if (eve.hasSense()){
+			System.out.println("LIGHT");
+			ShaderAttributes.LIGHT_POS.x=.38f;
+			ShaderAttributes.LIGHT_POS.y=.34f;	
+		}
+		else {
+			System.out.println("NO LIGHT");
+			ShaderAttributes.LIGHT_POS.x=-1f;
+			ShaderAttributes.LIGHT_POS.y=-1f;
+		}
 		//send a Vector4f to GLSL
 		game.shader.setUniformf("LightPos", ShaderAttributes.LIGHT_POS);
 		

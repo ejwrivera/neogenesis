@@ -14,6 +14,7 @@ public class Eve extends Creature {
 
 	/** The input. */
 	private Input input;
+	private Boolean sense;
 	
 	/**
 	 * Instantiates a new eve.
@@ -21,9 +22,7 @@ public class Eve extends Creature {
 	 * @param camera the camera
 	 */
 	public Eve(Circle startPosAndSize){
-		super(startPosAndSize);
-		biomass = 10;
-		texture = TextureMap.getTexture("eve");
+		super(startPosAndSize, 10);
 	}
 	
 	/**
@@ -37,6 +36,7 @@ public class Eve extends Creature {
 		this.biomass = biomass;
 		position.radius=biomass/2;
 		texture = TextureMap.getTexture("eve");
+		sense = false;
 	}
 	
 	/**
@@ -59,6 +59,9 @@ public class Eve extends Creature {
 	 */
 	public void consume(Food food) {
 		super.consume(new Food(food.getNutrition()*2));
+		if (biomass+undigestedBiomass >=31){
+			sense = true;
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -105,6 +108,10 @@ public class Eve extends Creature {
 	}
 	private float maxVelocityLimited(float magnitude, float maxSpeed){
 		return magnitude > maxSpeed ? maxSpeed : magnitude < -maxSpeed ? -maxSpeed : magnitude;
+	}
+
+	public boolean hasSense() {
+		return sense;
 	}
 	
 }
