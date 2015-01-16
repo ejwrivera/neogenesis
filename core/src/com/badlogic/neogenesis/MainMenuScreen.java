@@ -76,6 +76,7 @@ public class MainMenuScreen implements Screen {
 	 */
 	@Override
 	public void resize(int width, int height) {
+		stage.getViewport().update(width, height, true);
 	}
 
 	/* (non-Javadoc)
@@ -110,8 +111,9 @@ public class MainMenuScreen implements Screen {
         stage.addActor(table);
 
         Gdx.input.setInputProcessor(stage);
-    }
 
+    }
+	
 	/* (non-Javadoc)
 	 * @see com.badlogic.gdx.Screen#hide()
 	 */
