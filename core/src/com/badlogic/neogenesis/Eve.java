@@ -14,14 +14,13 @@ public class Eve extends Creature {
 	/** The input. */
 	private Input input;
 	private Boolean sense;
-	
 	/**
 	 * Instantiates a new eve.
 	 * @param startPosAndSize the start pos and size
 	 * @param camera the camera
 	 */
 	public Eve(Vector2 startPos){
-		super(startPos, 10);
+		this(startPos, 10);
 	}
 	
 	/**
@@ -69,10 +68,17 @@ public class Eve extends Creature {
 		float oldX = position.x;
 		float oldY = position.y;
 		
+		Vector3 mousePosition = CameraHandler.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+		
+		boolean left = input.isKeyPressed(Keys.LEFT) || (mousePosition.x < position.x && Gdx.input.isTouched());
+		boolean right = input.isKeyPressed(Keys.RIGHT) || (mousePosition.x > position.x && Gdx.input.isTouched());
+		boolean up = input.isKeyPressed(Keys.UP) || (mousePosition.y > position.y && Gdx.input.isTouched());
+		boolean down = 	input.isKeyPressed(Keys.DOWN) || (mousePosition.y < position.y && Gdx.input.isTouched());
+		
 		// calculate the change in X
-		position.x += delta(input.isKeyPressed(Keys.SHIFT_LEFT) ? 10 : 5, lastMovement.x, input.isKeyPressed(Keys.LEFT) ? "DECREASE" : input.isKeyPressed(Keys.RIGHT) ? "INCREASE" : "NONE" );
+		position.x += delta(input.isKeyPressed(Keys.SHIFT_LEFT) ? 10 : 5, lastMovement.x, left ? "DECREASE" : right ? "INCREASE" : "NONE" );
 		// calculate the change in Y
-		position.y += delta(input.isKeyPressed(Keys.SHIFT_LEFT) ? 10 : 5, lastMovement.y, input.isKeyPressed(Keys.DOWN) ? "DECREASE" : input.isKeyPressed(Keys.UP) ? "INCREASE" : "NONE");
+		position.y += delta(input.isKeyPressed(Keys.SHIFT_LEFT) ? 10 : 5, lastMovement.y, down ? "DECREASE" : up ? "INCREASE" : "NONE");
 
 		lastMovement = new Vector2(position.x-oldX, position.y-oldY);
 		
