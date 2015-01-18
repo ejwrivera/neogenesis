@@ -70,28 +70,20 @@ public class Eve extends Creature {
 		float oldY = position.y;
 		
 		// calculate the change in X
-		position.x += deltaX();
+		position.x += delta(input.isKeyPressed(Keys.SHIFT_LEFT) ? 10 : 5, lastMovement.x, input.isKeyPressed(Keys.LEFT) ? "DECREASE" : input.isKeyPressed(Keys.RIGHT) ? "INCREASE" : "NONE" );
 		// calculate the change in Y
-		position.y += deltaY();
+		position.y += delta(input.isKeyPressed(Keys.SHIFT_LEFT) ? 10 : 5, lastMovement.y, input.isKeyPressed(Keys.DOWN) ? "DECREASE" : input.isKeyPressed(Keys.UP) ? "INCREASE" : "NONE");
 
 		lastMovement = new Vector2(position.x-oldX, position.y-oldY);
 		
 		return new Vector3(lastMovement, 0);
 	}
 	
-	private float deltaX(){
-		float delta=lastMovement.x;
-		if (input.isKeyPressed(Keys.LEFT)||input.isKeyPressed(Keys.RIGHT)){   
-			delta += input.isKeyPressed(Keys.LEFT) ? -10 * Gdx.graphics.getDeltaTime() : 10 * Gdx.graphics.getDeltaTime();
-		}
-		delta += applyFriction(delta);
-		return maxVelocityLimited(delta);
-	}
-	private float deltaY(){
-		float delta=lastMovement.y;
-		if (input.isKeyPressed(Keys.DOWN)||input.isKeyPressed(Keys.UP)){   
-			delta += input.isKeyPressed(Keys.DOWN) ? -10 * Gdx.graphics.getDeltaTime() : 10 * Gdx.graphics.getDeltaTime();
-		}
+	private float delta(int acceleration, float momentum, String input){
+		float delta = momentum;
+		delta += input.equals("DECREASE") ? -acceleration * Gdx.graphics.getDeltaTime() 
+				: input.equals("INCREASE") ? acceleration * Gdx.graphics.getDeltaTime()
+				: 0;
 		delta += applyFriction(delta);
 		return maxVelocityLimited(delta);
 	}
