@@ -3,7 +3,6 @@ package com.badlogic.neogenesis;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
@@ -21,8 +20,8 @@ public class Eve extends Creature {
 	 * @param startPosAndSize the start pos and size
 	 * @param camera the camera
 	 */
-	public Eve(Circle startPosAndSize){
-		super(startPosAndSize, 10);
+	public Eve(Vector2 startPos){
+		super(startPos, 10);
 	}
 	
 	/**
@@ -31,10 +30,8 @@ public class Eve extends Creature {
 	 * @param camera the camera
 	 * @param biomass the biomass
 	 */
-	public Eve(Circle startPosAndSize, int biomass){
-		super(startPosAndSize, biomass);
-		this.biomass = biomass;
-		position.radius=biomass/2;
+	public Eve(Vector2 startPos, int biomass){
+		super(startPos, biomass);
 		texture = TextureMap.getTexture("eve");
 		sense = false;
 	}

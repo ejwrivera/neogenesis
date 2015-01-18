@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -65,7 +66,7 @@ public class GameWorld {
 		// create Eve
 		int biomass = (Integer) (loadGame ? game.saveManager.loadDataValue("biomass",int.class) : DebugValues.getEveStartingBiomass());
 		
-		eve = new Eve(new Circle(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 0), biomass);
+		eve = new Eve(new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2), biomass);
 		addToMaps(eve);	
 	
 		// initialize flags
@@ -163,7 +164,7 @@ public class GameWorld {
 	 */
 	private boolean spawnCreature (int size){
 		boolean spawned = false;
-		Creature creature = new Creature(new Circle(MathUtils.random(0, 4800), MathUtils.random(0, 3600), 0), size);
+		Creature creature = new Creature(new Vector2(MathUtils.random(0, 4800), MathUtils.random(0, 3600)), size);
 		if (!creature.collidesWith(eve.getCircle())){
 			addToMaps(creature);
 			spawned = true;

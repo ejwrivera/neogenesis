@@ -32,8 +32,8 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	 * Instantiates a new creature.
 	 * @param startPosAndSize the start pos and size
 	 */
-	public Creature(Circle startPosAndSize){
-		this(startPosAndSize, 5);
+	public Creature(Vector2 startPos){
+		this(startPos, 5);
 	}
 	
 	/**
@@ -41,13 +41,12 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	 * @param startPosAndSize the start pos and size
 	 * @param biomass the biomass
 	 */
-	public Creature(Circle startPosAndSize, int biomass){
-		position = startPosAndSize;
+	public Creature(Vector2 startPos, int biomass){
+		position = new Circle(startPos, biomass/2);
 		id = IDFactory.getNewID();
 		this.biomass = biomass;
 		texture = TextureMap.getTexture("creature");
 		lastMovement = new Vector2(0, 0);
-		position.radius=biomass;
 		undigestedBiomass = 0;
 		AI = new HerbivoreAI();
 	}
