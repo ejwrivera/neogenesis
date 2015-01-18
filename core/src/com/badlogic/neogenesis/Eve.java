@@ -5,6 +5,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 
 /**
  * The Class Eve. Player character class - for camera locking and player movement input
@@ -13,7 +15,8 @@ public class Eve extends Creature {
 
 	/** The input. */
 	private Input input;
-	private Boolean sense;
+	private ObjectMap<String, Boolean> abilities;
+	private ObjectMap<String, Boolean> availableAbilities;
 	/**
 	 * Instantiates a new eve.
 	 * @param startPosAndSize the start pos and size
@@ -32,7 +35,12 @@ public class Eve extends Creature {
 	public Eve(Vector2 startPos, int biomass){
 		super(startPos, biomass);
 		texture = TextureMap.getTexture("eve");
-		sense = false;
+		abilities = new ObjectMap<String, Boolean>();
+		availableAbilities = new ObjectMap<String, Boolean>();
+		abilities.put("sense", false);
+		abilities.put("boost", false);
+		availableAbilities.put("sense", false);
+		availableAbilities.put("boost", false);
 	}
 	
 	/**
@@ -55,8 +63,11 @@ public class Eve extends Creature {
 	 */
 	public void consume(Food food) {
 		super.consume(new Food(food.getNutrition()*2));
-		if (biomass+undigestedBiomass >=31){
-			sense = true;
+		if (biomass+undigestedBiomass >=31 && !(abilities.get("sense")||availableAbilities.get("sense"))){
+			availableAbilities.put("sense", true);
+		}
+		if (biomass+undigestedBiomass >=35 && !abilities.get("boost")){
+			availableAbilities.put("boost", true);
 		}
 	}
 	
@@ -76,9 +87,9 @@ public class Eve extends Creature {
 		boolean down = 	input.isKeyPressed(Keys.DOWN) || (mousePosition.y < position.y && Gdx.input.isTouched());
 		
 		// calculate the change in X
-		position.x += delta(input.isKeyPressed(Keys.SHIFT_LEFT) ? 10 : 5, lastMovement.x, left ? "DECREASE" : right ? "INCREASE" : "NONE" );
+		position.x += delta(input.isKeyPressed(Keys.SHIFT_LEFT)&&abilities.get("boost") ? 10 : 5, lastMovement.x, left ? "DECREASE" : right ? "INCREASE" : "NONE" );
 		// calculate the change in Y
-		position.y += delta(input.isKeyPressed(Keys.SHIFT_LEFT) ? 10 : 5, lastMovement.y, down ? "DECREASE" : up ? "INCREASE" : "NONE");
+		position.y += delta(input.isKeyPressed(Keys.SHIFT_LEFT)&&abilities.get("boost") ? 10 : 5, lastMovement.y, down ? "DECREASE" : up ? "INCREASE" : "NONE");
 
 		lastMovement = new Vector2(position.x-oldX, position.y-oldY);
 		
@@ -106,7 +117,22 @@ public class Eve extends Creature {
 	}
 
 	public boolean hasSense() {
-		return sense;
+		return abilities.get("sense");
+	}
+
+	public Array<String> getAvailableUpgrades() {
+		Array<String> upgrades = new Array<String>();
+		for (String potential: availableAbilities.keys()){
+			if (availableAbilities.get(potential)){
+				upgrades.add(potential);
+			}
+		}
+		return upgrades;
+	}
+
+	public void addUpgrade(String upgrade) {
+		abilities.put(upgrade, true);
+		availableAbilities.put(upgrade, false);
 	}
 	
 }

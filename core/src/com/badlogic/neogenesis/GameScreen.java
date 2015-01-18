@@ -6,8 +6,17 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.OrderedMap;
 /**
  * The Class GameScreen. For displaying the primary game screen - should be as logic-less as possible.
  */
@@ -15,6 +24,10 @@ public class GameScreen implements Screen {
 	
 	/** The game. */
 	final private Neogenesis game;
+	/** The stage. */
+	private Stage stage = new Stage();
+	/** The table. */
+	private Table upgradeTable = new Table();
 	/** The sound. */
 	private Sound sound;
 	/** The music. */
@@ -23,6 +36,10 @@ public class GameScreen implements Screen {
 	private OrthographicCamera camera;
 	/** The eve. */
 	private Eve eve;	
+	/** The skin. */
+	private Skin skin = new Skin(Gdx.files.internal("uiskin.json"), new TextureAtlas(Gdx.files.internal("uiskin.atlas")));
+	/** The buttons to select upgrades. */
+	private OrderedMap<TextButton, String> upgradeButtons;
 	/** The zoom camera. */
 	private int zoomCamera;
 	/** The zoom speed. */
@@ -52,7 +69,8 @@ public class GameScreen implements Screen {
 		music = Gdx.audio.newMusic(Gdx.files.internal("music.wav"));
 		music.setLooping(true);
 				
-		// create the camera and the SpriteBatch
+		// create the camera and the SpriteBatch and buttons
+		upgradeButtons = new OrderedMap<TextButton, String>();
 		camera = new OrthographicCamera();
 		CameraHandler.camera = camera;
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -62,6 +80,12 @@ public class GameScreen implements Screen {
 		
 		camera.zoom*=DebugValues.getCameraZoomStart();
 		paused = false;
+		
+		upgradeTable.setFillParent(true);
+		upgradeTable.setPosition(-260, 0);
+        stage.addActor(upgradeTable);
+
+        Gdx.input.setInputProcessor(stage);
 		
 	}
 
@@ -80,11 +104,11 @@ public class GameScreen implements Screen {
 				music.play();
 			}
 		}
+		paused = world.paused;
 		while (world.soundStack>0){
 			sound.play();
 			world.soundStack--;
 		}
-		paused = world.paused;
 		if (world.gameExit){
 			music.stop();
 			game.saveManager.saveDataValue("biomass", eve.getBiomass());
@@ -109,6 +133,10 @@ public class GameScreen implements Screen {
 	public void draw(){
 		Gdx.gl.glClearColor(0, .2f, .4f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
+		stage.act();
+        stage.draw();
+		
 		camera.update();
 		// render in the coordinate system specified by the camera.
 		game.batch.setProjectionMatrix(camera.combined);
@@ -135,7 +163,29 @@ public class GameScreen implements Screen {
 		//send a Vector4f to GLSL
 		game.shader.setUniformf("LightPos", ShaderAttributes.LIGHT_POS);
 		
+		for (String upgrade: eve.getAvailableUpgrades()){
+			if (!upgradeButtons.containsValue(upgrade, true)){
+				TextButton newButton = new TextButton(upgrade, skin);
+				upgradeButtons.put(newButton, upgrade);
+			}
+		}
 		
+		Array<TextButton> toRemove = new Array<TextButton>();
+		for (TextButton button: upgradeButtons.keys()){
+			for (EventListener listener: button.getListeners()){
+				if (((ClickListener) listener).isPressed()){
+					eve.addUpgrade(upgradeButtons.get(button));
+					toRemove.add(button);
+				}	
+			}
+			upgradeTable.add(button).row();
+		}
+		for (TextButton button: toRemove){
+			upgradeTable.removeActor(button);
+			upgradeButtons.remove(button);
+		}
+		
+        
 		for (Drawable drawable : world.getDrawables().values()) {
 			Circle drawBox = drawable.getCircle();
 			game.batch.draw(drawable.getTexture(), drawBox.x-drawBox.radius, drawBox.y-drawBox.radius, drawBox.radius*2, drawBox.radius*2);
