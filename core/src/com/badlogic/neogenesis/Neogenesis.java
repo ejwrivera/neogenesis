@@ -20,6 +20,7 @@ public class Neogenesis extends Game {
 	private ShaderAttributes shaderAttributes;
 	
 	public SaveManager saveManager;
+	private boolean shaderOn;
 	
 	/* (non-Javadoc)
 	 * @see com.badlogic.gdx.ApplicationListener#create()
@@ -29,15 +30,28 @@ public class Neogenesis extends Game {
 		shaderAttributes = new ShaderAttributes();
 		shader = shaderAttributes.shader;
 			
-		//batch = new SpriteBatch();
-		batch = new SpriteBatch(1000, shader);
-		batch.setShader(shader);
+		shaderOn = false;
+		batch = new SpriteBatch();
+		
 		// Use LibGDX's default Arial font.
 		font = new BitmapFont();
 		this.setScreen(new MainMenuScreen(this));
 		saveManager = new SaveManager(false);
 	}
 
+	public void toggleShader(){
+		if (shaderOn){
+			shaderOn = false;
+			batch = new SpriteBatch();
+		}
+		else{
+			shaderOn = true;
+			batch = new SpriteBatch(1000, shader);
+			batch.setShader(shader);
+		}
+			
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.badlogic.gdx.Game#render()
 	 */

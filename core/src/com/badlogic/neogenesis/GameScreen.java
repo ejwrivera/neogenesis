@@ -90,12 +90,14 @@ public class GameScreen implements Screen {
 			game.saveManager.saveDataValue("biomass", eve.getBiomass());
 			camera.zoom=1;
 			game.font.setScale(camera.zoom);
+			game.toggleShader();
 			game.setScreen(new MainMenuScreen(game));
 		}
 		else if (world.gameOver){
 			music.stop();
 			camera.zoom=1;
 			game.font.setScale(camera.zoom);
+			game.toggleShader();
 			game.setScreen(new GameOverScreen(game));
 		}
 		if (!paused){
