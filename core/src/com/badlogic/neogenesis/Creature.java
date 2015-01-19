@@ -115,9 +115,11 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	 */
 	@Override
 	public Vector3 move() {
-		if (MathUtils.random(1,20)==20){
-			AI.amble(position);
-		}else {
+		if (MathUtils.random(1,50)==50){
+			lastMovement = AI.amble(position);
+			position.x+=lastMovement.x;
+			position.y+=lastMovement.y;
+		} else {
 			lastMovement = AI.forage(position);
 			position.x+=lastMovement.x;
 			position.y+=lastMovement.y;

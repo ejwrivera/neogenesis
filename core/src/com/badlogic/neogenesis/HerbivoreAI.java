@@ -16,15 +16,12 @@ public class HerbivoreAI implements AI {
 	public Vector2 amble(Circle position) {
 		int rand = MathUtils.random(0, 9);
 		switch (rand){
-			case 0: case 1: case 2: case 3: case 4: case 5: case 6:
-				break;
-			case 7:
-			case 8:
-				float oldX = position.x;
-				float oldY = position.y;
-				position.x += MathUtils.random(-50, 50) * Gdx.graphics.getDeltaTime();
-				position.y += MathUtils.random(-50, 50) * Gdx.graphics.getDeltaTime();
-				lastMovement = new Vector2(position.x-oldX, position.y-oldY);
+			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
+				Vector2 oldPosition = new Vector2(position.x, position.y);
+				Vector2 movement = new Vector2(80 * Gdx.graphics.getDeltaTime(), 0);
+				movement = movement.rotate(MathUtils.random(1, 360));
+				Vector2 newPosition = new Vector2(oldPosition).add(movement);
+				lastMovement = new Vector2(newPosition.x-oldPosition.x, newPosition.y-oldPosition.y);
 				break;
 			case 9:
 				lastMovement = new Vector2(0,0);
@@ -36,14 +33,6 @@ public class HerbivoreAI implements AI {
 
 	@Override
 	public Vector2 forage(Circle position) {
-		int rand = MathUtils.random(0, 9);
-		switch (rand){
-			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
-				break;
-			case 9:
-				lastMovement = new Vector2(0,0);
-				break;
-		}
 		return lastMovement;
 	}
 

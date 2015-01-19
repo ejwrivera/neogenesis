@@ -110,6 +110,7 @@ public class GameWorld {
 		consumables.put(food.getID(), food);
 		collidables.put(food.getID(), food);
 		drawables.put(food.getID(), food);
+		mobs.put(food.getID(), food);
 	}
 	/**
 	 * Removes a creature from the maps.
