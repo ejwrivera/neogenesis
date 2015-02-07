@@ -18,6 +18,7 @@ public class Eve extends Creature {
 	private ObjectMap<String, Boolean> availableAbilities;
 	private ObjectMap<String, Integer> availableAbilitiesCost;
 	private int usedBiomass;
+	
 	/**
 	 * Instantiates a new eve.
 	 * @param startPosAndSize the start pos and size
@@ -39,10 +40,12 @@ public class Eve extends Creature {
 		availableAbilitiesCost = new ObjectMap<String, Integer>();
 		availableAbilities.put("sense", false);
 		availableAbilities.put("boost", false);
+		availableAbilities.put("impetus", false);
 		availableAbilities.put("photosynthesis", false);
 		availableAbilitiesCost.put("sense", 10);
-		availableAbilitiesCost.put("boost", 5);
-		availableAbilitiesCost.put("photosynthesis", 30);
+		availableAbilitiesCost.put("boost", 20);
+		availableAbilitiesCost.put("impetus", 10);
+		availableAbilitiesCost.put("photosynthesis", 50);
 		usedBiomass = 0;
 	}
 	
@@ -72,6 +75,9 @@ public class Eve extends Creature {
 		if (biomass+undigestedBiomass >=36 && !(abilities.get("boost")||availableAbilities.get("boost"))){
 			availableAbilities.put("boost", true);
 		}
+		if (biomass+undigestedBiomass >=36 && !(abilities.get("impetus")||availableAbilities.get("impetus"))){
+			availableAbilities.put("impetus", true);
+		}
 		if (biomass+undigestedBiomass >=40 && !(abilities.get("photosynthesis")||availableAbilities.get("photosynthesis"))){
 			availableAbilities.put("photosynthesis", true);
 		}
@@ -92,10 +98,22 @@ public class Eve extends Creature {
 		boolean up = input.isKeyPressed(Keys.UP) || (mousePosition.y > position.y && Gdx.input.isTouched());
 		boolean down = 	input.isKeyPressed(Keys.DOWN) || (mousePosition.y < position.y && Gdx.input.isTouched());
 		
+		if (impetusAmount > 0){
+			impetusAmount++;
+		}
+		if (impetusAmount==32){
+			impetusAmount=0;
+		}
+		
+		if (input.isKeyPressed(Keys.CONTROL_LEFT) && impetusAmount==0 && abilities.get("impetus")){
+			impetusAmount = 1;
+		}
+		
+		int movement = impetusAmount+(input.isKeyPressed(Keys.SHIFT_LEFT)&&abilities.get("boost") ? 10 : 5);
 		// calculate the change in X
-		position.x += delta(input.isKeyPressed(Keys.SHIFT_LEFT)&&abilities.get("boost") ? 10 : 5, lastMovement.x, left ? "DECREASE" : right ? "INCREASE" : "NONE" );
+		position.x += delta(movement, lastMovement.x, left ? "DECREASE" : right ? "INCREASE" : "NONE" );
 		// calculate the change in Y
-		position.y += delta(input.isKeyPressed(Keys.SHIFT_LEFT)&&abilities.get("boost") ? 10 : 5, lastMovement.y, down ? "DECREASE" : up ? "INCREASE" : "NONE");
+		position.y += delta(movement, lastMovement.y, down ? "DECREASE" : up ? "INCREASE" : "NONE");
 
 		lastMovement = new Vector2(position.x-oldX, position.y-oldY);
 		

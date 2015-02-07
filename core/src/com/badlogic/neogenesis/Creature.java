@@ -26,6 +26,8 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	public Texture texture;
 	/** The biomass in the creature's belly. */
 	protected int undigestedBiomass;
+		
+	protected int impetusAmount;
 	
 	protected int clocktick;
 	
@@ -58,6 +60,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 		abilities.put("sense", false);
 		abilities.put("boost", false);
 		abilities.put("photosynthesis", false);
+		abilities.put("impetus", false);
 		
 		clocktick = 0;
 		
@@ -131,7 +134,6 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	 */
 	@Override
 	public Vector3 move() {
-		
 		if (MathUtils.random(1,50)==50){
 			lastMovement = AI.amble(position);
 			position.x+=lastMovement.x;
