@@ -6,6 +6,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Circle;
@@ -51,6 +52,8 @@ public class GameScreen implements Screen {
 	/** The game world where all business logic takes place. */
 	private GameWorld world;
 	
+	private Texture unusedBiomassTexture;
+	private Texture usedBiomassTexture;
 	/**
 	 * Instantiates a new game screen.
 	 * @param game the game
@@ -86,7 +89,8 @@ public class GameScreen implements Screen {
         stage.addActor(upgradeTable);
 
         Gdx.input.setInputProcessor(stage);
-		
+        unusedBiomassTexture = TextureMap.getTexture("unused_biomass");
+        usedBiomassTexture = TextureMap.getTexture("used_biomass");
 	}
 
 	/* (non-Javadoc)
@@ -137,21 +141,55 @@ public class GameScreen implements Screen {
 		stage.act();
         stage.draw();
 		
+        game.batch.begin();
+        camera.update();
+        game.batch.setProjectionMatrix(camera.combined);
+		for (Drawable drawable : world.getDrawables().values()) {
+			Circle drawBox = drawable.getCircle();
+			game.batch.draw(drawable.getTexture(), drawBox.x-drawBox.radius, drawBox.y-drawBox.radius, drawBox.radius*2, drawBox.radius*2);
+		}
+        game.batch.end();
+        
+        game.toggleShader();
+        
+        game.batch.begin();
+		
 		camera.update();
 		// render in the coordinate system specified by the camera.
 		game.batch.setProjectionMatrix(camera.combined);
 		// begin a new batch and draw Eve and all the creatures
-		game.batch.begin();
+		
+		
 		game.font.setScale(camera.zoom);
 		game.font.setUseIntegerPositions(false);
 		if (world.displayHUD){
 			game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-300*camera.zoom, camera.position.y+220*camera.zoom);
+			int biomassDisplay = eve.getBiomass();
+			int usedBiomass = eve.getUsedBiomass();
+			int displayLevel = 10000;
+			float biomassDisplayX = camera.position.x-300*camera.zoom;
+			float biomassDisplayY = camera.position.y+150*camera.zoom;
+			
+			while(biomassDisplay>0){
+				while(biomassDisplay < displayLevel){
+					biomassDisplayY+=5*camera.zoom;
+					displayLevel/=10;	
+				}
+				// 50 when camera zoom is 1 and displayLevel = 10000
+				float biomassSize = MathUtils.log(10, displayLevel*10)*10*camera.zoom;
+				
+				game.batch.draw(usedBiomass>0 ? usedBiomassTexture : unusedBiomassTexture, biomassDisplayX, biomassDisplayY, biomassSize, biomassSize);
+				biomassDisplayX += biomassSize;
+				biomassDisplay-=displayLevel;
+				usedBiomass-=displayLevel;
+			}
 			game.font.draw(game.batch, "Location: " + MathUtils.ceil(eve.getCircle().x) +", "+MathUtils.ceil(eve.getCircle().y), camera.position.x-300*camera.zoom+(230*camera.zoom), camera.position.y+220*camera.zoom);
 			game.font.draw(game.batch, "FPS: " + MathUtils.ceil(1/Gdx.graphics.getDeltaTime()), camera.position.x-200*camera.zoom+(400*camera.zoom), camera.position.y+220*camera.zoom);
 			if (zoomCamera>0){
 				game.font.draw(game.batch, "Zooming", camera.position.x-300*camera.zoom+(230*camera.zoom), camera.position.y+220*camera.zoom-(20*camera.zoom));
 			}
 		}
+		
 		if (eve.hasSense()){
 			ShaderAttributes.LIGHT_POS.x=.38f;
 			ShaderAttributes.LIGHT_POS.y=.34f;	
@@ -184,14 +222,8 @@ public class GameScreen implements Screen {
 			upgradeTable.removeActor(button);
 			upgradeButtons.remove(button);
 		}
-		
-        
-		for (Drawable drawable : world.getDrawables().values()) {
-			Circle drawBox = drawable.getCircle();
-			game.batch.draw(drawable.getTexture(), drawBox.x-drawBox.radius, drawBox.y-drawBox.radius, drawBox.radius*2, drawBox.radius*2);
-		}
 		game.batch.end();
-		
+		game.toggleShader();
 	}
 
 	public void orientCamera(){

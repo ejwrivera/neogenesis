@@ -16,6 +16,8 @@ public class Eve extends Creature {
 	/** The input. */
 	private Input input;
 	private ObjectMap<String, Boolean> availableAbilities;
+	private ObjectMap<String, Integer> availableAbilitiesCost;
+	private int usedBiomass;
 	/**
 	 * Instantiates a new eve.
 	 * @param startPosAndSize the start pos and size
@@ -34,9 +36,14 @@ public class Eve extends Creature {
 		super(startPos, biomass);
 		texture = TextureMap.getTexture("eve");
 		availableAbilities = new ObjectMap<String, Boolean>();
+		availableAbilitiesCost = new ObjectMap<String, Integer>();
 		availableAbilities.put("sense", false);
 		availableAbilities.put("boost", false);
 		availableAbilities.put("photosynthesis", false);
+		availableAbilitiesCost.put("sense", 10);
+		availableAbilitiesCost.put("boost", 5);
+		availableAbilitiesCost.put("photosynthesis", 30);
+		usedBiomass = 0;
 	}
 	
 	/**
@@ -132,6 +139,10 @@ public class Eve extends Creature {
 	public void addUpgrade(String upgrade) {
 		abilities.put(upgrade, true);
 		availableAbilities.put(upgrade, false);
-	}
+		usedBiomass+=availableAbilitiesCost.get(upgrade);
+	}	
 	
+	public int getUsedBiomass(){
+		return usedBiomass;
+	}
 }
