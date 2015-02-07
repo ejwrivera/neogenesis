@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.ObjectSet.ObjectSetIterator;
 
@@ -20,11 +21,15 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	/** The creature's id. */
 	protected ID id;
 	/** The creature's biomass. */
-	protected Integer biomass;
+	protected int biomass;
 	/** The creature's texture. */
 	public Texture texture;
 	/** The biomass in the creature's belly. */
-	protected Integer undigestedBiomass;
+	protected int undigestedBiomass;
+	
+	protected int clocktick;
+	
+	protected ObjectMap<String, Boolean> abilities;
 	
 	protected AI AI;
 	
@@ -49,6 +54,13 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 		lastMovement = new Vector2(0, 0);
 		undigestedBiomass = 0;
 		AI = new HerbivoreAI();
+		abilities = new ObjectMap<String, Boolean>();
+		abilities.put("sense", false);
+		abilities.put("boost", false);
+		abilities.put("photosynthesis", false);
+		
+		clocktick = 0;
+		
 	}
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Identifiable#getID()
@@ -92,6 +104,10 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	 */
 	@Override
 	public ObjectSet<ID> consume (ObjectSet<Consumable> appropriatelySizedConsumables){
+		clocktick++;
+		if (abilities.get("photosynthesis") && clocktick%25==0){
+			undigestedBiomass++;
+		}
 		if (undigestedBiomass > 0){
 			biomass++;
 			undigestedBiomass--;
@@ -115,6 +131,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	 */
 	@Override
 	public Vector3 move() {
+		
 		if (MathUtils.random(1,50)==50){
 			lastMovement = AI.amble(position);
 			position.x+=lastMovement.x;

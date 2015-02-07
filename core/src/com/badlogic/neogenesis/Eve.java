@@ -15,7 +15,6 @@ public class Eve extends Creature {
 
 	/** The input. */
 	private Input input;
-	private ObjectMap<String, Boolean> abilities;
 	private ObjectMap<String, Boolean> availableAbilities;
 	/**
 	 * Instantiates a new eve.
@@ -28,19 +27,16 @@ public class Eve extends Creature {
 	
 	/**
 	 * Instantiates a new eve.
-	 * @param startPosAndSize the start pos and size
-	 * @param camera the camera
-	 * @param biomass the biomass
+	 * @param startPosAndSize the start pos
+	 * @param biomass the starting biomass
 	 */
 	public Eve(Vector2 startPos, int biomass){
 		super(startPos, biomass);
 		texture = TextureMap.getTexture("eve");
-		abilities = new ObjectMap<String, Boolean>();
 		availableAbilities = new ObjectMap<String, Boolean>();
-		abilities.put("sense", false);
-		abilities.put("boost", false);
 		availableAbilities.put("sense", false);
 		availableAbilities.put("boost", false);
+		availableAbilities.put("photosynthesis", false);
 	}
 	
 	/**
@@ -66,8 +62,11 @@ public class Eve extends Creature {
 		if (biomass+undigestedBiomass >=31 && !(abilities.get("sense")||availableAbilities.get("sense"))){
 			availableAbilities.put("sense", true);
 		}
-		if (biomass+undigestedBiomass >=35 && !abilities.get("boost")){
+		if (biomass+undigestedBiomass >=36 && !(abilities.get("boost")||availableAbilities.get("boost"))){
 			availableAbilities.put("boost", true);
+		}
+		if (biomass+undigestedBiomass >=40 && !(abilities.get("photosynthesis")||availableAbilities.get("photosynthesis"))){
+			availableAbilities.put("photosynthesis", true);
 		}
 	}
 	
