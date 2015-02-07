@@ -114,24 +114,23 @@ public class GameScreen implements Screen {
 			world.soundStack--;
 		}
 		if (world.gameExit){
-			music.stop();
 			game.saveManager.saveDataValue("biomass", eve.getBiomass());
-			camera.zoom=1;
-			game.font.setScale(camera.zoom);
-			game.toggleShader();
-			game.setScreen(new MainMenuScreen(game));
+			switchScreen(new MainMenuScreen(game));
 		}
 		else if (world.gameOver){
-			music.stop();
-			camera.zoom=1;
-			game.font.setScale(camera.zoom);
-			game.toggleShader();
-			game.setScreen(new GameOverScreen(game));
+			switchScreen(new GameOverScreen(game));
 		}
 		if (!paused){
 			orientCamera();	
 		}
-		
+	}
+	
+	public void switchScreen(Screen screen){
+		music.stop();
+		camera.zoom=1;
+		game.font.setScale(camera.zoom);
+		game.toggleShader();
+		game.setScreen(screen);
 	}
 	
 	public void draw(){
