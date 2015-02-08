@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.Array;
 /**
  * The Class Food. For packaging together nutrition information of a given edible delight
  */
-public class Plant implements Consumable, Drawable, Mobile {
+public class Plant implements Consumable, Drawable, Mobile, Living {
 	/** The ID. */
 	private ID id;
 	/** Whether or not this food has been consumed. */
@@ -160,6 +160,15 @@ public class Plant implements Consumable, Drawable, Mobile {
 	
 	public void die(){
 		alive=false;
+	}
+
+	@Override
+	public void live() {
+	}
+
+	@Override
+	public boolean isAlive() {
+		return alive;
 	}
 
 	

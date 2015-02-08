@@ -227,5 +227,10 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 		}
 		position.radius=biomass/2;
 	}
+
+	@Override
+	public boolean isAlive() {
+		return alive;
+	}
 	
 }

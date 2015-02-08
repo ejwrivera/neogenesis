@@ -123,6 +123,7 @@ public class GameWorld {
 	 */
 	private void addToMaps(Plant plant) {
 		ID id = plant.getID();
+		theLiving.put(id, plant);
 		consumables.put(id, plant);
 		collidables.put(id, plant);
 		drawables.put(id, plant);
@@ -145,6 +146,9 @@ public class GameWorld {
 	 * @param id the id of the creature
 	 */
 	private void removeFromMaps(ID id) {
+		if (theLiving.containsKey(id)){
+			theLiving.remove(id);
+		}
 		if (mobs.containsKey(id)){
 			mobs.remove(id);
 		}
@@ -252,10 +256,24 @@ public class GameWorld {
 	 */
 	public void gameIncrement(){
 		eve.setInput(Gdx.input);
+		ObjectSet<ID> toRemove = new ObjectSet<ID>();
 		// everything that lives must live
 		for (Living thing : theLiving.values()) {
 			thing.live();
+			if (!thing.isAlive()){
+				System.out.println("whoa");
+				toRemove.add(thing.getID());
+			}
 		}
+		
+		for (ID id: toRemove){
+			if (eve.getID()==id){
+				gameOver = true;
+			}
+			removeFromMaps(id);
+			soundStack++;
+		}
+		
 		// move everything that moves
 		for (Mobile mob : mobs.values()) {
 			mob.move();
@@ -265,7 +283,6 @@ public class GameWorld {
 		if (TimeUtils.nanoTime()-lastSpawnTime > 200000000/DebugValues.getSpawnRate())
 			spawnCreature();
 		// check for collisions and consume
-		ObjectSet<ID> toRemove = new ObjectSet<ID>();
 		
 		// this needs to be altered to use collidable; OPEN DESIGN DECISION: should this still be applied?  Very small things should no longer affect larger things?   Probably - question is X orders of magnitude?
 		if (magnitudeConsuming){
@@ -273,16 +290,12 @@ public class GameWorld {
 			
 			for (Collidable collidable: collidables.values()){
 				if (collidable.stillCollidable()){
-					
 					ObjectSet<Collidable> appropriatelySizedCollidables = new ObjectSet<Collidable>();
 					for (int ii = -1; ii <= 0; ii++){
 						if (magnitudeMap.containsKey(collidable.getMagnitude()+ii)){
 							appropriatelySizedCollidables.addAll(magnitudeMap.get(collidable.getMagnitude()+ii));
 						}
 					}
-				}
-				else {
-					toRemove.add(collidable.getID());
 				}
 			}
 			
@@ -293,18 +306,7 @@ public class GameWorld {
 				if (collidable.stillCollidable()){
 					collidable.collidesWith(collidablesToCheck); 
 				}
-				else {
-					toRemove.add(collidable.getID());
-				}
 			}
-		}
-		
-		for (ID id: toRemove){
-			if (eve.getID()==id){
-				gameOver = true;
-			}
-			removeFromMaps(id);
-			soundStack++;
 		}
 	}
 
