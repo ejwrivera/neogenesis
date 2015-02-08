@@ -1,5 +1,7 @@
 package com.badlogic.neogenesis;
 
+import com.badlogic.gdx.math.Vector2;
+
 public interface Consumer extends Collidable {
 
 	/**
@@ -7,6 +9,7 @@ public interface Consumer extends Collidable {
 	 * @param appropriatelySizedConsumables the consumables that may be eaten
 	 * @return the set of ids that have been consumed
 	 */
-	void consume(Consumable consumablesToConsume);
+	void ingest(Consumable consumablesToConsume);
+	Vector2 getCenter();
 	
 }

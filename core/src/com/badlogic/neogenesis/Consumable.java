@@ -10,8 +10,12 @@ public interface Consumable extends Collidable{
 	 * Converts self into food, with nutrition values and potential effects
 	 * @return the food
 	 */
-	public Food beConsumed();
-	// for checking if edible
+	public Food beDigested();
+	
+	public Food beBitten();
+	
+	public boolean beIngested(Consumer consumer);
+	
 	/**
 	 * Gets the biomass.
 	 * @return the biomass

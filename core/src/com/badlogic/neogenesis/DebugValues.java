@@ -19,7 +19,7 @@ public class DebugValues {
 	/** The camera zoom rate. */
 	private static int cameraZoomRate = 1;
 	/** Toggls magnitude checks for consuming */
-	private static boolean magnitudeConsuming = false;
+	private static boolean magnitudeColliding = false;
 	/** The default amount of starting food */
 	private static int foodAmount = 500;
 	
@@ -33,7 +33,7 @@ public class DebugValues {
 	/** The default camera zoom rate. */
 	private static int defaultCameraZoomRate = 1;
 	/** Toggls magnitude checks for consuming */
-	private static boolean defaultMagnitudeConsuming = true;
+	private static boolean defaultMagnitudeColliding = true;
 	/** The default amount of starting food */
 	private static int defaultFoodAmount = 200;
 	
@@ -44,12 +44,12 @@ public class DebugValues {
 	 * @param cameraStart set the starting camera zoom factor
 	 * @param cameraRate set the camera zoom rate
 	 */
-	public static void populateDebugValues(int eveStartBio, int spawn, float cameraStart, int cameraRate, boolean magnitudeEat){
+	public static void populateDebugValues(int eveStartBio, int spawn, float cameraStart, int cameraRate, boolean magnitudeCollide){
 		eveStartingBiomass=eveStartBio;
 		spawnRate = spawn;
 		cameraZoomStart = cameraStart;
 		cameraZoomRate = cameraRate;
-		magnitudeConsuming = magnitudeEat;
+		magnitudeColliding = magnitudeCollide;
 	}
 	
 	/**
@@ -64,7 +64,7 @@ public class DebugValues {
 				spawnRate = 3;
 				cameraZoomStart = 2;
 				cameraZoomRate = 1;
-				magnitudeConsuming = false;
+				magnitudeColliding = false;
 				foodAmount = 500;
 				break;
 			// quick start
@@ -73,7 +73,7 @@ public class DebugValues {
 				spawnRate = 1;
 				cameraZoomStart = .25f;
 				cameraZoomRate = 1;
-				magnitudeConsuming = false;
+				magnitudeColliding = false;
 				foodAmount = 200;
 				break;
 			default:
@@ -112,8 +112,8 @@ public class DebugValues {
 		return debug ? cameraZoomRate : defaultCameraZoomRate;
 	}
 
-	public static boolean getMagnitudeConsuming() {
-		return debug ? magnitudeConsuming : defaultMagnitudeConsuming;
+	public static boolean getMagnitudeColliding() {
+		return debug ? magnitudeColliding : defaultMagnitudeColliding;
 	}
 	
 	public static int getFoodAmount(){

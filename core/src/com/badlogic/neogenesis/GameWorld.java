@@ -35,8 +35,8 @@ public class GameWorld {
 	/** The starting amount of Food. */
 	private int foodAmount;
 	
-	/**  Toggles whether magnitude is checked for consuming. */
-	private boolean magnitudeConsuming;
+	/**  Toggles whether magnitude is checked for colliding. */
+	private boolean magnitudeColliding;
 	
 	/**  Toggles the display of the info at the top, biomass and location. */
 	public boolean displayHUD;
@@ -80,7 +80,7 @@ public class GameWorld {
 		gameOver = false;
 		gameExit = false;
 		soundStack = 0;
-		magnitudeConsuming = DebugValues.getMagnitudeConsuming();
+		magnitudeColliding = DebugValues.getMagnitudeColliding();
 		
 		foodAmount = DebugValues.getFoodAmount();
 		// spawn the first mega creatures
@@ -261,7 +261,6 @@ public class GameWorld {
 		for (Living thing : theLiving.values()) {
 			thing.live();
 			if (!thing.isAlive()){
-				System.out.println("whoa");
 				toRemove.add(thing.getID());
 			}
 		}
@@ -285,9 +284,8 @@ public class GameWorld {
 		// check for collisions and consume
 		
 		// this needs to be altered to use collidable; OPEN DESIGN DECISION: should this still be applied?  Very small things should no longer affect larger things?   Probably - question is X orders of magnitude?
-		if (magnitudeConsuming){
+		if (magnitudeColliding){
 			IntMap<ObjectSet<Collidable>> magnitudeMap = generateCollidableMagnitudeMap();
-			
 			for (Collidable collidable: collidables.values()){
 				if (collidable.stillCollidable()){
 					ObjectSet<Collidable> appropriatelySizedCollidables = new ObjectSet<Collidable>();
@@ -298,7 +296,6 @@ public class GameWorld {
 					}
 				}
 			}
-			
 		}
 		else {
 			Array<Collidable> collidablesToCheck = new Array<Collidable>(collidables.values().toArray());

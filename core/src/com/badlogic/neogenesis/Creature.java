@@ -1,5 +1,6 @@
 package com.badlogic.neogenesis;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 
 /**
  * The Class Creature. Base class of all critters, currently concrete, eventually abstract
@@ -27,7 +29,9 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 	/** The creature's texture. */
 	public Texture texture;
 	/** The biomass in the creature's belly. */
-	protected int undigestedBiomass;
+	protected ObjectSet<Consumable> belly;
+	
+	protected Consumer inBellyOf;
 		
 	protected int impetusAmount;
 	
@@ -58,7 +62,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 		this.biomass = biomass;
 		texture = TextureMap.getTexture("creature");
 		lastMovement = new Vector2(0, 0);
-		undigestedBiomass = 0;
+		belly = new ObjectSet<Consumable>();
 		AI = new HerbivoreAI();
 		abilities = new ObjectMap<String, Boolean>();
 		abilities.put("sense", false);
@@ -86,12 +90,26 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 	}
 	
 	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Consumable#beConsumed()
+	 * @see com.badlogic.neogenesis.Consumable#beDigested()
 	 */
 	@Override
-	public Food beConsumed() {
+	public Food beDigested() {
 		die();
-		return new Food(biomass, 1);
+		int digestedBiomass = biomass;
+		biomass=0;
+		return new Food(digestedBiomass, 1);
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Consumable#beDigested()
+	 */
+	@Override
+	public Food beBitten() {
+		if (biomass < 1){
+			return beDigested();
+		}
+		biomass-=1;
+		return new Food(10, 1);
 	}
 	
 	/* (non-Javadoc)
@@ -105,8 +123,8 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 	 * @see com.badlogic.neogenesis.Consumer#consume(com.badlogic.gdx.utils.ObjectSet)
 	 */
 	@Override
-	public void consume (Consumable consumablesToConsume){
-		consume(consumablesToConsume.beConsumed());
+	public void ingest (Consumable consumableToIngest){
+		belly.add(consumableToIngest);
 	}
 	
 	/* (non-Javadoc)
@@ -114,16 +132,32 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 	 */
 	@Override
 	public Vector3 move() {
-		if (MathUtils.random(1,50)==50){
-			lastMovement = AI.amble(position);
-			position.x+=lastMovement.x;
-			position.y+=lastMovement.y;
-		} else {
-			lastMovement = AI.forage(position);
-			position.x+=lastMovement.x;
-			position.y+=lastMovement.y;
+		if (inBellyOf==null){
+			if (MathUtils.random(1,50)==50){
+				lastMovement = AI.amble(position);
+				position.x+=lastMovement.x;
+				position.y+=lastMovement.y;
+			} else {
+				lastMovement = AI.forage(position);
+				position.x+=lastMovement.x;
+				position.y+=lastMovement.y;
+			}
+			return new Vector3(lastMovement, 0);
 		}
-		return new Vector3(lastMovement, 0);
+		else {
+			Vector2 oldPosition = new Vector2(position.x, position.y);
+			Vector2 movement = new Vector2(160 * Gdx.graphics.getDeltaTime(), 0);
+			// point towards center of inBellyOf
+			Vector2 bellyCenter = inBellyOf.getCenter();
+			movement = movement.rotate(oldPosition.sub(bellyCenter).angle());
+			Vector2 newPosition = new Vector2(oldPosition).add(movement);
+			lastMovement = new Vector2(newPosition.x-oldPosition.x, newPosition.y-oldPosition.y);
+			position.x = lastMovement.x;
+			position.y = lastMovement.y;
+			lastMovement = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
+			return new Vector3(lastMovement, 0);
+		}
+		
 	}
 	
 	/* (non-Javadoc)
@@ -138,10 +172,15 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 	 * Consume. Should be a renamed and possibly for consumer interface, along with consume above
 	 * @param food the food
 	 */
-	public void consume(Food food) {
-		undigestedBiomass += food.getNutrition()/10;
+	public void digest(Food food) {
+		biomass += food.getNutrition()/10;
 	}
 
+	public void digest(Consumable consumableToDigest){
+		digest(consumableToDigest.beBitten());
+	}
+	
+	
 	@Override
 	public Boolean collidesWith(Collidable other) {
 		boolean overlaps;
@@ -183,13 +222,12 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 
 	@Override
 	public void collidedWith(Consumer consumer) {
-		
 	}
 
 	@Override
 	public void collidedWith(Consumable consumable) {
-		if (consumable.getBiomass()<biomass){
-			consume (consumable.beConsumed());
+		if (consumable.getBiomass()<biomass && consumable.beIngested(this)){
+			ingest(consumable);
 		}
 	}
 	
@@ -219,11 +257,19 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 	public void live() {
 		clocktick++;
 		if (abilities.get("photosynthesis") && clocktick%25==0){
-			undigestedBiomass++;
+			digest(new Food(5));
 		}
-		if (undigestedBiomass > 0){
-			biomass++;
-			undigestedBiomass--;
+		if (belly.size>0){
+			ObjectSet<Consumable> toRemove = new ObjectSet<Consumable>();
+			for (Consumable consumableToDigest: belly){
+				digest(consumableToDigest);
+				if (consumableToDigest.getBiomass()<=0){
+					toRemove.add(consumableToDigest); 
+				}
+			}
+			for (Consumable needsRemoving: toRemove){
+				belly.remove(needsRemoving);
+			}
 		}
 		position.radius=biomass/2;
 	}
@@ -231,6 +277,17 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 	@Override
 	public boolean isAlive() {
 		return alive;
+	}
+
+	@Override
+	public boolean beIngested(Consumer consumer) {
+		inBellyOf = consumer;
+		return true;
+	}
+
+	@Override
+	public Vector2 getCenter() {
+		return new Vector2 (position.x, position.y);
 	}
 	
 }

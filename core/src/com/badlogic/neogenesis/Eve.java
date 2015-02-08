@@ -69,8 +69,8 @@ public class Eve extends Creature {
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Creature#consume(com.badlogic.neogenesis.Food)
 	 */
-	public void consume(Food food) {
-		super.consume(new Food(food.getNutrition()*2));
+	public void digest(Food food){
+		super.digest(new Food(food.getNutrition()*2));
 		protein+=food.getProtein();
 		
 		if (protein >= 3){
@@ -86,37 +86,53 @@ public class Eve extends Creature {
 	 * @see com.badlogic.neogenesis.Creature#move()
 	 */
 	public Vector3 move(){
-		// process user input
-		float oldX = position.x;
-		float oldY = position.y;
 		
-		Vector3 mousePosition = CameraHandler.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-		
-		boolean left = input.isKeyPressed(Keys.LEFT) || (mousePosition.x < position.x && Gdx.input.isTouched());
-		boolean right = input.isKeyPressed(Keys.RIGHT) || (mousePosition.x > position.x && Gdx.input.isTouched());
-		boolean up = input.isKeyPressed(Keys.UP) || (mousePosition.y > position.y && Gdx.input.isTouched());
-		boolean down = 	input.isKeyPressed(Keys.DOWN) || (mousePosition.y < position.y && Gdx.input.isTouched());
-		
-		if (impetusAmount > 0){
-			impetusAmount++;
-		}
-		if (impetusAmount==32){
-			impetusAmount=0;
-		}
-		
-		if (input.isKeyPressed(Keys.CONTROL_LEFT) && impetusAmount==0 && abilities.get("impetus")){
-			impetusAmount = 1;
-		}
-		
-		int movement = impetusAmount+(input.isKeyPressed(Keys.SHIFT_LEFT)&&abilities.get("boost") ? 10 : 5);
-		// calculate the change in X
-		position.x += delta(movement, lastMovement.x, left ? "DECREASE" : right ? "INCREASE" : "NONE" );
-		// calculate the change in Y
-		position.y += delta(movement, lastMovement.y, down ? "DECREASE" : up ? "INCREASE" : "NONE");
+		if (inBellyOf==null){
+			// process user input
+			float oldX = position.x;
+			float oldY = position.y;
+			
+			Vector3 mousePosition = CameraHandler.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+			
+			boolean left = input.isKeyPressed(Keys.LEFT) || (mousePosition.x < position.x && Gdx.input.isTouched());
+			boolean right = input.isKeyPressed(Keys.RIGHT) || (mousePosition.x > position.x && Gdx.input.isTouched());
+			boolean up = input.isKeyPressed(Keys.UP) || (mousePosition.y > position.y && Gdx.input.isTouched());
+			boolean down = 	input.isKeyPressed(Keys.DOWN) || (mousePosition.y < position.y && Gdx.input.isTouched());
+			
+			if (impetusAmount > 0){
+				impetusAmount++;
+			}
+			if (impetusAmount==32){
+				impetusAmount=0;
+			}
+			
+			if (input.isKeyPressed(Keys.CONTROL_LEFT) && impetusAmount==0 && abilities.get("impetus")){
+				impetusAmount = 1;
+			}
+			
+			int movement = impetusAmount+(input.isKeyPressed(Keys.SHIFT_LEFT)&&abilities.get("boost") ? 10 : 5);
+			// calculate the change in X
+			position.x += delta(movement, lastMovement.x, left ? "DECREASE" : right ? "INCREASE" : "NONE" );
+			// calculate the change in Y
+			position.y += delta(movement, lastMovement.y, down ? "DECREASE" : up ? "INCREASE" : "NONE");
 
-		lastMovement = new Vector2(position.x-oldX, position.y-oldY);
-		
-		return new Vector3(lastMovement, 0);
+			lastMovement = new Vector2(position.x-oldX, position.y-oldY);
+			
+			return new Vector3(lastMovement, 0);
+		}
+		else {
+			Vector2 oldPosition = new Vector2(position.x, position.y);
+			Vector2 movement = new Vector2(160 * Gdx.graphics.getDeltaTime(), 0);
+			// point towards center of inBellyOf
+			Vector2 bellyCenter = inBellyOf.getCenter();
+			movement = movement.rotate(oldPosition.sub(bellyCenter).angle());
+			Vector2 newPosition = new Vector2(oldPosition).add(movement);
+			lastMovement = new Vector2(newPosition.x-oldPosition.x, newPosition.y-oldPosition.y);
+			position.x = lastMovement.x;
+			position.y = lastMovement.y;
+			lastMovement = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
+			return new Vector3(lastMovement, 0);
+		}
 	}
 	
 	private float delta(int acceleration, float momentum, String input){

@@ -60,12 +60,22 @@ public class Plant implements Consumable, Drawable, Mobile, Living {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Consumable#beConsumed()
+	 * @see com.badlogic.neogenesis.Consumable#beDigested()
 	 */
 	@Override
-	public Food beConsumed() {
+	public Food beDigested() {
 		die();
-		return new Food (biomass, 0);
+		int digestedBiomass = biomass;
+		biomass=0;
+		return new Food(digestedBiomass);
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Consumable#beDigested()
+	 */
+	@Override
+	public Food beBitten() {
+		return beDigested();
 	}
 
 	/* (non-Javadoc)
@@ -169,6 +179,11 @@ public class Plant implements Consumable, Drawable, Mobile, Living {
 	@Override
 	public boolean isAlive() {
 		return alive;
+	}
+	
+	@Override
+	public boolean beIngested(Consumer consumer) {
+		return true;
 	}
 
 	
