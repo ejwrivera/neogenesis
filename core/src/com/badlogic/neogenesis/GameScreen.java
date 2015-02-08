@@ -137,59 +137,11 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClearColor(0, .2f, .4f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		stage.act();
-        stage.draw();
-		
         game.batch.begin();
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
-		for (Drawable drawable : world.getDrawables().values()) {
-			Circle drawBox = drawable.getCircle();
-			game.batch.draw(drawable.getTexture(), drawBox.x-drawBox.radius, drawBox.y-drawBox.radius, drawBox.radius*2, drawBox.radius*2);
-		}
-        game.batch.end();
         
-        game.toggleShader();
-        
-        game.batch.begin();
-		
-		camera.update();
-		// render in the coordinate system specified by the camera.
-		game.batch.setProjectionMatrix(camera.combined);
-		// begin a new batch and draw Eve and all the creatures
-		
-		
-		game.font.setScale(camera.zoom);
-		game.font.setUseIntegerPositions(false);
-		if (world.displayHUD){
-			game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-300*camera.zoom, camera.position.y+220*camera.zoom);
-			int biomassDisplay = eve.getBiomass();
-			int usedBiomass = eve.getUsedBiomass();
-			int displayLevel = 10000;
-			float biomassDisplayX = camera.position.x-300*camera.zoom;
-			float biomassDisplayY = camera.position.y+150*camera.zoom;
-			
-			while(biomassDisplay>0){
-				while(biomassDisplay < displayLevel){
-					biomassDisplayY+=5*camera.zoom;
-					displayLevel/=10;	
-				}
-				// 50 when camera zoom is 1 and displayLevel = 10000
-				float biomassSize = MathUtils.log(10, displayLevel*10)*10*camera.zoom;
-				
-				game.batch.draw(usedBiomass>0 ? usedBiomassTexture : unusedBiomassTexture, biomassDisplayX, biomassDisplayY, biomassSize, biomassSize);
-				biomassDisplayX += biomassSize;
-				biomassDisplay-=displayLevel;
-				usedBiomass-=displayLevel;
-			}
-			game.font.draw(game.batch, "Location: " + MathUtils.ceil(eve.getCircle().x) +", "+MathUtils.ceil(eve.getCircle().y), camera.position.x-300*camera.zoom+(230*camera.zoom), camera.position.y+220*camera.zoom);
-			game.font.draw(game.batch, "FPS: " + MathUtils.ceil(1/Gdx.graphics.getDeltaTime()), camera.position.x-200*camera.zoom+(400*camera.zoom), camera.position.y+220*camera.zoom);
-			if (zoomCamera>0){
-				game.font.draw(game.batch, "Zooming", camera.position.x-300*camera.zoom+(230*camera.zoom), camera.position.y+220*camera.zoom-(20*camera.zoom));
-			}
-		}
-		
-		if (eve.hasSense()){
+        if (eve.hasSense()){
 			ShaderAttributes.LIGHT_POS.x=.38f;
 			ShaderAttributes.LIGHT_POS.y=.34f;	
 		}
@@ -197,8 +149,50 @@ public class GameScreen implements Screen {
 			ShaderAttributes.LIGHT_POS.x=-1f;
 			ShaderAttributes.LIGHT_POS.y=-1f;
 		}
-		//send a Vector4f to GLSL
-		game.shader.setUniformf("LightPos", ShaderAttributes.LIGHT_POS);
+        
+        //send a Vector4f to GLSL
+        game.shader.setUniformf("LightPos", ShaderAttributes.LIGHT_POS);
+        
+		for (Drawable drawable : world.getDrawables().values()) {
+			Circle drawBox = drawable.getCircle();
+			game.batch.draw(drawable.getTexture(), drawBox.x-drawBox.radius, drawBox.y-drawBox.radius, drawBox.radius*2, drawBox.radius*2);
+		}
+		
+        game.batch.end();
+        
+        stage.act();
+        stage.draw();
+        
+        game.toggleShader();
+        
+        game.batch.begin();
+		
+       
+        
+		camera.update();
+		// render in the coordinate system specified by the camera.
+		game.batch.setProjectionMatrix(camera.combined);
+		// begin a new batch and draw Eve and all the creatures
+		
+		 
+		
+		
+		game.font.setScale(camera.zoom);
+		game.font.setUseIntegerPositions(false);
+		if (world.displayHUD){
+			game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-300*camera.zoom, camera.position.y+220*camera.zoom);
+			
+			int usedBiomass = eve.getUsedBiomass();
+			int unusedBiomass = eve.getBiomass();
+			displayBiomass(unusedBiomass, unusedBiomassTexture);
+			displayBiomass(usedBiomass, usedBiomassTexture);
+			
+			game.font.draw(game.batch, "Location: " + MathUtils.ceil(eve.getCircle().x) +", "+MathUtils.ceil(eve.getCircle().y), camera.position.x-300*camera.zoom+(230*camera.zoom), camera.position.y+220*camera.zoom);
+			game.font.draw(game.batch, "FPS: " + MathUtils.ceil(1/Gdx.graphics.getDeltaTime()), camera.position.x-200*camera.zoom+(400*camera.zoom), camera.position.y+220*camera.zoom);
+			if (zoomCamera>0){
+				game.font.draw(game.batch, "Zooming", camera.position.x-300*camera.zoom+(230*camera.zoom), camera.position.y+220*camera.zoom-(20*camera.zoom));
+			}
+		}
 		
 		for (String upgrade: eve.getAvailableUpgrades()){
 			if (!upgradeButtons.containsValue(upgrade, true)){
@@ -225,6 +219,34 @@ public class GameScreen implements Screen {
 		game.toggleShader();
 	}
 
+	private void displayBiomass(int biomassDisplay, Texture displayTexture){
+		int column = 0;
+		int row = 0;
+		int displayLevel = 10000;
+		float adjust = 0;
+		float cameraX = camera.position.x-300*camera.zoom;
+		float cameraY = camera.position.y+150*camera.zoom;
+		while(biomassDisplay>0){
+			while(biomassDisplay < displayLevel){
+				adjust+=5*camera.zoom;
+				displayLevel/=10;	
+			}
+			// 50 when camera zoom is 1 and displayLevel = 10000
+			float biomassSize = MathUtils.log(10, displayLevel*10)*10*camera.zoom;
+			
+			game.batch.draw(displayTexture, cameraX+adjust, cameraY+adjust, biomassSize, biomassSize);
+			cameraX += 50*camera.zoom;
+			column++;
+			if (column==10){
+				column = 0;
+				row++;
+				cameraX = camera.position.x-300*camera.zoom;
+				cameraY = camera.position.y+(150-50*row)*camera.zoom;
+			}
+			biomassDisplay-=displayLevel;
+		}
+	}
+	
 	public void orientCamera(){
 		while (zoomLevel < (int)eve.getCircle().radius/16){
 			zoomCamera+=5*zoomSpeed;
