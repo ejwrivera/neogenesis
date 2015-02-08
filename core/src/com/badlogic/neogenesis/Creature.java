@@ -146,7 +146,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 		}
 		else {
 			Vector2 oldPosition = new Vector2(position.x, position.y);
-			Vector2 movement = new Vector2(160 * Gdx.graphics.getDeltaTime(), 0);
+			Vector2 movement = new Vector2(320 * Gdx.graphics.getDeltaTime(), 0);
 			// point towards center of inBellyOf
 			Vector2 bellyCenter = inBellyOf.getCenter();
 			movement = movement.rotate(oldPosition.sub(bellyCenter).angle());
@@ -157,7 +157,6 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 			lastMovement = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
 			return new Vector3(lastMovement, 0);
 		}
-		
 	}
 	
 	/* (non-Javadoc)
@@ -259,18 +258,21 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 		if (abilities.get("photosynthesis") && clocktick%25==0){
 			digest(new Food(5));
 		}
-		if (belly.size>0){
-			ObjectSet<Consumable> toRemove = new ObjectSet<Consumable>();
-			for (Consumable consumableToDigest: belly){
-				digest(consumableToDigest);
-				if (consumableToDigest.getBiomass()<=0){
-					toRemove.add(consumableToDigest); 
+		if (clocktick%20==0){
+			if (belly.size>0){
+				ObjectSet<Consumable> toRemove = new ObjectSet<Consumable>();
+				for (Consumable consumableToDigest: belly){
+					digest(consumableToDigest);
+					if (consumableToDigest.getBiomass()<=0){
+						toRemove.add(consumableToDigest); 
+					}
+				}
+				for (Consumable needsRemoving: toRemove){
+					belly.remove(needsRemoving);
 				}
 			}
-			for (Consumable needsRemoving: toRemove){
-				belly.remove(needsRemoving);
-			}
 		}
+		
 		position.radius=biomass/2;
 	}
 

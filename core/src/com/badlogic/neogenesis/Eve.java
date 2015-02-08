@@ -122,7 +122,7 @@ public class Eve extends Creature {
 		}
 		else {
 			Vector2 oldPosition = new Vector2(position.x, position.y);
-			Vector2 movement = new Vector2(160 * Gdx.graphics.getDeltaTime(), 0);
+			Vector2 movement = new Vector2(320 * Gdx.graphics.getDeltaTime(), 0);
 			// point towards center of inBellyOf
 			Vector2 bellyCenter = inBellyOf.getCenter();
 			movement = movement.rotate(oldPosition.sub(bellyCenter).angle());

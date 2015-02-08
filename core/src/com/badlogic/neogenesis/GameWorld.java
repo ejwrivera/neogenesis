@@ -88,9 +88,9 @@ public class GameWorld {
 		while (!spawnCreature(1000)&&tries<100){
 			tries++;
 		}
-		while (!spawnCreature(2000)&&tries<100){
-			tries++;
-		}
+		//while (!spawnCreature(2000)&&tries<100){
+		//	tries++;
+		//}
 		// spawn the food
 		for (int ii = 0; ii < foodAmount; ii++){
 			spawnPlant();

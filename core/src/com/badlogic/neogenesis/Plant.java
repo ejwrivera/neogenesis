@@ -26,6 +26,8 @@ public class Plant implements Consumable, Drawable, Mobile, Living {
 	
 	private int biomass;
 	
+	protected Consumer inBellyOf;
+	
 	private boolean alive;
 	
 	private Vector2 lastMovement;
@@ -102,14 +104,29 @@ public class Plant implements Consumable, Drawable, Mobile, Living {
 
 	@Override
 	public Vector3 move() {
-		Vector2 oldPosition = new Vector2(position.x, position.y);
-		Vector2 movement = new Vector2(10 * Gdx.graphics.getDeltaTime(), 0);
-		movement = movement.rotate(MathUtils.random(1, 45));
-		Vector2 newPosition = new Vector2(oldPosition).add(movement);
-		position.x=newPosition.x;
-		position.y=newPosition.y;
-		lastMovement = newPosition.sub(oldPosition);
-		return new Vector3(newPosition.x-oldPosition.x, newPosition.y-oldPosition.y, 0);
+		if (inBellyOf==null){
+			Vector2 oldPosition = new Vector2(position.x, position.y);
+			Vector2 movement = new Vector2(10 * Gdx.graphics.getDeltaTime(), 0);
+			movement = movement.rotate(MathUtils.random(1, 45));
+			Vector2 newPosition = new Vector2(oldPosition).add(movement);
+			position.x=newPosition.x;
+			position.y=newPosition.y;
+			lastMovement = newPosition.sub(oldPosition);
+			return new Vector3(newPosition.x-oldPosition.x, newPosition.y-oldPosition.y, 0);
+		}
+		else {
+			Vector2 oldPosition = new Vector2(position.x, position.y);
+			Vector2 movement = new Vector2(320 * Gdx.graphics.getDeltaTime(), 0);
+			// point towards center of inBellyOf
+			Vector2 bellyCenter = inBellyOf.getCenter();
+			movement = movement.rotate(oldPosition.sub(bellyCenter).angle());
+			Vector2 newPosition = new Vector2(oldPosition).add(movement);
+			lastMovement = new Vector2(newPosition.x-oldPosition.x, newPosition.y-oldPosition.y);
+			position.x = lastMovement.x;
+			position.y = lastMovement.y;
+			lastMovement = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
+			return new Vector3(lastMovement, 0);
+		}
 	}
 
 	@Override
@@ -183,6 +200,7 @@ public class Plant implements Consumable, Drawable, Mobile, Living {
 	
 	@Override
 	public boolean beIngested(Consumer consumer) {
+		inBellyOf = consumer;
 		return true;
 	}
 
