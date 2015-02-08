@@ -92,7 +92,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	 */
 	@Override
 	public Food beConsumed() {
-		return new Food(biomass);
+		return new Food(biomass, 1);
 	}
 	
 	/* (non-Javadoc)

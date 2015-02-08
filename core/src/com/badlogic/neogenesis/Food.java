@@ -10,38 +10,36 @@ import com.badlogic.gdx.math.Vector3;
 /**
  * The Class Food. For packaging together nutrition information of a given edible delight
  */
-public class Food implements Consumable, Drawable, Mobile {
+public class Food implements Edible {
 
 	/** The nutrition. */
 	private int nutrition;
 	/** The ID. */
+	private int protein;
 	private ID id;
 	/** Whether or not this food has been consumed. */
 	private boolean consumed;
 	/** The texture. */
-	private Texture texture;
-	/** The position. */
-	private Circle position;
 	/**
 	 * Instantiates a new food.
 	 * @param nutrition the nutrition
 	 */
-	public Food(int nutrition, Circle position){
-		this.nutrition=nutrition;
-		this.position=position;
+	public Food(int nutrition, int protein){
+		this.nutrition = nutrition;
+		this.protein = protein;
 		id = IDFactory.getNewID();
 		consumed=false;
-		texture = TextureMap.getTexture("food");
 	}
 	
 	public Food(int nutrition){
-		this(nutrition, new Circle());
+		this(nutrition, 0);
 	}
-	
+	// copy constructor
 	public Food(Food food){
-		this(food.getNutrition(), new Circle());
+		this(food.getNutrition(), food.getProtein());
 	}
 	
+
 	/**
 	 * Gets the nutrition.
 	 * @return the nutrition
@@ -50,66 +48,27 @@ public class Food implements Consumable, Drawable, Mobile {
 		return nutrition;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Collidable#collidesWith(com.badlogic.gdx.math.Rectangle)
-	 */
 	@Override
-	public Boolean collidesWith(Circle other) {
-		return position.overlaps(other);
+	public int getProtein() {
+		return protein;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Identifiable#getID()
-	 */
+	@Override
+	public Food beBitten() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Food beSwallowed() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	@Override
 	public ID getID() {
 		return id;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Consumable#beConsumed()
-	 */
-	@Override
-	public Food beConsumed() {
-		consumed = true;
-		return this;
-	}
 
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Consumable#getBiomass()
-	 */
-	@Override
-	public int getBiomass() {
-		return 0;
-	}
-	
-	public boolean beenConsumed() {
-		return consumed;
-	}
-
-	@Override
-	public int getMagnitude() {
-		return -1;
-	}
-
-	@Override
-	public Circle getCircle() {
-		return position;
-	}
-
-	@Override
-	public Texture getTexture() {
-		return texture;
-	}
-
-	@Override
-	public Vector3 move() {
-		Vector2 oldPosition = new Vector2(position.x, position.y);
-		Vector2 movement = new Vector2(10 * Gdx.graphics.getDeltaTime(), 0);
-		movement = movement.rotate(MathUtils.random(1, 45));
-		Vector2 newPosition = new Vector2(oldPosition).add(movement);
-		position.x=newPosition.x;
-		position.y=newPosition.y;
-		return new Vector3(newPosition.x-oldPosition.x, newPosition.y-oldPosition.y, 0);
-	}
 }

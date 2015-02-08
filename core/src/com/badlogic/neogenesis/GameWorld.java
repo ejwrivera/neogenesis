@@ -111,11 +111,11 @@ public class GameWorld {
 	 *
 	 * @param food the food
 	 */
-	private void addToMaps(Food food) {
-		consumables.put(food.getID(), food);
-		collidables.put(food.getID(), food);
-		drawables.put(food.getID(), food);
-		mobs.put(food.getID(), food);
+	private void addToMaps(Plant plant) {
+		consumables.put(plant.getID(), plant);
+		collidables.put(plant.getID(), plant);
+		drawables.put(plant.getID(), plant);
+		mobs.put(plant.getID(), plant);
 	}
 	/**
 	 * Removes a creature from the maps.
@@ -183,7 +183,7 @@ public class GameWorld {
 	 * Spawn food.
 	 */
 	private void spawnFood() {
-		addToMaps(new Food(5, new Circle(MathUtils.random(0, 2400), MathUtils.random(0, 1800), 4)));
+		addToMaps(new Plant(5, new Circle(MathUtils.random(0, 2400), MathUtils.random(0, 1800), 4)));
 	}
 
 	/**

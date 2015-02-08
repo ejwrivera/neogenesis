@@ -18,6 +18,7 @@ public class Eve extends Creature {
 	private ObjectMap<String, Boolean> availableAbilities;
 	private ObjectMap<String, Integer> availableAbilitiesCost;
 	private int usedBiomass;
+	private int protein;
 	
 	/**
 	 * Instantiates a new eve.
@@ -47,6 +48,7 @@ public class Eve extends Creature {
 		availableAbilitiesCost.put("impetus", 10);
 		availableAbilitiesCost.put("photosynthesis", 50);
 		usedBiomass = 0;
+		protein = 0;
 	}
 	
 	/**
@@ -69,17 +71,14 @@ public class Eve extends Creature {
 	 */
 	public void consume(Food food) {
 		super.consume(new Food(food.getNutrition()*2));
-		if (biomass+undigestedBiomass >=31 && !(abilities.get("sense")||availableAbilities.get("sense"))){
-			availableAbilities.put("sense", true);
-		}
-		if (biomass+undigestedBiomass >=36 && !(abilities.get("boost")||availableAbilities.get("boost"))){
-			availableAbilities.put("boost", true);
-		}
-		if (biomass+undigestedBiomass >=36 && !(abilities.get("impetus")||availableAbilities.get("impetus"))){
-			availableAbilities.put("impetus", true);
-		}
-		if (biomass+undigestedBiomass >=40 && !(abilities.get("photosynthesis")||availableAbilities.get("photosynthesis"))){
-			availableAbilities.put("photosynthesis", true);
+		protein+=food.getProtein();
+		
+		if (protein >= 3){
+			for(String ability: availableAbilities.keys()){
+				if ( !(abilities.get(ability)||availableAbilities.get(ability)) && biomass > availableAbilitiesCost.get(ability)){
+					availableAbilities.put(ability,  true);
+				}
+			}
 		}
 	}
 	
@@ -154,13 +153,23 @@ public class Eve extends Creature {
 		return upgrades;
 	}
 
-	public void addUpgrade(String upgrade) {
+	public boolean addUpgrade(String upgrade) {
+		int cost = availableAbilitiesCost.get(upgrade);
+		if (cost > biomass-usedBiomass || protein < 3){
+			return false;
+		}
 		abilities.put(upgrade, true);
 		availableAbilities.put(upgrade, false);
-		usedBiomass+=availableAbilitiesCost.get(upgrade);
+		usedBiomass+=cost;
+		protein-=3;
+		return true;
 	}	
 	
 	public int getUsedBiomass(){
 		return usedBiomass;
+	}
+	
+	public int getProtein(){
+		return protein;
 	}
 }

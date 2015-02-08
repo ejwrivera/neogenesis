@@ -137,6 +137,7 @@ public class GameScreen implements Screen {
 		Gdx.gl.glClearColor(0, .2f, .4f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
+		// draw everything that should be affected by shader
         game.batch.begin();
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
@@ -162,26 +163,22 @@ public class GameScreen implements Screen {
         
         stage.act();
         stage.draw();
-        
+        // disable the shader, should probably change to turnOffShader
         game.toggleShader();
-        
+        // draw everything that's not affected by the shader
         game.batch.begin();
 		
-       
-        
+     
 		camera.update();
 		// render in the coordinate system specified by the camera.
 		game.batch.setProjectionMatrix(camera.combined);
 		// begin a new batch and draw Eve and all the creatures
-		
-		 
-		
-		
+			
 		game.font.setScale(camera.zoom);
 		game.font.setUseIntegerPositions(false);
 		if (world.displayHUD){
 			game.font.draw(game.batch, "Biomass: " + eve.getBiomass(), camera.position.x-300*camera.zoom, camera.position.y+220*camera.zoom);
-			
+			game.font.draw(game.batch, "Protein: " + eve.getProtein(), camera.position.x-300*camera.zoom, camera.position.y+200*camera.zoom);
 			int usedBiomass = eve.getUsedBiomass();
 			int unusedBiomass = eve.getBiomass();
 			displayBiomass(unusedBiomass, unusedBiomassTexture);
@@ -205,8 +202,9 @@ public class GameScreen implements Screen {
 		for (TextButton button: upgradeButtons.keys()){
 			for (EventListener listener: button.getListeners()){
 				if (((ClickListener) listener).isPressed()){
-					eve.addUpgrade(upgradeButtons.get(button));
-					toRemove.add(button);
+					if (eve.addUpgrade(upgradeButtons.get(button))){
+						toRemove.add(button);
+					}
 				}	
 			}
 			upgradeTable.add(button).row();
@@ -237,7 +235,7 @@ public class GameScreen implements Screen {
 			game.batch.draw(displayTexture, cameraX+adjust, cameraY+adjust, biomassSize, biomassSize);
 			cameraX += 50*camera.zoom;
 			column++;
-			if (column==10){
+			if (column==5){
 				column = 0;
 				row++;
 				cameraX = camera.position.x-300*camera.zoom;
