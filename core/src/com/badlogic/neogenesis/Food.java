@@ -1,12 +1,5 @@
 package com.badlogic.neogenesis;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-
 /**
  * The Class Food. For packaging together nutrition information of a given edible delight
  */
@@ -61,7 +54,10 @@ public class Food implements Edible {
 
 	@Override
 	public Food beSwallowed() {
-		// TODO Auto-generated method stub
+		if(!consumed){
+			consumed=true;
+			return this;
+		}
 		return null;
 	}
 

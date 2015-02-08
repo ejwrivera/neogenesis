@@ -1,18 +1,20 @@
 package com.badlogic.neogenesis;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
-import com.badlogic.gdx.utils.ObjectSet.ObjectSetIterator;
 
 /**
  * The Class Creature. Base class of all critters, currently concrete, eventually abstract
  */
-public class Creature implements Consumable, Consumer, Mobile, Drawable {
+public class Creature implements Consumable, Consumer, Mobile, Drawable, Living {
 
 	/** The creature's position. */
 	protected Circle position;
@@ -34,6 +36,8 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	protected ObjectMap<String, Boolean> abilities;
 	
 	protected AI AI;
+	
+	protected boolean alive;
 	
 	/**
 	 * Instantiates a new creature.
@@ -63,7 +67,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 		abilities.put("impetus", false);
 		
 		clocktick = 0;
-		
+		alive=true;
 	}
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Identifiable#getID()
@@ -72,13 +76,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	public ID getID(){
 		return id;
 	}
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Collidable#collidesWith(com.badlogic.gdx.math.Circle)
-	 */
-	@Override
-	public Boolean collidesWith(Circle other) {
-		return position.overlaps(other);
-	}
+	
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Collidable#getMagnitude()
 	 */
@@ -92,6 +90,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	 */
 	@Override
 	public Food beConsumed() {
+		die();
 		return new Food(biomass, 1);
 	}
 	
@@ -106,29 +105,10 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	 * @see com.badlogic.neogenesis.Consumer#consume(com.badlogic.gdx.utils.ObjectSet)
 	 */
 	@Override
-	public ObjectSet<ID> consume (ObjectSet<Consumable> appropriatelySizedConsumables){
-		clocktick++;
-		if (abilities.get("photosynthesis") && clocktick%25==0){
-			undigestedBiomass++;
-		}
-		if (undigestedBiomass > 0){
-			biomass++;
-			undigestedBiomass--;
-		}
-		position.radius=biomass/2;
-		ObjectSet<ID> toRemove = new ObjectSet<ID>();
-		ObjectSetIterator<Consumable> consumables = appropriatelySizedConsumables.iterator();
-		while (consumables.hasNext()) {
-			Consumable consumable = consumables.next();
-			if (!toRemove.contains(consumable.getID()) && id!=consumable.getID() && consumable.collidesWith(position)) {
-				if (biomass>consumable.getBiomass()){
-					consume(consumable.beConsumed());
-					toRemove.add(consumable.getID());
-				}
-			}
-		}
-		return toRemove;
+	public void consume (Consumable consumablesToConsume){
+		consume(consumablesToConsume.beConsumed());
 	}
+	
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Mobile#move()
 	 */
@@ -146,16 +126,6 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 		return new Vector3(lastMovement, 0);
 	}
 	
-	
-	
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Drawable#getCircle()
-	 */
-	@Override
-	public Circle getCircle() {
-		return position;
-	}
-	
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Drawable#getTexture()
 	 */
@@ -171,4 +141,91 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable {
 	public void consume(Food food) {
 		undigestedBiomass += food.getNutrition()/10;
 	}
+
+	@Override
+	public Boolean collidesWith(Collidable other) {
+		boolean overlaps;
+		if (other.getShape() instanceof Circle){
+			overlaps = position.overlaps((Circle)other.getShape());
+		}
+		else {
+			overlaps = Intersector.overlaps(position, (Rectangle)other.getShape());
+		}
+		if (overlaps && other.stillCollidable() && id!=other.getID()){	
+			other.collidedWith((Consumer)this);
+			other.collidedWith((Consumable)this);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public Array<Collidable> collidesWith(Array<Collidable> otherCollidables) {
+		Array<Collidable> collidedWith = new Array<Collidable>();
+		
+		for (Collidable collidable: otherCollidables){
+			if (collidesWith(collidable)){
+				collidedWith.add(collidable);
+			}
+		}
+		return collidedWith;
+	}
+
+	@Override
+	public Shape2D getShape() {
+		return position;
+	}
+
+	@Override
+	public boolean stillCollidable() {
+		return alive;
+	}
+
+	@Override
+	public void collidedWith(Consumer consumer) {
+		
+	}
+
+	@Override
+	public void collidedWith(Consumable consumable) {
+		if (consumable.getBiomass()<biomass){
+			consume (consumable.beConsumed());
+		}
+	}
+	
+	@Override
+	public void collidedWith(Rock rock) {
+		Vector2 oldPosition = new Vector2(position.x, position.y);
+		if ( (lastMovement.x > 1 || lastMovement .x < -1) || (lastMovement.y > 1 || lastMovement.y < -1)){
+			lastMovement = lastMovement.rotate(180);
+			Vector2 newPosition = new Vector2(oldPosition).add(lastMovement);
+			position.x=newPosition.x;
+			position.y=newPosition.y;
+		}
+		
+		// squeezes the stuck thing out the right side of the rock, needs to properly squeeze out depending on direction of rock collision
+		if (collidesWith(rock)){
+			position.x++;
+			lastMovement = new Vector2(1,0);
+		}
+		
+	}
+
+	public void die(){
+		alive=false;
+	}
+
+	@Override
+	public void live() {
+		clocktick++;
+		if (abilities.get("photosynthesis") && clocktick%25==0){
+			undigestedBiomass++;
+		}
+		if (undigestedBiomass > 0){
+			biomass++;
+			undigestedBiomass--;
+		}
+		position.radius=biomass/2;
+	}
+	
 }

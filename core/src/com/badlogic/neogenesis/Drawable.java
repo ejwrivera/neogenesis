@@ -1,7 +1,7 @@
 package com.badlogic.neogenesis;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Shape2D;
 
 /**
  * The Interface Drawable.  For rendering only.
@@ -9,10 +9,10 @@ import com.badlogic.gdx.math.Circle;
 public interface Drawable extends Identifiable{
 	
 	/**
-	 * Gets the bounding rectangle.
-	 * @return the rectangle
+	 * gets its position and size
+	 * @return the circle
 	 */
-	public Circle getCircle();
+	public Shape2D getShape();
 	
 	/**
 	 * Gets the texture.

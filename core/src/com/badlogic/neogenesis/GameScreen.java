@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -155,8 +157,15 @@ public class GameScreen implements Screen {
         game.shader.setUniformf("LightPos", ShaderAttributes.LIGHT_POS);
         
 		for (Drawable drawable : world.getDrawables().values()) {
-			Circle drawBox = drawable.getCircle();
-			game.batch.draw(drawable.getTexture(), drawBox.x-drawBox.radius, drawBox.y-drawBox.radius, drawBox.radius*2, drawBox.radius*2);
+			Shape2D drawShape = drawable.getShape();
+			if (drawShape instanceof Circle){
+				Circle drawCircle = (Circle) drawShape;
+				game.batch.draw(drawable.getTexture(), drawCircle.x-drawCircle.radius, drawCircle.y-drawCircle.radius, drawCircle.radius*2, drawCircle.radius*2);
+			}
+			else {
+				Rectangle drawBox = (Rectangle) drawShape;
+				game.batch.draw(drawable.getTexture(), drawBox.x, drawBox.y, drawBox.getWidth(), drawBox.getHeight());
+			}
 		}
 		
         game.batch.end();
@@ -184,7 +193,7 @@ public class GameScreen implements Screen {
 			displayBiomass(unusedBiomass, unusedBiomassTexture);
 			displayBiomass(usedBiomass, usedBiomassTexture);
 			
-			game.font.draw(game.batch, "Location: " + MathUtils.ceil(eve.getCircle().x) +", "+MathUtils.ceil(eve.getCircle().y), camera.position.x-300*camera.zoom+(230*camera.zoom), camera.position.y+220*camera.zoom);
+			game.font.draw(game.batch, "Location: " + MathUtils.ceil(((Circle)eve.getShape()).x) +", "+MathUtils.ceil(((Circle)eve.getShape()).y), camera.position.x-300*camera.zoom+(230*camera.zoom), camera.position.y+220*camera.zoom);
 			game.font.draw(game.batch, "FPS: " + MathUtils.ceil(1/Gdx.graphics.getDeltaTime()), camera.position.x-200*camera.zoom+(400*camera.zoom), camera.position.y+220*camera.zoom);
 			if (zoomCamera>0){
 				game.font.draw(game.batch, "Zooming", camera.position.x-300*camera.zoom+(230*camera.zoom), camera.position.y+220*camera.zoom-(20*camera.zoom));
@@ -246,7 +255,7 @@ public class GameScreen implements Screen {
 	}
 	
 	public void orientCamera(){
-		while (zoomLevel < (int)eve.getCircle().radius/16){
+		while (zoomLevel < (int)((Circle)eve.getShape()).radius/16){
 			zoomCamera+=5*zoomSpeed;
 			zoomLevel++;
 		}

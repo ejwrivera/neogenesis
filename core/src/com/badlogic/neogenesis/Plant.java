@@ -3,9 +3,13 @@ package com.badlogic.neogenesis;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 
 /**
  * The Class Food. For packaging together nutrition information of a given edible delight
@@ -21,6 +25,10 @@ public class Plant implements Consumable, Drawable, Mobile {
 	private Circle position;
 	
 	private int biomass;
+	
+	private boolean alive;
+	
+	private Vector2 lastMovement;
 	/**
 	 * Instantiates a new food.
 	 * @param nutrition the nutrition
@@ -31,10 +39,8 @@ public class Plant implements Consumable, Drawable, Mobile {
 		id = IDFactory.getNewID();
 		consumed=false;
 		texture = TextureMap.getTexture("food");
-	}
-	
-	public Plant(int nutrition){
-		this(nutrition, new Circle());
+		alive = true;
+		lastMovement=new Vector2(0,0);
 	}
 	
 	/**
@@ -43,14 +49,6 @@ public class Plant implements Consumable, Drawable, Mobile {
 	 */
 	public int getNutrition(){
 		return biomass;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Collidable#collidesWith(com.badlogic.gdx.math.Rectangle)
-	 */
-	@Override
-	public Boolean collidesWith(Circle other) {
-		return position.overlaps(other);
 	}
 
 	/* (non-Javadoc)
@@ -66,6 +64,7 @@ public class Plant implements Consumable, Drawable, Mobile {
 	 */
 	@Override
 	public Food beConsumed() {
+		die();
 		return new Food (biomass, 0);
 	}
 
@@ -87,11 +86,6 @@ public class Plant implements Consumable, Drawable, Mobile {
 	}
 
 	@Override
-	public Circle getCircle() {
-		return position;
-	}
-
-	@Override
 	public Texture getTexture() {
 		return texture;
 	}
@@ -104,6 +98,69 @@ public class Plant implements Consumable, Drawable, Mobile {
 		Vector2 newPosition = new Vector2(oldPosition).add(movement);
 		position.x=newPosition.x;
 		position.y=newPosition.y;
+		lastMovement = newPosition.sub(oldPosition);
 		return new Vector3(newPosition.x-oldPosition.x, newPosition.y-oldPosition.y, 0);
 	}
+
+	@Override
+	public Boolean collidesWith(Collidable other) {
+		boolean overlaps;
+		if (other.getShape() instanceof Circle){
+			overlaps = position.overlaps((Circle)other.getShape());
+		}
+		else {
+			overlaps = Intersector.overlaps(position, (Rectangle)other.getShape());
+		}
+		if (overlaps && other.stillCollidable() && id!=other.getID()){	
+			other.collidedWith((Consumable)this);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public Array<Collidable> collidesWith(Array<Collidable> otherCollidables) {
+		Array<Collidable> collidedWith = new Array<Collidable>();
+		for (Collidable collidable: otherCollidables){
+			if (collidesWith(collidable)){
+				collidedWith.add(collidable);
+			}
+		}
+		return collidedWith;
+	}
+
+	@Override
+	public Shape2D getShape() {
+		return position;
+	}
+
+	@Override
+	public boolean stillCollidable() {
+		return alive;
+	}
+
+	@Override
+	public void collidedWith(Consumer consumer) {
+		consumer.collidedWith((Consumable)this);
+	}
+
+	@Override
+	public void collidedWith(Consumable consumable) {	
+	}
+	
+	@Override
+	public void collidedWith(Rock rock) {
+		Vector2 oldPosition = new Vector2(position.x, position.y);
+		lastMovement = lastMovement.rotate(180);
+		Vector2 newPosition = new Vector2(oldPosition).add(lastMovement);
+		position.x=newPosition.x;
+		position.y=newPosition.y;
+		lastMovement = new Vector2(0,0);
+	}
+	
+	public void die(){
+		alive=false;
+	}
+
+	
 }
