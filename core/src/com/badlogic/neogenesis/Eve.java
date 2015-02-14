@@ -121,15 +121,22 @@ public class Eve extends Creature {
 			return new Vector3(lastMovement, 0);
 		}
 		else {
-			Vector2 oldPosition = new Vector2(position.x, position.y);
-			Vector2 movement = new Vector2(320 * Gdx.graphics.getDeltaTime(), 0);
-			// point towards center of inBellyOf
+			Vector2 newPosition;
 			Vector2 bellyCenter = inBellyOf.getCenter();
-			movement = movement.rotate(oldPosition.sub(bellyCenter).angle());
-			Vector2 newPosition = new Vector2(oldPosition).add(movement);
-			lastMovement = new Vector2(newPosition.x-oldPosition.x, newPosition.y-oldPosition.y);
-			position.x = lastMovement.x;
-			position.y = lastMovement.y;
+			Vector2 oldPosition = new Vector2(position.x, position.y);
+			if (Math.abs(position.x-bellyCenter.x)+Math.abs(position.y-bellyCenter.y)<6){
+				newPosition = bellyCenter;
+			}
+			else{
+				
+				Vector2 movement = new Vector2(320 * Gdx.graphics.getDeltaTime(), 0);
+				// point towards center of inBellyOf
+				
+				movement = movement.rotate(bellyCenter.sub(oldPosition).angle());
+				newPosition = new Vector2(oldPosition).add(movement);
+			}
+			position.x = newPosition.x;
+			position.y = newPosition.y;
 			lastMovement = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
 			return new Vector3(lastMovement, 0);
 		}

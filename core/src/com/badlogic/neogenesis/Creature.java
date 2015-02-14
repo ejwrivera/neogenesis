@@ -105,7 +105,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 	 */
 	@Override
 	public Food beBitten() {
-		if (biomass < 1){
+		if (biomass <= 1){
 			return beDigested();
 		}
 		biomass-=1;
@@ -225,7 +225,8 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 
 	@Override
 	public void collidedWith(Consumable consumable) {
-		if (consumable.getBiomass()<biomass && consumable.beIngested(this)){
+		
+		if (inBellyOf==null && consumable.getBiomass()<biomass && consumable.beIngested(this)){
 			ingest(consumable);
 		}
 	}
@@ -262,6 +263,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 			if (belly.size>0){
 				ObjectSet<Consumable> toRemove = new ObjectSet<Consumable>();
 				for (Consumable consumableToDigest: belly){
+					if (this instanceof Eve) System.out.println(consumableToDigest);
 					digest(consumableToDigest);
 					if (consumableToDigest.getBiomass()<=0){
 						toRemove.add(consumableToDigest); 

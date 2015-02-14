@@ -168,7 +168,6 @@ public class Plant implements Consumable, Drawable, Mobile, Living {
 
 	@Override
 	public void collidedWith(Consumer consumer) {
-		consumer.collidedWith((Consumable)this);
 	}
 
 	@Override
