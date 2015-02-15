@@ -204,7 +204,7 @@ public class GameWorld {
 	 * Spawn food.
 	 */
 	private boolean spawnPlant() {
-		addToMaps(new Plant(5, new Circle(MathUtils.random(0, 2400), MathUtils.random(0, 1800), 4)));
+		addToMaps(new Plant(1, new Circle(MathUtils.random(0, 2400), MathUtils.random(0, 1800), 4)));
 		return true;
 	}
 

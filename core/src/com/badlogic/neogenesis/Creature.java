@@ -49,6 +49,8 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 	
 	private boolean hunting;
 	
+	private int undigestedBiomass;
+	
 	/**
 	 * Instantiates a new creature.
 	 * @param startPosAndSize the start pos and size
@@ -81,6 +83,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 		hunting = false;
 		
 		sense = new Sense(position,200);
+		undigestedBiomass = 0;
 	}
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Identifiable#getID()
@@ -114,11 +117,11 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 	 */
 	@Override
 	public Food beBitten() {
-		if (biomass <= 10){
+		if (biomass <= 1){
 			return beDigested();
 		}
-		biomass-=10;
-		return new Food(10, 1);
+		biomass-=2;
+		return new Food(1, 1);
 	}
 	
 	/* (non-Javadoc)
@@ -168,15 +171,21 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 			}
 		}
 		else {
-			Vector2 oldPosition = new Vector2(position.x, position.y);
-			Vector2 movement = new Vector2(320 * Gdx.graphics.getDeltaTime(), 0);
-			// point towards center of inBellyOf
+			Vector2 newPosition;
 			Vector2 bellyCenter = inBellyOf.getCenter();
-			movement = movement.rotate(oldPosition.sub(bellyCenter).angle());
-			Vector2 newPosition = new Vector2(oldPosition).add(movement);
-			lastMovement = new Vector2(newPosition.x-oldPosition.x, newPosition.y-oldPosition.y);
-			position.x = lastMovement.x;
-			position.y = lastMovement.y;
+			Vector2 oldPosition = new Vector2(position.x, position.y);
+			if (Math.abs(position.x-bellyCenter.x)+Math.abs(position.y-bellyCenter.y)<6){
+				newPosition = bellyCenter;
+			}
+			else{
+				Vector2 movement = new Vector2(320 * Gdx.graphics.getDeltaTime(), 0);
+				// point towards center of inBellyOf
+				
+				movement = movement.rotate(bellyCenter.sub(oldPosition).angle());
+				newPosition = new Vector2(oldPosition).add(movement);
+			}
+			position.x = newPosition.x;
+			position.y = newPosition.y;
 			lastMovement = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
 			return new Vector3(lastMovement, 0);
 		}
@@ -195,7 +204,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 	 * @param food the food
 	 */
 	public void digest(Food food) {
-		biomass += food.getNutrition()/10;
+		biomass += food.getNutrition();
 	}
 
 	public void digest(Consumable consumableToDigest){
@@ -302,9 +311,9 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 	public void live() {
 		clocktick++;
 		if (abilities.get("photosynthesis") && clocktick%25==0){
-			digest(new Food(5));
+			digest(new Food(1));
 		}
-		if (clocktick%20==0){
+		if (clocktick%4==0){
 			if (belly.size>0){
 				ObjectSet<Consumable> toRemove = new ObjectSet<Consumable>();
 				for (Consumable consumableToDigest: belly){

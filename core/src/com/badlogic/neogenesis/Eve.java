@@ -19,6 +19,7 @@ public class Eve extends Creature {
 	private ObjectMap<String, Integer> availableAbilitiesCost;
 	private int usedBiomass;
 	private int protein;
+	private int proteinStore;
 	
 	/**
 	 * Instantiates a new eve.
@@ -49,6 +50,7 @@ public class Eve extends Creature {
 		availableAbilitiesCost.put("photosynthesis", 50);
 		usedBiomass = 0;
 		protein = 0;
+		proteinStore = 0;
 	}
 	
 	/**
@@ -70,8 +72,12 @@ public class Eve extends Creature {
 	 * @see com.badlogic.neogenesis.Creature#consume(com.badlogic.neogenesis.Food)
 	 */
 	public void digest(Food food){
-		super.digest(new Food(food.getNutrition()*2));
-		protein+=food.getProtein();
+		super.digest(food);
+		proteinStore+=food.getProtein();
+		if (proteinStore>10){
+			protein++;
+			proteinStore-=10;
+		}
 		
 		if (protein >= 3){
 			for(String ability: availableAbilities.keys()){
