@@ -17,19 +17,18 @@ import com.badlogic.gdx.utils.TimeUtils;
  */
 public class GameWorld {
 	/** The eve. */
-	private Eve eve;	
+	private Eve eve;
 	/** The living things. */
 	private ObjectMap<ID, Living> theLiving;
 	/** The mobile objects. */
 	private ObjectMap<ID, Mobile> mobs;	
-	/** The consumers. */
-	private ObjectMap<ID, Consumer> consumers;
-	/** The consumables. */
-	private ObjectMap<ID, Consumable> consumables;
 	/** Things to check for collision. */
 	private ObjectMap<ID, Collidable> collidables;
 	/** Things to draw. */
 	private ObjectMap<ID, Drawable> drawables;
+	/** Things to potentially clean up. */
+	private ObjectMap<ID, Destructible> destructibles;
+	
 	/** The last spawn time. */
 	private long lastSpawnTime;
 	/** The starting amount of Food. */
@@ -63,10 +62,9 @@ public class GameWorld {
 		// initialize maps
 		theLiving = new ObjectMap<ID, Living>();
 		mobs = new ObjectMap<ID, Mobile>();
-		consumers = new ObjectMap<ID, Consumer>();
-		consumables = new ObjectMap<ID, Consumable>();
 		collidables = new ObjectMap<ID, Collidable>();
 		drawables = new ObjectMap<ID, Drawable>();
+		destructibles = new ObjectMap<ID, Destructible>();
 		
 		// create Eve
 		int biomass = (Integer) (loadGame ? game.saveManager.loadDataValue("biomass",int.class) : DebugValues.getEveStartingBiomass());
@@ -110,10 +108,9 @@ public class GameWorld {
 		ID id = creature.getID();
 		theLiving.put(id, creature);
 		mobs.put(id, creature);
-		consumers.put(id, creature);
-		consumables.put(id, creature);
 		collidables.put(id, creature);
 		drawables.put(id, creature);
+		destructibles.put(id, creature);
 	}
 	
 	/**
@@ -124,10 +121,10 @@ public class GameWorld {
 	private void addToMaps(Plant plant) {
 		ID id = plant.getID();
 		theLiving.put(id, plant);
-		consumables.put(id, plant);
 		collidables.put(id, plant);
 		drawables.put(id, plant);
 		mobs.put(id, plant);
+		destructibles.put(id, plant);
 	}
 	/**
 	 * Adds a rock to the maps.
@@ -152,17 +149,14 @@ public class GameWorld {
 		if (mobs.containsKey(id)){
 			mobs.remove(id);
 		}
-		if (consumers.containsKey(id)){
-			consumers.remove(id);
-		}
-		if (consumables.containsKey(id)){
-			consumables.remove(id);
-		}
 		if (collidables.containsKey(id)){
 			collidables.remove(id);
 		}
 		if (drawables.containsKey(id)){
 			drawables.remove(id);
+		}	
+		if (destructibles.containsKey(id)){
+			destructibles.remove(id);
 		}	
 	}
 	
@@ -260,7 +254,9 @@ public class GameWorld {
 		// everything that lives must live
 		for (Living thing : theLiving.values()) {
 			thing.live();
-			if (!thing.isAlive()){
+		}
+		for (Destructible thing: destructibles.values()){
+			if (!thing.isDestroyed()){
 				toRemove.add(thing.getID());
 			}
 		}
@@ -310,7 +306,7 @@ public class GameWorld {
 	/**
 	 * Generate consumable magnitude map.
 	 *
-	 * @return the map of integer to consumables in that size class
+	 * @return the map of integer to collidables in that size class
 	 */
 	private IntMap<ObjectSet<Collidable>> generateCollidableMagnitudeMap() {
 		IntMap<ObjectSet<Collidable>> magnitudeMap = new IntMap<ObjectSet<Collidable>>();

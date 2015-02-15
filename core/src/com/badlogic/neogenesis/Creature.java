@@ -16,10 +16,10 @@ import com.badlogic.gdx.utils.ObjectSet;
 /**
  * The Class Creature. Base class of all critters, currently concrete, eventually abstract
  */
-public class Creature implements Consumable, Consumer, Mobile, Drawable, Living {
+public class Creature implements Consumable, Consumer, Mobile, Drawable, Living, Destructible {
 
 	/** The creature's position. */
-	protected Circle position;
+	protected Vector2 position;
 	/** The last movement. */
 	protected Vector2 lastMovement;
 	/** The creature's id. */
@@ -57,7 +57,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 	 * @param biomass the biomass
 	 */
 	public Creature(Vector2 startPos, int biomass){
-		position = new Circle(startPos, biomass/2);
+		position = startPos;
 		id = IDFactory.getNewID();
 		this.biomass = biomass;
 		texture = TextureMap.getTexture("creature");
@@ -134,11 +134,11 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 	public Vector3 move() {
 		if (inBellyOf==null){
 			if (MathUtils.random(1,50)==50){
-				lastMovement = AI.amble(position);
+				lastMovement = AI.amble(getCircle());
 				position.x+=lastMovement.x;
 				position.y+=lastMovement.y;
 			} else {
-				lastMovement = AI.forage(position);
+				lastMovement = AI.forage(getCircle());
 				position.x+=lastMovement.x;
 				position.y+=lastMovement.y;
 			}
@@ -203,10 +203,10 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 	public Boolean collidesWith(Collidable other) {
 		boolean overlaps;
 		if (other.getShape() instanceof Circle){
-			overlaps = position.overlaps((Circle)other.getShape());
+			overlaps = getCircle().overlaps((Circle)other.getShape());
 		}
 		else {
-			overlaps = Intersector.overlaps(position, (Rectangle)other.getShape());
+			overlaps = Intersector.overlaps(getCircle(), (Rectangle)other.getShape());
 		}
 		return overlaps && other.stillCollidable();
 	}
@@ -248,7 +248,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 	
 	@Override
 	public Shape2D getShape() {
-		return position;
+		return getCircle();
 	}
 
 	public void die(){
@@ -275,8 +275,6 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 				}
 			}
 		}
-		
-		position.radius=biomass/2;
 	}
 
 	@Override
@@ -292,7 +290,16 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 
 	@Override
 	public Vector2 getCenter() {
-		return new Vector2 (position.x, position.y);
+		return position;
+	}
+
+	public Circle getCircle() {
+		return new Circle(position, biomass/2);
+	}
+	
+	@Override
+	public boolean isDestroyed() {
+		return isAlive();
 	}
 	
 }
