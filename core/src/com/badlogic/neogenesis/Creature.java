@@ -49,7 +49,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 	
 	private boolean hunting;
 	
-	private int undigestedBiomass;
+	protected int health;
 	
 	/**
 	 * Instantiates a new creature.
@@ -83,7 +83,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 		hunting = false;
 		
 		sense = new Sense(position,200);
-		undigestedBiomass = 0;
+		health = 5;
 	}
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Identifiable#getID()
@@ -226,7 +226,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 		for (Collidable collidable: otherCollidables){
 			
 			collidable.collidedWith(sense);
-			if (potentialPrey!=sense.getSensed()){
+			if (potentialPrey!=sense.getSensed()&&sense.getSensed().getBiomass()<biomass){
 				potentialPrey=sense.getSensed();
 				if (potentialDirection==null){
 					potentialDirection = potentialPrey.getPosition(); 
@@ -306,10 +306,28 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 	public void die(){
 		alive=false;
 	}
+	
+	public Corpse getCorpse(){
+		if (!alive){
+			return new Corpse(new Plant(biomass, getCircle()));
+		}
+		return null;
+	}
+	
 
 	@Override
 	public void live() {
 		clocktick++;
+		if (inBellyOf!=null && clocktick%100==0){
+			health--;
+		}
+		if (clocktick%500==0 && !(this instanceof Eve)){
+			health--;
+		}
+		
+		if (health <= 0){
+			die();
+		}
 		if (abilities.get("photosynthesis") && clocktick%25==0){
 			digest(new Food(1));
 		}

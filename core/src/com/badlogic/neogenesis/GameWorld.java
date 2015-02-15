@@ -254,6 +254,9 @@ public class GameWorld {
 		// everything that lives must live
 		for (Living thing : theLiving.values()) {
 			thing.live();
+			if (!thing.isAlive()&&thing.getCorpse().plant!=null){
+				addToMaps(thing.getCorpse().plant);
+			}
 		}
 		for (Destructible thing: destructibles.values()){
 			if (!thing.isDestroyed()){

@@ -200,6 +200,13 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 		alive=false;
 	}
 
+	public Corpse getCorpse(){
+		if (!alive){
+			return new Corpse();
+		}
+		return null;
+	}
+	
 	@Override
 	public void live() {
 	}
