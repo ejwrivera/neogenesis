@@ -130,6 +130,11 @@ public class Plant implements Consumable, Drawable, Mobile, Living {
 	}
 
 	@Override
+	public boolean stillCollidable() {
+		return alive;
+	}
+	
+	@Override
 	public Boolean collidesWith(Collidable other) {
 		boolean overlaps;
 		if (other.getShape() instanceof Circle){
@@ -138,11 +143,7 @@ public class Plant implements Consumable, Drawable, Mobile, Living {
 		else {
 			overlaps = Intersector.overlaps(position, (Rectangle)other.getShape());
 		}
-		if (overlaps && other.stillCollidable() && id!=other.getID()){	
-			other.collidedWith((Consumable)this);
-			return true;
-		}
-		return false;
+		return overlaps && other.stillCollidable();	
 	}
 
 	@Override
@@ -151,21 +152,18 @@ public class Plant implements Consumable, Drawable, Mobile, Living {
 		for (Collidable collidable: otherCollidables){
 			if (collidesWith(collidable)){
 				collidedWith.add(collidable);
+				collidedWith(collidable);
+				collidable.collidedWith((Collidable)this);
 			}
 		}
 		return collidedWith;
 	}
 
 	@Override
-	public Shape2D getShape() {
-		return position;
+	public void collidedWith(Collidable other){
+		other.collidedWith((Consumable)this);
 	}
-
-	@Override
-	public boolean stillCollidable() {
-		return alive;
-	}
-
+	
 	@Override
 	public void collidedWith(Consumer consumer) {
 	}
@@ -182,6 +180,11 @@ public class Plant implements Consumable, Drawable, Mobile, Living {
 		position.x=newPosition.x;
 		position.y=newPosition.y;
 		lastMovement = new Vector2(0,0);
+	}
+	
+	@Override
+	public Shape2D getShape() {
+		return position;
 	}
 	
 	public void die(){

@@ -19,6 +19,7 @@ public interface Collidable extends Identifiable {
 	public int getMagnitude();
 	public boolean stillCollidable();
 	
+	public void collidedWith(Collidable collidable);
 	public void collidedWith(Consumer consumer);
 	public void collidedWith(Consumable consumable);
 	public void collidedWith(Rock rock);

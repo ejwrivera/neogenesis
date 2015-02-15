@@ -105,10 +105,10 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 	 */
 	@Override
 	public Food beBitten() {
-		if (biomass <= 1){
+		if (biomass <= 10){
 			return beDigested();
 		}
-		biomass-=1;
+		biomass-=10;
 		return new Food(10, 1);
 	}
 	
@@ -181,6 +181,25 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 	
 	
 	@Override
+	public boolean stillCollidable() {
+		return alive;
+	}
+	
+	@Override
+	public Array<Collidable> collidesWith(Array<Collidable> otherCollidables) {
+		Array<Collidable> collidedWith = new Array<Collidable>();
+		
+		for (Collidable collidable: otherCollidables){
+			if (collidesWith(collidable)){
+				collidedWith.add(collidable);
+				collidedWith(collidable);
+				collidable.collidedWith((Collidable)this);
+			}
+		}
+		return collidedWith;
+	}
+	
+	@Override
 	public Boolean collidesWith(Collidable other) {
 		boolean overlaps;
 		if (other.getShape() instanceof Circle){
@@ -189,36 +208,14 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 		else {
 			overlaps = Intersector.overlaps(position, (Rectangle)other.getShape());
 		}
-		if (overlaps && other.stillCollidable() && id!=other.getID()){	
-			other.collidedWith((Consumer)this);
-			other.collidedWith((Consumable)this);
-			return true;
-		}
-		return false;
+		return overlaps && other.stillCollidable();
 	}
 
-	@Override
-	public Array<Collidable> collidesWith(Array<Collidable> otherCollidables) {
-		Array<Collidable> collidedWith = new Array<Collidable>();
-		
-		for (Collidable collidable: otherCollidables){
-			if (collidesWith(collidable)){
-				collidedWith.add(collidable);
-			}
-		}
-		return collidedWith;
+	public void collidedWith(Collidable other){
+		other.collidedWith((Consumer)this);
+		other.collidedWith((Consumable)this);
 	}
-
-	@Override
-	public Shape2D getShape() {
-		return position;
-	}
-
-	@Override
-	public boolean stillCollidable() {
-		return alive;
-	}
-
+	
 	@Override
 	public void collidedWith(Consumer consumer) {
 	}
@@ -248,6 +245,11 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 		}
 		
 	}
+	
+	@Override
+	public Shape2D getShape() {
+		return position;
+	}
 
 	public void die(){
 		alive=false;
@@ -263,7 +265,6 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living 
 			if (belly.size>0){
 				ObjectSet<Consumable> toRemove = new ObjectSet<Consumable>();
 				for (Consumable consumableToDigest: belly){
-					if (this instanceof Eve) System.out.println(consumableToDigest);
 					digest(consumableToDigest);
 					if (consumableToDigest.getBiomass()<=0){
 						toRemove.add(consumableToDigest); 

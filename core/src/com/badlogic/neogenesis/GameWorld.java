@@ -281,9 +281,7 @@ public class GameWorld {
 		// check if we need to create a new creature
 		if (TimeUtils.nanoTime()-lastSpawnTime > 200000000/DebugValues.getSpawnRate())
 			spawnCreature();
-		// check for collisions and consume
-		
-		// this needs to be altered to use collidable; OPEN DESIGN DECISION: should this still be applied?  Very small things should no longer affect larger things?   Probably - question is X orders of magnitude?
+		// check for collisions
 		if (magnitudeColliding){
 			IntMap<ObjectSet<Collidable>> magnitudeMap = generateCollidableMagnitudeMap();
 			for (Collidable collidable: collidables.values()){
@@ -300,9 +298,11 @@ public class GameWorld {
 		else {
 			Array<Collidable> collidablesToCheck = new Array<Collidable>(collidables.values().toArray());
 			for (Collidable collidable: collidables.values()){
+				collidablesToCheck.removeValue(collidable, true);
 				if (collidable.stillCollidable()){
 					collidable.collidesWith(collidablesToCheck); 
 				}
+				
 			}
 		}
 	}
