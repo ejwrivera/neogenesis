@@ -1,6 +1,7 @@
 package com.badlogic.neogenesis;
 
 import com.badlogic.gdx.math.Shape2D;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 /**
@@ -16,6 +17,7 @@ public interface Collidable extends Identifiable {
 	public Boolean collidesWith(Collidable other);
 	public Array<Collidable> collidesWith (Array<Collidable> otherCollidables);
 	public Shape2D getShape();
+	public Vector2 getPosition();
 	public int getMagnitude();
 	public boolean stillCollidable();
 	

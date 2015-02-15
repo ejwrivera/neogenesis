@@ -17,9 +17,11 @@ import com.badlogic.gdx.utils.ObjectSet;
  * The Class Creature. Base class of all critters, currently concrete, eventually abstract
  */
 public class Creature implements Consumable, Consumer, Mobile, Drawable, Living, Destructible {
-
+	
 	/** The creature's position. */
 	protected Vector2 position;
+	/** The creature's ideal position. */
+	protected Vector2 movingTowards;
 	/** The last movement. */
 	protected Vector2 lastMovement;
 	/** The creature's id. */
@@ -42,6 +44,10 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 	protected AI AI;
 	
 	protected boolean alive;
+	
+	protected Sense sense;
+	
+	private boolean hunting;
 	
 	/**
 	 * Instantiates a new creature.
@@ -71,7 +77,10 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 		abilities.put("impetus", false);
 		
 		clocktick = 0;
-		alive=true;
+		alive = true;
+		hunting = false;
+		
+		sense = new Sense(position,200);
 	}
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Identifiable#getID()
@@ -132,17 +141,31 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 	 */
 	@Override
 	public Vector3 move() {
+		
 		if (inBellyOf==null){
-			if (MathUtils.random(1,50)==50){
-				lastMovement = AI.amble(getCircle());
-				position.x+=lastMovement.x;
-				position.y+=lastMovement.y;
-			} else {
-				lastMovement = AI.forage(getCircle());
-				position.x+=lastMovement.x;
-				position.y+=lastMovement.y;
+			if (hunting&&movingTowards!=null){
+				Vector2 oldPosition = new Vector2(position.x, position.y);
+				Vector2 movement = new Vector2(50 * Gdx.graphics.getDeltaTime(), 0);
+				Vector2 temp = new Vector2(movingTowards);
+				movement = movement.rotate(temp.sub(oldPosition).angle());
+				Vector2 newPosition = new Vector2(oldPosition).add(movement);
+				position.x = newPosition.x;
+				position.y = newPosition.y;
+				lastMovement = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
+				return new Vector3(lastMovement, 0);		
 			}
-			return new Vector3(lastMovement, 0);
+			else{
+				if (MathUtils.random(1,50)==50){
+					lastMovement = AI.amble(getCircle());
+					position.x+=lastMovement.x;
+					position.y+=lastMovement.y;
+				} else {
+					lastMovement = AI.forage(getCircle());
+					position.x+=lastMovement.x;
+					position.y+=lastMovement.y;
+				}
+				return new Vector3(lastMovement, 0);
+			}
 		}
 		else {
 			Vector2 oldPosition = new Vector2(position.x, position.y);
@@ -189,13 +212,32 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 	public Array<Collidable> collidesWith(Array<Collidable> otherCollidables) {
 		Array<Collidable> collidedWith = new Array<Collidable>();
 		
+		Consumable potentialPrey=null;
+		Vector2 potentialDirection=null;
 		for (Collidable collidable: otherCollidables){
+			
+			collidable.collidedWith(sense);
+			if (potentialPrey!=sense.getSensed()){
+				potentialPrey=sense.getSensed();
+				if (potentialDirection==null){
+					potentialDirection = potentialPrey.getPosition(); 
+					hunting = true;
+				}
+				else {
+					if (position.dst(potentialDirection)>position.dst(potentialPrey.getPosition())){
+						potentialDirection=potentialPrey.getPosition();
+						hunting = true;
+					}
+				}
+			}
+			
 			if (collidesWith(collidable)){
 				collidedWith.add(collidable);
 				collidedWith(collidable);
 				collidable.collidedWith((Collidable)this);
 			}
 		}
+		movingTowards = potentialDirection;
 		return collidedWith;
 	}
 	
@@ -226,6 +268,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 		if (inBellyOf==null && consumable.getBiomass()<biomass && consumable.beIngested(this)){
 			ingest(consumable);
 		}
+		hunting = false;
 	}
 	
 	@Override
@@ -290,7 +333,7 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 
 	@Override
 	public Vector2 getCenter() {
-		return position;
+		return new Vector2(position);
 	}
 
 	public Circle getCircle() {
@@ -300,6 +343,11 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 	@Override
 	public boolean isDestroyed() {
 		return isAlive();
+	}
+
+	@Override
+	public Vector2 getPosition() {
+		return new Vector2(position);
 	}
 	
 }

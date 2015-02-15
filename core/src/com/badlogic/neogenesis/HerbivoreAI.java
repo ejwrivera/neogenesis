@@ -18,7 +18,7 @@ public class HerbivoreAI implements AI {
 		switch (rand){
 			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
 				Vector2 oldPosition = new Vector2(position.x, position.y);
-				Vector2 movement = new Vector2(80 * Gdx.graphics.getDeltaTime(), 0);
+				Vector2 movement = new Vector2(50 * Gdx.graphics.getDeltaTime(), 0);
 				movement = movement.rotate(MathUtils.random(1, 360));
 				Vector2 newPosition = new Vector2(oldPosition).add(movement);
 				lastMovement = new Vector2(newPosition.x-oldPosition.x, newPosition.y-oldPosition.y);

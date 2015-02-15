@@ -22,7 +22,9 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 	/** The texture. */
 	private Texture texture;
 	/** The position. */
-	private Circle position;
+	private Vector2 position;
+	
+	private float size;
 	
 	private int biomass;
 	
@@ -37,7 +39,8 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 	 */
 	public Plant(int biomass, Circle position){
 		this.biomass=biomass;
-		this.position=position;
+		this.position=new Vector2(position.x, position.y);
+		this.size = position.radius;
 		id = IDFactory.getNewID();
 		consumed=false;
 		texture = TextureMap.getTexture("food");
@@ -138,10 +141,10 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 	public Boolean collidesWith(Collidable other) {
 		boolean overlaps;
 		if (other.getShape() instanceof Circle){
-			overlaps = position.overlaps((Circle)other.getShape());
+			overlaps = (getCircle()).overlaps((Circle)other.getShape());
 		}
 		else {
-			overlaps = Intersector.overlaps(position, (Rectangle)other.getShape());
+			overlaps = Intersector.overlaps(getCircle(), (Rectangle)other.getShape());
 		}
 		return overlaps && other.stillCollidable();	
 	}
@@ -184,7 +187,7 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 	
 	@Override
 	public Shape2D getShape() {
-		return position;
+		return getCircle();
 	}
 	
 	public void die(){
@@ -211,5 +214,13 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 		return isAlive();
 	}
 
+	@Override
+	public Vector2 getPosition() {
+		return position;
+	}
+
+	private Circle getCircle() {
+		return new Circle(position.x, position.y, size);
+	}
 	
 }

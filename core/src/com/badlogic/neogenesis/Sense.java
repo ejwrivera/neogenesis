@@ -1,6 +1,5 @@
 package com.badlogic.neogenesis;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
@@ -8,45 +7,60 @@ import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-public class Rock implements Drawable, Collidable{
+public class Sense implements Collidable, Destructible {
 
-	private ID id;
-	private Rectangle position;
-	private Texture texture;
+	boolean destroyed;
+	Vector2 position;
+	int size;
+	Consumable sensed;
 	
-	public Rock(Rectangle position){
+	Sense (Vector2 position, int size){
 		this.position=position;
-		id = IDFactory.getNewID();
-		texture=TextureMap.getTexture("rock");
+		this.size = size;
+		destroyed = false;
 	}
-	@Override
-	public ID getID() {
-		return id;
+	
+	public Consumable getSensed(){
+		return sensed;
 	}
-
+	
+	public void destroy(){
+		destroyed = true;
+	}
+	
+	public boolean isDestroyed(){
+		return destroyed;
+	}
 	
 	@Override
 	public Shape2D getShape() {
-		return position;
+		return new Circle(position.x, position.y, size);
 	}
 
 	@Override
 	public int getMagnitude() {
-		return (int) position.getWidth()/100;
+		return 0;
 	}
 
 	@Override
 	public boolean stillCollidable() {
-		return true;
+		return isDestroyed();
 	}
 	
+	@Override
+	public ID getID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public Boolean collidesWith(Collidable other) {
 		boolean overlaps;
-		if (other.getShape() instanceof Rectangle){
-			overlaps = position.overlaps((Rectangle)other.getShape());
+		if (other.getShape() instanceof Circle){
+			overlaps = ((Circle)getShape()).overlaps((Circle)other.getShape());
 		}
 		else {
-			overlaps = Intersector.overlaps((Circle)other.getShape(),position);
+			overlaps = Intersector.overlaps((Circle)getShape(), (Rectangle)other.getShape());
 		}
 		return overlaps && other.stillCollidable();
 	}
@@ -54,27 +68,28 @@ public class Rock implements Drawable, Collidable{
 	@Override
 	public Array<Collidable> collidesWith(Array<Collidable> otherCollidables) {
 		Array<Collidable> collidedWith = new Array<Collidable>();
+
 		for (Collidable collidable: otherCollidables){
 			if (collidesWith(collidable)){
 				collidedWith.add(collidable);
-				collidedWith(collidable);
-				collidable.collidedWith((Collidable)this);
 			}
 		}
 		return collidedWith;
 	}
 
 	@Override
-	public void collidedWith(Collidable other) {
-		other.collidedWith((Rock)this);
+	public void collidedWith(Collidable collidable) {
 	}
-
+	
 	@Override
 	public void collidedWith(Consumer consumer) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public void collidedWith(Consumable consumable) {
+		sensed = consumable;
 	}
 
 	@Override
@@ -82,15 +97,14 @@ public class Rock implements Drawable, Collidable{
 		// TODO Auto-generated method stub
 		
 	}
-	
-	@Override
-	public Texture getTexture() {
-		return texture;
-	}
+
 	@Override
 	public Vector2 getPosition() {
-		// doesn't return the center
-		return new Vector2(position.x, position.y);
+		return position;
 	}
 
+	
+
+	
+	
 }
