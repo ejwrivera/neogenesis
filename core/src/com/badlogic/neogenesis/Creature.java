@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 /**
  * The Class Creature. Base class of all critters, currently concrete, eventually abstract
  */
-public class Creature implements Consumable, Consumer, Mobile, Drawable, Living, Destructible {
+public class Creature implements Consumable, Consumer, Mobile, Drawable, Living, Destructible, Audible {
 	
 	/** The creature's position. */
 	protected Vector2 position;
@@ -136,7 +136,9 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 	 */
 	@Override
 	public void ingest (Consumable consumableToIngest){
-		belly.add(consumableToIngest);
+		if (!belly.contains(consumableToIngest)){
+			belly.add(consumableToIngest);
+		}
 	}
 	
 	/* (non-Javadoc)
@@ -375,6 +377,15 @@ public class Creature implements Consumable, Consumer, Mobile, Drawable, Living,
 	@Override
 	public Vector2 getPosition() {
 		return new Vector2(position);
+	}
+
+	@Override
+	public boolean emittingSound() {
+		return false;
+	}
+
+	@Override
+	public void emitSound() {
 	}
 	
 }

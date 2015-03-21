@@ -92,7 +92,7 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 	 */
 	@Override
 	public int getBiomass() {
-		return 0;
+		return biomass;
 	}
 	
 	public boolean beenConsumed() {

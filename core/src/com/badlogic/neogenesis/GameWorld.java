@@ -26,6 +26,8 @@ public class GameWorld {
 	private ObjectMap<ID, Collidable> collidables;
 	/** Things to draw. */
 	private ObjectMap<ID, Drawable> drawables;
+	/** Things to emit sound. */
+	private ObjectMap<ID, Audible> audibles;
 	/** Things to potentially clean up. */
 	private ObjectMap<ID, Destructible> destructibles;
 	
@@ -46,6 +48,7 @@ public class GameWorld {
 	
 	/** The sound stack. */
 	public int soundStack;
+	
 
 	/**
 	 * Instantiates a new game screen.
@@ -62,6 +65,7 @@ public class GameWorld {
 		mobs = new ObjectMap<ID, Mobile>();
 		collidables = new ObjectMap<ID, Collidable>();
 		drawables = new ObjectMap<ID, Drawable>();
+		audibles = new ObjectMap<ID, Audible>();
 		destructibles = new ObjectMap<ID, Destructible>();
 		
 		// create Eve
@@ -113,6 +117,7 @@ public class GameWorld {
 		collidables.put(id, creature);
 		drawables.put(id, creature);
 		destructibles.put(id, creature);
+		audibles.put(id, creature);
 	}
 	
 	/**
@@ -271,7 +276,6 @@ public class GameWorld {
 				gameOver = true;
 			}
 			removeFromMaps(id);
-			soundStack++;
 		}
 		
 		// move everything that moves
@@ -307,6 +311,12 @@ public class GameWorld {
 			}
 		}
 		
+		for (Audible audible: audibles.values()){
+			if (audible.emittingSound()){
+				soundStack++;
+				audible.emitSound();
+			}	
+		}
 	}
 
 	/**

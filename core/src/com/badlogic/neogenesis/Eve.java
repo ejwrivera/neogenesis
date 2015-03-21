@@ -20,6 +20,7 @@ public class Eve extends Creature {
 	private int usedBiomass;
 	private int protein;
 	private int proteinStore;
+	private boolean sound;
 	
 	/**
 	 * Instantiates a new eve.
@@ -51,6 +52,7 @@ public class Eve extends Creature {
 		usedBiomass = 0;
 		protein = 0;
 		proteinStore = 0;
+		sound = false;
 	}
 	
 	/**
@@ -201,4 +203,21 @@ public class Eve extends Creature {
 	public int getProtein(){
 		return protein;
 	}
+	
+	public void ingest (Consumable consumableToIngest){
+		System.out.println(belly + " is in belly ");
+		if (!belly.contains(consumableToIngest)){
+			belly.add(consumableToIngest );
+			System.out.println(consumableToIngest+ " is new");
+			sound = true;
+		}
+	}
+	
+	public boolean emittingSound (){
+		return sound;
+	}
+	public void emitSound(){
+		sound = false;
+	}
+	
 }

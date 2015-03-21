@@ -23,7 +23,7 @@ public class DebugValues {
 	/** The default amount of starting food */
 	private static int creatureAmount = 300;
 	/** The default amount of starting food */
-	private static int foodAmount = 200;
+	private static int foodAmount = 500;
 	/** The default amount of starting food */
 	private static int rockAmount = 200;
 	
@@ -41,7 +41,7 @@ public class DebugValues {
 	/** The default amount of starting food */
 	private static int defaultCreatureAmount = 300;
 	/** The default amount of starting food */
-	private static int defaultFoodAmount = 200;
+	private static int defaultFoodAmount = 500;
 	/** The default amount of starting food */
 	private static int defaultRockAmount = 200;
 	
@@ -82,7 +82,7 @@ public class DebugValues {
 				cameraZoomStart = .25f;
 				cameraZoomRate = 1;
 				magnitudeColliding = false;
-				foodAmount = 200;
+				foodAmount = 500;
 				break;
 			default:
 		}
