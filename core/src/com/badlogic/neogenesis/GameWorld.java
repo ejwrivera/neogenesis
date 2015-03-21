@@ -36,7 +36,6 @@ public class GameWorld {
 	
 	/**  Toggles whether magnitude is checked for colliding. */
 	private boolean magnitudeColliding;
-	
 	/**  Toggles the display of the info at the top, biomass and location. */
 	public boolean displayHUD;
 	/** Toggles if the game paused. */
@@ -49,12 +48,10 @@ public class GameWorld {
 	/** The sound stack. */
 	public int soundStack;
 	
-
 	/**
-	 * Instantiates a new game screen.
-	 *
+	 * Instantiates a new game world.
 	 * @param game the game
-	 * @param loadGame the load game
+	 * @param loadGame whether this is a new or loaded game
 	 */
 	public GameWorld(final Neogenesis game, boolean loadGame) {
 		DebugValues.debug=true; // set to true to use current debug values
@@ -107,7 +104,6 @@ public class GameWorld {
 
 	/**
 	 * Adds a creature to the maps.
-	 *
 	 * @param creature the creature
 	 */
 	private void addToMaps(Creature creature) {
@@ -122,7 +118,6 @@ public class GameWorld {
 	
 	/**
 	 * Adds a plant to the maps.
-	 *
 	 * @param plant the plant
 	 */
 	private void addToMaps(Plant plant) {
@@ -135,7 +130,6 @@ public class GameWorld {
 	}
 	/**
 	 * Adds a rock to the maps.
-	 *
 	 * @param rock the rock
 	 */
 	private void addToMaps(Rock rock) {
@@ -144,10 +138,9 @@ public class GameWorld {
 		drawables.put(id, rock);
 	}
 	
-	
 	/**
-	 * Removes a creature from the maps.
-	 * @param id the id of the creature
+	 * Removes something from all the appropriate maps
+	 * @param id the id of the thing
 	 */
 	private void removeFromMaps(ID id) {
 		if (theLiving.containsKey(id)){
@@ -162,14 +155,16 @@ public class GameWorld {
 		if (drawables.containsKey(id)){
 			drawables.remove(id);
 		}	
+		if (audibles.containsKey(id)){
+			audibles.remove(id);
+		}
 		if (destructibles.containsKey(id)){
 			destructibles.remove(id);
 		}	
 	}
 	
 	/**
-	 * Spawn creature.
-	 *
+	 * Spawn creature, size randomly determined
 	 * @return true, if successful
 	 */
 	private boolean spawnCreature() {
@@ -192,7 +187,6 @@ public class GameWorld {
 	
 	/**
 	 * Spawn creature.
-	 *
 	 * @param size the size
 	 * @return true, if successful
 	 */
@@ -209,12 +203,17 @@ public class GameWorld {
 	
 	/**
 	 * Spawn food.
+	 * @return true, if successful
 	 */
 	private boolean spawnPlant() {
 		addToMaps(new Plant(1, new Circle(MathUtils.random(0, 9600), MathUtils.random(0, 7200), 4)));
 		return true;
 	}
 
+	/**
+	 * Spawn rock.
+	 * @return true, if successful
+	 */
 	private boolean spawnRock() {
 		Rock rock = new Rock(new Rectangle(MathUtils.random(0, 9600), MathUtils.random(0, 7200), 15, 15));
 		boolean spawned=false;
@@ -225,6 +224,11 @@ public class GameWorld {
 		return spawned;
 	}
 	
+	/**
+	 * Checks if is collision.
+	 * @param collidableToCheck the collidable to check
+	 * @return true, if is collision
+	 */
 	private boolean isCollision(Collidable collidableToCheck){
 		for (Collidable collidable: collidables.values()){
 			if (collidableToCheck.collidesWith(collidable)){
@@ -253,7 +257,7 @@ public class GameWorld {
 	}
 	
 	/**
-	 * Game increment.
+	 * Increment the game state to the next game state.  
 	 */
 	public void gameIncrement(){
 		eve.setInput(Gdx.input);
@@ -321,7 +325,6 @@ public class GameWorld {
 
 	/**
 	 * Generate consumable magnitude map.
-	 *
 	 * @return the map of integer to collidables in that size class
 	 */
 	private IntMap<ObjectSet<Collidable>> generateCollidableMagnitudeMap() {
@@ -338,7 +341,6 @@ public class GameWorld {
 	
 	/**
 	 * Gets the drawables.
-	 *
 	 * @return the drawables for rendering
 	 */
 	public ObjectMap<ID, Drawable> getDrawables(){
@@ -347,7 +349,6 @@ public class GameWorld {
 	
 	/**
 	 * Gets the eve.
-	 *
 	 * @return the eve
 	 */
 	public Eve getEve() {

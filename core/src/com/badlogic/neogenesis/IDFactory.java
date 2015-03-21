@@ -6,8 +6,7 @@ package com.badlogic.neogenesis;
 public class IDFactory {
 	
 	/**
-	 * Gets the new id.
-	 *
+	 * Gets a new id.
 	 * @return the new id
 	 */
 	public static ID getNewID(){

@@ -15,34 +15,35 @@ import com.badlogic.gdx.utils.Array;
  * The Class Food. For packaging together nutrition information of a given edible delight
  */
 public class Plant implements Consumable, Drawable, Mobile, Living, Destructible {
+	
 	/** The ID. */
 	private ID id;
-	/** Whether or not this food has been consumed. */
-	private boolean consumed;
 	/** The texture. */
 	private Texture texture;
 	/** The position. */
 	private Vector2 position;
-	
+	/** The size. */
 	private float size;
-	
+	/** The biomass. */
 	private int biomass;
-	
+	/** The in belly of. */
 	protected Consumer inBellyOf;
-	
+	/** The alive. */
 	private boolean alive;
-	
+	/** The last movement. */
 	private Vector2 lastMovement;
+	
 	/**
-	 * Instantiates a new food.
-	 * @param nutrition the nutrition
+	 * Instantiates a new plant.
+	 *
+	 * @param biomass the biomass
+	 * @param position the position
 	 */
 	public Plant(int biomass, Circle position){
 		this.biomass=biomass;
 		this.position=new Vector2(position.x, position.y);
 		this.size = position.radius;
 		id = IDFactory.getNewID();
-		consumed=false;
 		texture = TextureMap.getTexture("food");
 		alive = true;
 		lastMovement=new Vector2(0,0);
@@ -94,21 +95,26 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 	public int getBiomass() {
 		return biomass;
 	}
-	
-	public boolean beenConsumed() {
-		return consumed;
-	}
 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#getMagnitude()
+	 */
 	@Override
 	public int getMagnitude() {
 		return -1;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Drawable#getTexture()
+	 */
 	@Override
 	public Texture getTexture() {
 		return texture;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Mobile#move()
+	 */
 	@Override
 	public Vector3 move() {
 		if (inBellyOf==null){
@@ -142,11 +148,17 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#stillCollidable()
+	 */
 	@Override
 	public boolean stillCollidable() {
 		return alive;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#collidesWith(com.badlogic.neogenesis.Collidable)
+	 */
 	@Override
 	public Boolean collidesWith(Collidable other) {
 		boolean overlaps;
@@ -159,6 +171,9 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 		return overlaps && other.stillCollidable();	
 	}
 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#collidesWith(com.badlogic.gdx.utils.Array)
+	 */
 	@Override
 	public Array<Collidable> collidesWith(Array<Collidable> otherCollidables) {
 		Array<Collidable> collidedWith = new Array<Collidable>();
@@ -172,19 +187,31 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 		return collidedWith;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#collidedWith(com.badlogic.neogenesis.Collidable)
+	 */
 	@Override
 	public void collidedWith(Collidable other){
 		other.collidedWith((Consumable)this);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#collidedWith(com.badlogic.neogenesis.Consumer)
+	 */
 	@Override
 	public void collidedWith(Consumer consumer) {
 	}
 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#collidedWith(com.badlogic.neogenesis.Consumable)
+	 */
 	@Override
 	public void collidedWith(Consumable consumable) {	
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#collidedWith(com.badlogic.neogenesis.Rock)
+	 */
 	@Override
 	public void collidedWith(Rock rock) {
 		Vector2 oldPosition = new Vector2(position.x, position.y);
@@ -195,15 +222,24 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 		lastMovement = new Vector2(0,0);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#getShape()
+	 */
 	@Override
 	public Shape2D getShape() {
 		return getCircle();
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Living#die()
+	 */
 	public void die(){
 		alive=false;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Living#getCorpse()
+	 */
 	public Corpse getCorpse(){
 		if (!alive){
 			return new Corpse();
@@ -211,31 +247,50 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 		return null;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Living#live()
+	 */
 	@Override
 	public void live() {
 	}
 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Living#isAlive()
+	 */
 	@Override
 	public boolean isAlive() {
 		return alive;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Consumable#beIngested(com.badlogic.neogenesis.Consumer)
+	 */
 	@Override
 	public boolean beIngested(Consumer consumer) {
 		inBellyOf = consumer;
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Destructible#isDestroyed()
+	 */
 	@Override
 	public boolean isDestroyed() {
 		return isAlive();
 	}
 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#getPosition()
+	 */
 	@Override
 	public Vector2 getPosition() {
 		return position;
 	}
 
+	/**
+	 * Gets the circle.
+	 * @return the circle
+	 */
 	private Circle getCircle() {
 		return new Circle(position.x, position.y, size);
 	}

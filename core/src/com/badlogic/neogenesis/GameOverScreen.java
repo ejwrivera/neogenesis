@@ -8,10 +8,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-// TODO: Auto-generated Javadoc
-// for displaying the Game Over screen
 /**
- * The Class GameOverScreen.
+ * The Class GameOverScreen, for displaying... the Game Over screen.
  */
 public class GameOverScreen implements Screen {
 

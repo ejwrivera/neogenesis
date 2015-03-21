@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 /**
- * The Class Neogenesis.
+ * The Neogenesis game class.
  */
 public class Neogenesis extends Game {
 
@@ -14,12 +14,17 @@ public class Neogenesis extends Game {
 	SpriteBatch batch;
 	/** The font. */
 	BitmapFont font;
-	/** The shader */
+	
+	/**  The shader. */
 	public ShaderProgram shader;
-	/** The shader attributes */
+	
+	/**  The shader attributes. */
 	private ShaderAttributes shaderAttributes;
 	
+	/** The save manager. */
 	public SaveManager saveManager;
+	
+	/** The shader on. */
 	private boolean shaderOn;
 	
 	/* (non-Javadoc)
@@ -39,6 +44,9 @@ public class Neogenesis extends Game {
 		saveManager = new SaveManager(false);
 	}
 
+	/**
+	 * Toggle shader.
+	 */
 	public void toggleShader(){
 		if (shaderOn){
 			shaderOn = false;
@@ -67,6 +75,11 @@ public class Neogenesis extends Game {
 		font.dispose();
 	}
 
+	/**
+	 * Shader resize.
+	 * @param width the width
+	 * @param height the height
+	 */
 	public void shaderResize(int width, int height) {
 		shader.begin();
 		shader.setUniformf("Resolution", width, height);

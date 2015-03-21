@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.OrderedMap;
+
 /**
  * The Class GameScreen. For displaying the primary game screen - should be as logic-less as possible.
  */
@@ -54,11 +55,16 @@ public class GameScreen implements Screen {
 	/** The game world where all business logic takes place. */
 	private GameWorld world;
 	
+	/** The unused biomass texture. */
 	private Texture unusedBiomassTexture;
+	
+	/** The used biomass texture. */
 	private Texture usedBiomassTexture;
+	
 	/**
 	 * Instantiates a new game screen.
 	 * @param game the game
+	 * @param loadGame the load game
 	 */
 	public GameScreen(final Neogenesis game, boolean loadGame) {
 		this.game = game;
@@ -86,6 +92,7 @@ public class GameScreen implements Screen {
 		camera.zoom*=DebugValues.getCameraZoomStart();
 		paused = false;
 		
+		// stage the upgrade display, needs to be moved to another screen/tab eventually
 		upgradeTable.setFillParent(true);
 		upgradeTable.setPosition(-260, 0);
         stage.addActor(upgradeTable);
@@ -127,6 +134,10 @@ public class GameScreen implements Screen {
 		}
 	}
 	
+	/**
+	 * Invoke to perform clean up that is necessary on screen switching
+	 * @param screen the screen to be switched to
+	 */
 	public void switchScreen(Screen screen){
 		music.stop();
 		camera.zoom=1;
@@ -135,6 +146,9 @@ public class GameScreen implements Screen {
 		game.setScreen(screen);
 	}
 	
+	/**
+	 * Draw the screen.  Might be inefficient, could use reviewing 
+	 */
 	public void draw(){
 		Gdx.gl.glClearColor(0, .2f, .4f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -226,6 +240,12 @@ public class GameScreen implements Screen {
 		game.toggleShader();
 	}
 
+	/**
+	 * Display biomass.
+	 *
+	 * @param biomassDisplay the biomass display
+	 * @param displayTexture the display texture
+	 */
 	private void displayBiomass(int biomassDisplay, Texture displayTexture){
 		int column = 0;
 		int row = 0;
@@ -254,6 +274,9 @@ public class GameScreen implements Screen {
 		}
 	}
 	
+	/**
+	 * Orient camera.
+	 */
 	public void orientCamera(){
 		while (zoomLevel < (int)((Circle)eve.getShape()).radius/16){
 			zoomCamera+=5*zoomSpeed;

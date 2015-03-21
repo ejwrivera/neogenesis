@@ -5,13 +5,24 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
+/**
+ * The Herbivore implementation of the AI Interface.
+ */
 public class HerbivoreAI implements AI {
 
+	/** The last movement. */
 	private Vector2 lastMovement; 
 	
+	/**
+	 * Instantiates a new herbivore ai.
+	 */
 	public HerbivoreAI(){
 		lastMovement = new Vector2(0,0);
 	}
+	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.AI#amble(com.badlogic.gdx.math.Circle)
+	 */
 	@Override
 	public Vector2 amble(Circle position) {
 		int rand = MathUtils.random(0, 9);
@@ -27,10 +38,12 @@ public class HerbivoreAI implements AI {
 				lastMovement = new Vector2(0,0);
 				break;
 		}
-		
 		return lastMovement;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.AI#forage(com.badlogic.gdx.math.Circle)
+	 */
 	@Override
 	public Vector2 forage(Circle position) {
 		return lastMovement;

@@ -9,10 +9,12 @@ public class Food implements Edible {
 	private int nutrition;
 	/** The ID. */
 	private int protein;
+	
+	/** The id. */
 	private ID id;
 	/** Whether or not this food has been consumed. */
 	private boolean consumed;
-	/** The texture. */
+	
 	/**
 	 * Instantiates a new food.
 	 * @param nutrition the nutrition
@@ -24,14 +26,29 @@ public class Food implements Edible {
 		consumed=false;
 	}
 	
+	/**
+	 * Instantiates a new food with no protein.
+	 * @param nutrition the nutrition
+	 */
 	public Food(int nutrition){
 		this(nutrition, 0);
 	}
-	// copy constructor
+	/**
+	 * Instantiates a new food, copy constructor.
+	 *
+	 * @param food the food
+	 */
 	public Food(Food food){
 		this(food.getNutrition(), food.getProtein());
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Identifiable#getID()
+	 */
+	@Override
+	public ID getID() {
+		return id;
+	}
 
 	/**
 	 * Gets the nutrition.
@@ -41,17 +58,17 @@ public class Food implements Edible {
 		return nutrition;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Edible#getProtein()
+	 */
 	@Override
 	public int getProtein() {
 		return protein;
 	}
 
-	@Override
-	public Food beBitten() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Edible#beSwallowed()
+	 */
 	@Override
 	public Food beSwallowed() {
 		if(!consumed){
@@ -60,11 +77,4 @@ public class Food implements Edible {
 		}
 		return null;
 	}
-
-	@Override
-	public ID getID() {
-		return id;
-	}
-
-
 }

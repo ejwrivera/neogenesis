@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.ObjectMap;
  */
 public class TextureMap {
 	
+	/** The texture map. */
 	private static ObjectMap <String, Texture> textureMap = new ObjectMap<String, Texture>(); 
 	
 	/**

@@ -15,25 +15,23 @@ public class Eve extends Creature {
 
 	/** The input. */
 	private Input input;
+	/** The available abilities. */
 	private ObjectMap<String, Boolean> availableAbilities;
+	/** The available abilities cost. */
 	private ObjectMap<String, Integer> availableAbilitiesCost;
+	/** The utilized biomass. */
 	private int usedBiomass;
+	/** The protein. */
 	private int protein;
+	/** The protein store, used instead of making protein a float. */
 	private int proteinStore;
+	/** Whether Eve is currently emitting sound. */
 	private boolean sound;
 	
 	/**
-	 * Instantiates a new eve.
-	 * @param startPosAndSize the start pos and size
-	 * @param camera the camera
-	 */
-	public Eve(Vector2 startPos){
-		this(startPos, 10);
-	}
-	
-	/**
-	 * Instantiates a new eve.
-	 * @param startPosAndSize the start pos
+	 * Instantiates a new eve.  It begins.
+	 *
+	 * @param startPos the starting position
 	 * @param biomass the starting biomass
 	 */
 	public Eve(Vector2 startPos, int biomass){
@@ -64,12 +62,13 @@ public class Eve extends Creature {
 	}
 	
 	/**
-	 * Gets the last movement.
+	 * Gets the last movement so that camera can be oriented properly.
 	 * @return the last movement
 	 */
 	public Vector2 getLastMovement(){
 		return lastMovement;
 	}
+
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Creature#consume(com.badlogic.neogenesis.Food)
 	 */
@@ -91,10 +90,90 @@ public class Eve extends Creature {
 	}
 	
 	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Creature#ingest(com.badlogic.neogenesis.Consumable)
+	 */
+	public void ingest (Consumable consumableToIngest){
+		if (!belly.contains(consumableToIngest)){
+			belly.add(consumableToIngest );
+			sound = true;
+		}
+	}
+	
+	/**
+	 * Checks for sense.
+	 * @return true, if the sense ability has been procured
+	 */
+	public boolean hasSense() {
+		return abilities.get("sense");
+	}
+
+	/**
+	 * Gets the available upgrades.  For displaying the upgrades on screen.
+	 * @return the available upgrades
+	 */
+	public Array<String> getAvailableUpgrades() {
+		Array<String> upgrades = new Array<String>();
+		for (String potential: availableAbilities.keys()){
+			if (availableAbilities.get(potential)){
+				upgrades.add(potential);
+			}
+		}
+		return upgrades;
+	}
+
+	/**
+	 * Adds an upgrade.
+	 * @param upgrade the upgrade
+	 * @return true, if the upgrade can be currently purchased and the resources are available
+	 */
+	public boolean addUpgrade(String upgrade) {
+		int cost = availableAbilitiesCost.get(upgrade);
+		if (cost > biomass-usedBiomass || protein < 3){
+			return false;
+		}
+		abilities.put(upgrade, true);
+		availableAbilities.put(upgrade, false);
+		usedBiomass+=cost;
+		protein-=3;
+		return true;
+	}	
+	
+	/**
+	 * Gets the utilized biomass for display.
+	 * @return the used biomass
+	 */
+	public int getUsedBiomass(){
+		return usedBiomass;
+	}
+	
+	/**
+	 * Gets the protein amount for display.
+	 * @return the protein
+	 */
+	public int getProtein(){
+		return protein;
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Creature#emittingSound()
+	 */
+	public boolean emittingSound (){
+		return sound;
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Creature#emitSound()
+	 */
+	public void emitSound(){
+		sound = false;
+	}
+	
+	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Creature#move()
 	 */
 	public Vector3 move(){
-		
+		// needs to be refactored to remove this branching.  Also it might be possible to have a super() call handle most of the logic if the impetus force is added, but this would
+		// require that AI creatures determine their movement and similarly make a super() call
 		if (inBellyOf==null){
 			// process user input
 			float oldX = position.x;
@@ -149,7 +228,17 @@ public class Eve extends Creature {
 			return new Vector3(lastMovement, 0);
 		}
 	}
+
+	/* Below are temporary physics simulations - to be replaced with a universal physics system */
 	
+	/**
+	 * Delta.
+	 *
+	 * @param acceleration the acceleration
+	 * @param momentum the momentum
+	 * @param input the input
+	 * @return the float
+	 */
 	private float delta(int acceleration, float momentum, String input){
 		float delta = momentum;
 		delta += input.equals("DECREASE") ? -acceleration * Gdx.graphics.getDeltaTime() 
@@ -159,65 +248,37 @@ public class Eve extends Creature {
 		return maxVelocityLimited(delta);
 	}
 	
+	/**
+	 * Apply friction.
+	 *
+	 * @param magnitude the magnitude
+	 * @return the float
+	 */
 	private float applyFriction (float magnitude){
 		return magnitude > 0 ? -2 * Gdx.graphics.getDeltaTime() : 2 * Gdx.graphics.getDeltaTime();
 	}
 	
+	/**
+	 * Max velocity limited.
+	 *
+	 * @param magnitude the magnitude
+	 * @return the float
+	 */
 	private float maxVelocityLimited(float magnitude){
 		return maxVelocityLimited(magnitude, 7);
 	}
+	
+	/**
+	 * Max velocity limited.
+	 *
+	 * @param magnitude the magnitude
+	 * @param maxSpeed the max speed
+	 * @return the float
+	 */
 	private float maxVelocityLimited(float magnitude, float maxSpeed){
 		return magnitude > maxSpeed ? maxSpeed : magnitude < -maxSpeed ? -maxSpeed : magnitude;
 	}
 
-	public boolean hasSense() {
-		return abilities.get("sense");
-	}
-
-	public Array<String> getAvailableUpgrades() {
-		Array<String> upgrades = new Array<String>();
-		for (String potential: availableAbilities.keys()){
-			if (availableAbilities.get(potential)){
-				upgrades.add(potential);
-			}
-		}
-		return upgrades;
-	}
-
-	public boolean addUpgrade(String upgrade) {
-		int cost = availableAbilitiesCost.get(upgrade);
-		if (cost > biomass-usedBiomass || protein < 3){
-			return false;
-		}
-		abilities.put(upgrade, true);
-		availableAbilities.put(upgrade, false);
-		usedBiomass+=cost;
-		protein-=3;
-		return true;
-	}	
 	
-	public int getUsedBiomass(){
-		return usedBiomass;
-	}
-	
-	public int getProtein(){
-		return protein;
-	}
-	
-	public void ingest (Consumable consumableToIngest){
-		System.out.println(belly + " is in belly ");
-		if (!belly.contains(consumableToIngest)){
-			belly.add(consumableToIngest );
-			System.out.println(consumableToIngest+ " is new");
-			sound = true;
-		}
-	}
-	
-	public boolean emittingSound (){
-		return sound;
-	}
-	public void emitSound(){
-		sound = false;
-	}
 	
 }

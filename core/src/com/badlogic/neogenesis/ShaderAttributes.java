@@ -4,21 +4,36 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
+/**
+ * The Class ShaderAttributes.
+ */
 public class ShaderAttributes {
+	
+	/** The Constant DEFAULT_LIGHT_Z. */
 	public static final float DEFAULT_LIGHT_Z = 0.075f;
+	
+	/** The Constant AMBIENT_INTENSITY. */
 	public static final float AMBIENT_INTENSITY = 0.2f;
+	
+	/** The Constant LIGHT_INTENSITY. */
 	public static final float LIGHT_INTENSITY = 3f;
 	
+	/** The Constant LIGHT_POS. */
 	public static final Vector3 LIGHT_POS = new Vector3(0f,0f,DEFAULT_LIGHT_Z);
 	
 	//Light RGB and intensity (alpha)
+	/** The Constant LIGHT_COLOR. */
 	public static final Vector3 LIGHT_COLOR = new Vector3(1f, 0.8f, 0.6f);
  
 	//Ambient RGB and intensity (alpha)
+	/** The Constant AMBIENT_COLOR. */
 	public static final Vector3 AMBIENT_COLOR = new Vector3(0.6f, 0.6f, 1f);
  
 	//Attenuation coefficients for light falloff
+	/** The Constant FALLOFF. */
 	public static final Vector3 FALLOFF = new Vector3(.4f, 3f, 20f);
+	
+	/** The vert. */
 	final String VERT =  
 			"attribute vec4 "+ShaderProgram.POSITION_ATTRIBUTE+";\n" +
 			"attribute vec4 "+ShaderProgram.COLOR_ATTRIBUTE+";\n" +
@@ -35,6 +50,7 @@ public class ShaderAttributes {
 			"	gl_Position =  u_projTrans * " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" +
 			"}";
 
+	/** The frag. */
 	final String FRAG = 
 			  "#ifdef GL_ES\n" //
 			+ "#define LOWP lowp\n" //
@@ -93,8 +109,12 @@ public class ShaderAttributes {
 			"	gl_FragColor = vColor * vec4(FinalColor, DiffuseColor.a);\n" + 
 			"}";
 	
+	/** The shader. */
 	public ShaderProgram shader;
 	
+	/**
+	 * Instantiates a new shader attributes.
+	 */
 	public ShaderAttributes(){
 		ShaderProgram.pedantic = false;
 		shader = new ShaderProgram(VERT, FRAG);

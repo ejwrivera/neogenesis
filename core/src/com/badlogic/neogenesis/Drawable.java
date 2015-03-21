@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Shape2D;
 
 /**
- * The Interface Drawable.  For rendering only.
+ * The Drawable Interface.  For rendering only.
  */
 public interface Drawable extends Identifiable{
 	
