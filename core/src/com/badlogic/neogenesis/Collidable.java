@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 /**
- * The Interface Collidable.  Used for collision; separate from consumable, which extends it
+ * The Interface Collidable.  Used for collision
  */
 public interface Collidable extends Identifiable {
 	

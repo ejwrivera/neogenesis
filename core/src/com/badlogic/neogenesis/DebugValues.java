@@ -21,7 +21,11 @@ public class DebugValues {
 	/** Toggls magnitude checks for consuming */
 	private static boolean magnitudeColliding = false;
 	/** The default amount of starting food */
-	private static int foodAmount = 500;
+	private static int creatureAmount = 300;
+	/** The default amount of starting food */
+	private static int foodAmount = 200;
+	/** The default amount of starting food */
+	private static int rockAmount = 200;
 	
 	// default values
 	/** The default eve starting biomass. */
@@ -35,7 +39,11 @@ public class DebugValues {
 	/** Toggls magnitude checks for consuming */
 	private static boolean defaultMagnitudeColliding = true;
 	/** The default amount of starting food */
+	private static int defaultCreatureAmount = 300;
+	/** The default amount of starting food */
 	private static int defaultFoodAmount = 200;
+	/** The default amount of starting food */
+	private static int defaultRockAmount = 200;
 	
 	/**
 	 * Populate debug values.  For programmatically setting debug values
@@ -116,8 +124,16 @@ public class DebugValues {
 		return debug ? magnitudeColliding : defaultMagnitudeColliding;
 	}
 	
+	public static int getCreatureAmount(){
+		return debug ? creatureAmount : defaultCreatureAmount;
+	}
+	
 	public static int getFoodAmount(){
 		return debug ? foodAmount : defaultFoodAmount;
+	}
+	
+	public static int getRockAmount(){
+		return debug ? rockAmount : defaultRockAmount;
 	}
 	
 }

@@ -80,7 +80,11 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 	 */
 	@Override
 	public Food beBitten() {
-		return beDigested();
+		if (biomass <= 1){
+			return beDigested();
+		}
+		biomass-=2;
+		return new Food(1, 1);
 	}
 
 	/* (non-Javadoc)

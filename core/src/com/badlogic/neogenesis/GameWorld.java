@@ -31,8 +31,6 @@ public class GameWorld {
 	
 	/** The last spawn time. */
 	private long lastSpawnTime;
-	/** The starting amount of Food. */
-	private int foodAmount;
 	
 	/**  Toggles whether magnitude is checked for colliding. */
 	private boolean magnitudeColliding;
@@ -80,20 +78,24 @@ public class GameWorld {
 		soundStack = 0;
 		magnitudeColliding = DebugValues.getMagnitudeColliding();
 		
-		foodAmount = DebugValues.getFoodAmount();
+		int creatureAmount = DebugValues.getCreatureAmount();
+		int foodAmount = DebugValues.getFoodAmount();
+		int rockAmount = DebugValues.getRockAmount();
 		// spawn the first mega creatures
 		int tries = 0;
 		while (!spawnCreature(1000)&&tries<100){
 			tries++;
 		}
-		//while (!spawnCreature(2000)&&tries<100){
-		//	tries++;
-		//}
+		// spawn the small creatures
+		for (int ii = 0; ii < creatureAmount; ii++){
+			spawnCreature();
+		}
 		// spawn the food
 		for (int ii = 0; ii < foodAmount; ii++){
 			spawnPlant();
 		}
-		for (int ii = 0; ii < 50; ii++){
+		// spawn the rocks
+		for (int ii = 0; ii < rockAmount; ii++){
 			spawnRock();
 		}
 	}
@@ -168,10 +170,10 @@ public class GameWorld {
 	private boolean spawnCreature() {
 		int size;
 		
-		if (MathUtils.random(1,100)==100){
+		if (MathUtils.random(1,500)==500){
 			size = MathUtils.random(50, 400)*5;
 		}
-		else if (MathUtils.random(1,10)==10){
+		else if (MathUtils.random(1,50)==50){
 			size = MathUtils.random(4, 20)*5;
 		}
 		else if (MathUtils.random(1,2)==2){
@@ -191,7 +193,7 @@ public class GameWorld {
 	 */
 	private boolean spawnCreature (int size){
 		boolean spawned = false;
-		Creature creature = new Creature(new Vector2(MathUtils.random(0, 4800), MathUtils.random(0, 3600)), size);
+		Creature creature = new Creature(new Vector2(MathUtils.random(0, 9600), MathUtils.random(0, 7200)), size);
 		if (!creature.collidesWith((Collidable)eve)){
 			addToMaps(creature);
 			spawned = true;
@@ -204,12 +206,12 @@ public class GameWorld {
 	 * Spawn food.
 	 */
 	private boolean spawnPlant() {
-		addToMaps(new Plant(1, new Circle(MathUtils.random(0, 2400), MathUtils.random(0, 1800), 4)));
+		addToMaps(new Plant(1, new Circle(MathUtils.random(0, 9600), MathUtils.random(0, 7200), 4)));
 		return true;
 	}
 
 	private boolean spawnRock() {
-		Rock rock = new Rock(new Rectangle(MathUtils.random(0, 2400), MathUtils.random(0, 1800), 15, 15));
+		Rock rock = new Rock(new Rectangle(MathUtils.random(0, 9600), MathUtils.random(0, 7200), 15, 15));
 		boolean spawned=false;
 		if (!isCollision(rock)){
 			addToMaps(rock);
@@ -278,7 +280,7 @@ public class GameWorld {
 		}
 		
 		// check if we need to create a new creature
-		if (TimeUtils.nanoTime()-lastSpawnTime > 200000000/DebugValues.getSpawnRate())
+		if (TimeUtils.nanoTime()-lastSpawnTime > 2000000000/DebugValues.getSpawnRate())
 			spawnCreature();
 		// check for collisions
 		if (magnitudeColliding){
@@ -304,6 +306,7 @@ public class GameWorld {
 				
 			}
 		}
+		
 	}
 
 	/**
