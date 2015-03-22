@@ -1,6 +1,5 @@
 package com.badlogic.neogenesis;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
@@ -13,15 +12,13 @@ import com.badlogic.gdx.utils.ObjectSet;
 /**
  * The Class Creature. Base class of all critters, currently concrete, eventually abstract
  */
-public class Creature extends GameObject implements Consumer, Consumable, Drawable, Living, Destructible, Audible {
+public class Creature extends GameObject implements Consumer, Consumable, Living, Destructible, Audible {
 	
 	/* properties */
 	
 
 	/** The creature's id. */
 	protected ID id;
-	/** The creature's texture. */
-	protected Texture texture;
 	/** The clocktick. */
 	protected int clocktick;
 	
@@ -52,11 +49,10 @@ public class Creature extends GameObject implements Consumer, Consumable, Drawab
 	 * @param biomass the starting biomass
 	 */
 	public Creature(Vector2 startPos, int biomass){
-		super(new Visible(), new Audible2(), new Movable(startPos, new HerbivoreAI()), new Collidable2(), new Living2());
+		super(new Visible(TextureMap.getTexture("creature")), new Audible2(), new Movable(startPos, new HerbivoreAI()), new Collidable2(), new Living2());
 		
 		this.biomass = biomass;
 		id = IDFactory.getNewID();
-		texture = TextureMap.getTexture("creature");
 		sense = new Sense(startPos,200);
 		
 		clocktick = 0;
@@ -77,14 +73,6 @@ public class Creature extends GameObject implements Consumer, Consumable, Drawab
 	@Override
 	public ID getID(){
 		return id;
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Drawable#getTexture()
-	 */
-	@Override
-	public Texture getTexture() {
-		return texture;
 	}
 	
 	/* (non-Javadoc)
@@ -111,6 +99,7 @@ public class Creature extends GameObject implements Consumer, Consumable, Drawab
 	public void move() {
 		((Movable)moveLogic).setCircle(getCircle());
 		super.move();
+		((Visible)drawLogic).setShape(getCircle());
 	}
 	
 	/* (non-Javadoc)

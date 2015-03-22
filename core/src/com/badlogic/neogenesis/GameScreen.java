@@ -171,7 +171,7 @@ public class GameScreen implements Screen {
         game.shader.setUniformf("LightPos", ShaderAttributes.LIGHT_POS);
         
         // this should simply be drawing the wrapped rectangles + textures from the drawables, some Image class
-		for (Drawable drawable : world.getDrawables().values()) {
+		for (GameObject drawable : world.getDrawables()) {
 			Shape2D drawShape = drawable.getShape();
 			if (drawShape instanceof Circle){
 				Circle drawCircle = (Circle) drawShape;

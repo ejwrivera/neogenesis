@@ -1,5 +1,8 @@
 package com.badlogic.neogenesis;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Shape2D;
+
 public class GameObject {
 	
 	protected IDrawable drawLogic;
@@ -17,9 +20,12 @@ public class GameObject {
         this.metabolicLogic = metabolicLogic;
     }
  
-	public void draw() {
-		drawLogic.draw();
-    }
+	public Shape2D getShape(){
+		return drawLogic.getShape();
+	}
+	public Texture getTexture(){
+		return drawLogic.getTexture();
+	}
 	
 	public void emitSound() {
 		soundLogic.emitSound();

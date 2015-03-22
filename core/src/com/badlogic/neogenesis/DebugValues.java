@@ -83,7 +83,7 @@ public class DebugValues {
 				cameraZoomStart = .25f;
 				cameraZoomRate = 1;
 				magnitudeColliding = false;
-				foodAmount = 1000;
+				foodAmount = 500;
 				break;
 			default:
 		}

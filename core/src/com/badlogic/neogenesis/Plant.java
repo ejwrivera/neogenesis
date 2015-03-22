@@ -1,6 +1,5 @@
 package com.badlogic.neogenesis;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
@@ -11,12 +10,10 @@ import com.badlogic.gdx.utils.Array;
 /**
  * The Plant class. For non-motile organic stuff.
  */
-public class Plant extends GameObject implements Consumable, Drawable, Living, Destructible {
+public class Plant extends GameObject implements Consumable, Living, Destructible {
 	
 	/** The ID. */
 	private ID id;
-	/** The texture. */
-	private Texture texture;
 	/** The size. */
 	private float size;
 	/** The biomass. */
@@ -33,11 +30,11 @@ public class Plant extends GameObject implements Consumable, Drawable, Living, D
 	 * @param position the position
 	 */
 	public Plant(int biomass, Circle position){
-		super(new Visible(), new Audible2(), new Movable(new Vector2(position.x, position.y), new PlantAITEMP()), new Collidable2(), new Living2());
+		super(new Visible(TextureMap.getTexture("food")), new Audible2(), new Movable(new Vector2(position.x, position.y), new PlantAITEMP()), new Collidable2(), new Living2());
 		this.biomass=biomass;
 		this.size = position.radius;
 		id = IDFactory.getNewID();
-		texture = TextureMap.getTexture("food");
+		;
 		alive = true;
 	}
 	
@@ -94,14 +91,6 @@ public class Plant extends GameObject implements Consumable, Drawable, Living, D
 	@Override
 	public int getMagnitude() {
 		return -1;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Drawable#getTexture()
-	 */
-	@Override
-	public Texture getTexture() {
-		return texture;
 	}
 
 	/* (non-Javadoc)

@@ -1,35 +1,28 @@
 package com.badlogic.neogenesis;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 /**
  * The Class Rock.
  */
-public class Rock implements Drawable, Collidable{
+public class Rock extends GameObject implements Collidable{
 
 	/** The id. */
 	private ID id;
-	
-	/** The position. */
-	private Rectangle position;
-	
-	/** The texture. */
-	private Texture texture;
-	
+		
 	/**
 	 * Instantiates a new rock.
 	 * @param position the position
 	 */
 	public Rock(Rectangle position){
-		this.position=position;
+		super(new Visible(TextureMap.getTexture("rock")), new Audible2(), new NonMovable(position), new Collidable2(), new Living2());
+		((Visible)drawLogic).setShape(position);
+		
 		id = IDFactory.getNewID();
-		texture=TextureMap.getTexture("rock");
 	}
 	
 	/* (non-Javadoc)
@@ -40,21 +33,12 @@ public class Rock implements Drawable, Collidable{
 		return id;
 	}
 
-	
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Drawable#getShape()
-	 */
-	@Override
-	public Shape2D getShape() {
-		return position;
-	}
-
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Collidable#getMagnitude()
 	 */
 	@Override
 	public int getMagnitude() {
-		return (int) position.getWidth()/100;
+		return (int) ((NonMovable)moveLogic).position.getWidth()/100;
 	}
 
 	/* (non-Javadoc)
@@ -71,10 +55,10 @@ public class Rock implements Drawable, Collidable{
 	public Boolean collidesWith(Collidable other) {
 		boolean overlaps;
 		if (other.getShape() instanceof Rectangle){
-			overlaps = position.overlaps((Rectangle)other.getShape());
+			overlaps = ((NonMovable)moveLogic).position.overlaps((Rectangle)other.getShape());
 		}
 		else {
-			overlaps = Intersector.overlaps((Circle)other.getShape(),position);
+			overlaps = Intersector.overlaps((Circle)other.getShape(),((NonMovable)moveLogic).position);
 		}
 		return overlaps && other.stillCollidable();
 	}
@@ -127,20 +111,12 @@ public class Rock implements Drawable, Collidable{
 	}
 	
 	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Drawable#getTexture()
-	 */
-	@Override
-	public Texture getTexture() {
-		return texture;
-	}
-	
-	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Collidable#getPosition()
 	 */
 	@Override
 	public Vector2 getPosition() {
 		// doesn't return the center
-		return new Vector2(position.x, position.y);
+		return new Vector2(((NonMovable)moveLogic).position.x, ((NonMovable)moveLogic).position.y);
 	}
 
 }

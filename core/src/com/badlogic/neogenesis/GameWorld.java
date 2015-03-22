@@ -22,8 +22,6 @@ public class GameWorld {
 	private ObjectMap<ID, Living> theLiving;
 	/** Things to check for collision. */
 	private ObjectMap<ID, Collidable> collidables;
-	/** Things to draw. */
-	private ObjectMap<ID, Drawable> drawables;
 	/** Things to emit sound. */
 	private ObjectMap<ID, Audible> audibles;
 	/** Things to potentially clean up. */
@@ -60,7 +58,6 @@ public class GameWorld {
 		// initialize maps
 		theLiving = new ObjectMap<ID, Living>();
 		collidables = new ObjectMap<ID, Collidable>();
-		drawables = new ObjectMap<ID, Drawable>();
 		audibles = new ObjectMap<ID, Audible>();
 		destructibles = new ObjectMap<ID, Destructible>();
 		
@@ -114,7 +111,6 @@ public class GameWorld {
 		gameObjects.add(creature);
 		theLiving.put(id, creature);
 		collidables.put(id, creature);
-		drawables.put(id, creature);
 		destructibles.put(id, creature);
 		audibles.put(id, creature);
 	}
@@ -128,7 +124,6 @@ public class GameWorld {
 		gameObjects.add(plant);
 		theLiving.put(id, plant);
 		collidables.put(id, plant);
-		drawables.put(id, plant);
 		destructibles.put(id, plant);
 	}
 	/**
@@ -137,8 +132,8 @@ public class GameWorld {
 	 */
 	private void addToMaps(Rock rock) {
 		ID id = rock.getID();
+		gameObjects.add(rock);
 		collidables.put(id, rock);
-		drawables.put(id, rock);
 	}
 	
 	/**
@@ -152,9 +147,6 @@ public class GameWorld {
 		if (collidables.containsKey(id)){
 			collidables.remove(id);
 		}
-		if (drawables.containsKey(id)){
-			drawables.remove(id);
-		}	
 		if (audibles.containsKey(id)){
 			audibles.remove(id);
 		}
@@ -342,8 +334,8 @@ public class GameWorld {
 	 * Gets the drawables.
 	 * @return the drawables for rendering
 	 */
-	public ObjectMap<ID, Drawable> getDrawables(){
-		return drawables;
+	public Array<GameObject> getDrawables(){
+		return gameObjects;
 	}
 	
 	/**

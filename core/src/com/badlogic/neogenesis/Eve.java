@@ -34,8 +34,8 @@ public class Eve extends Creature {
 		super(startPos, biomass);
 		moveLogic = new MovableEVETEMP(startPos);
 		((MovableEVETEMP)moveLogic).abilities = abilities;
+		drawLogic = new Visible(TextureMap.getTexture("eve"));
 		
-		texture = TextureMap.getTexture("eve");
 		availableAbilities = new ObjectMap<String, Boolean>();
 		availableAbilitiesCost = new ObjectMap<String, Integer>();
 		availableAbilities.put("sense", false);
