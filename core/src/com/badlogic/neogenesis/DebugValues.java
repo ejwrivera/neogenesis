@@ -39,7 +39,7 @@ public class DebugValues {
 	/**  Toggls magnitude checks for consuming. */
 	private static boolean defaultMagnitudeColliding = true;
 	/**  The default amount of starting creatures. */
-	private static int defaultCreatureAmount = 300;
+	private static int defaultCreatureAmount = 400;
 	/**  The default amount of starting food. */
 	private static int defaultFoodAmount = 500;
 	/**  The default amount of starting rocks. */
@@ -83,7 +83,7 @@ public class DebugValues {
 				cameraZoomStart = .25f;
 				cameraZoomRate = 1;
 				magnitudeColliding = false;
-				foodAmount = 500;
+				foodAmount = 1000;
 				break;
 			default:
 		}

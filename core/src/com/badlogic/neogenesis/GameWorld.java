@@ -288,7 +288,7 @@ public class GameWorld {
 		}
 		
 		// check if we need to create a new creature
-		if (TimeUtils.nanoTime()-lastSpawnTime > 2000000000/DebugValues.getSpawnRate())
+		if (TimeUtils.nanoTime()-lastSpawnTime > 200000000/DebugValues.getSpawnRate())
 			spawnCreature();
 		// check for collisions
 		if (magnitudeColliding){
