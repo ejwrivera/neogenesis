@@ -3,6 +3,8 @@ package com.badlogic.neogenesis;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -11,7 +13,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 /**
  * The Class Eve. Player character class - for camera locking and player movement input
  */
-public class Eve extends Creature {
+public class Eve extends Creature implements Mobile{
 
 	/** The input. */
 	private Input input;
@@ -28,6 +30,12 @@ public class Eve extends Creature {
 	/** Whether Eve is currently emitting sound. */
 	private boolean sound;
 	
+	
+	/** The position. */
+	private Vector2 position;
+	/** The last movement. */
+	private Vector2 lastMovement;
+	
 	/**
 	 * Instantiates a new eve.  It begins.
 	 *
@@ -36,6 +44,9 @@ public class Eve extends Creature {
 	 */
 	public Eve(Vector2 startPos, int biomass){
 		super(startPos, biomass);
+		this.position = startPos;
+		this.lastMovement = new Vector2(0,0);
+		
 		texture = TextureMap.getTexture("eve");
 		availableAbilities = new ObjectMap<String, Boolean>();
 		availableAbilitiesCost = new ObjectMap<String, Integer>();
@@ -171,7 +182,7 @@ public class Eve extends Creature {
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Creature#move()
 	 */
-	public Vector3 move(){
+	public void move(){
 		// needs to be refactored to remove this branching.  Also it might be possible to have a super() call handle most of the logic if the impetus force is added, but this would
 		// require that AI creatures determine their movement and similarly make a super() call
 		if (inBellyOf==null){
@@ -204,8 +215,6 @@ public class Eve extends Creature {
 			position.y += delta(movement, lastMovement.y, down ? "DECREASE" : up ? "INCREASE" : "NONE");
 
 			lastMovement = new Vector2(position.x-oldX, position.y-oldY);
-			
-			return new Vector3(lastMovement, 0);
 		}
 		else {
 			Vector2 newPosition;
@@ -225,7 +234,6 @@ public class Eve extends Creature {
 			position.x = newPosition.x;
 			position.y = newPosition.y;
 			lastMovement = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
-			return new Vector3(lastMovement, 0);
 		}
 	}
 
@@ -279,6 +287,33 @@ public class Eve extends Creature {
 		return magnitude > maxSpeed ? maxSpeed : magnitude < -maxSpeed ? -maxSpeed : magnitude;
 	}
 
+	public Shape2D getShape (){
+		return getCircle();
+	}
 	
+	private Circle getCircle() {
+		return new Circle(position, biomass/2);
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#collidedWith(com.badlogic.neogenesis.Rock)
+	 */
+	@Override
+	public void collidedWith(Rock rock) {
+		// this needs to be changed so that force is applied
+		
+		Vector2 oldPosition = new Vector2(position.x, position.y);
+		if ( (lastMovement.x > 1 || lastMovement .x < -1) || (lastMovement.y > 1 || lastMovement.y < -1)){
+			lastMovement = lastMovement.rotate(180);
+			Vector2 newPosition = new Vector2(oldPosition).add(lastMovement);
+			position.x=newPosition.x;
+			position.y=newPosition.y;
+		}
+		// squeezes the stuck thing out the right side of the rock, needs to properly squeeze out depending on direction of rock collision
+		if (collidesWith(rock)){
+			position.x++;
+			lastMovement = new Vector2(1,0);
+		}	
+	}
 	
 }

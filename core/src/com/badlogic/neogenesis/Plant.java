@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
 /**
@@ -116,7 +115,7 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 	 * @see com.badlogic.neogenesis.Mobile#move()
 	 */
 	@Override
-	public Vector3 move() {
+	public void move() {
 		if (inBellyOf==null){
 			Vector2 oldPosition = new Vector2(position.x, position.y);
 			Vector2 movement = new Vector2(10 * Gdx.graphics.getDeltaTime(), 0);
@@ -125,7 +124,6 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 			position.x=newPosition.x;
 			position.y=newPosition.y;
 			lastMovement = newPosition.sub(oldPosition);
-			return new Vector3(newPosition.x-oldPosition.x, newPosition.y-oldPosition.y, 0);
 		}
 		else {
 			Vector2 newPosition;
@@ -144,7 +142,6 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 			position.x = newPosition.x;
 			position.y = newPosition.y;
 			lastMovement = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
-			return new Vector3(lastMovement, 0);
 		}
 	}
 

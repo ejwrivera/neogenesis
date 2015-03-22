@@ -31,6 +31,8 @@ public class GameWorld {
 	/** Things to potentially clean up. */
 	private ObjectMap<ID, Destructible> destructibles;
 	
+	private Array<GameObject> gameObjects;
+	
 	/** The last spawn time. */
 	private long lastSpawnTime;
 	
@@ -64,6 +66,9 @@ public class GameWorld {
 		drawables = new ObjectMap<ID, Drawable>();
 		audibles = new ObjectMap<ID, Audible>();
 		destructibles = new ObjectMap<ID, Destructible>();
+		
+		gameObjects = new Array<GameObject>();
+		
 		
 		// create Eve
 		int biomass = (Integer) (loadGame ? game.saveManager.loadDataValue("biomass",int.class) : DebugValues.getEveStartingBiomass());
@@ -107,9 +112,16 @@ public class GameWorld {
 	 * @param creature the creature
 	 */
 	private void addToMaps(Creature creature) {
+		
 		ID id = creature.getID();
+		
+		if (creature instanceof Eve){
+			mobs.put(id, (Eve)creature);
+		}
+		else {
+			gameObjects.add(creature);
+		}
 		theLiving.put(id, creature);
-		mobs.put(id, creature);
 		collidables.put(id, creature);
 		drawables.put(id, creature);
 		destructibles.put(id, creature);
@@ -285,6 +297,10 @@ public class GameWorld {
 		// move everything that moves
 		for (Mobile mob : mobs.values()) {
 			mob.move();
+		}
+		
+		for (GameObject object: gameObjects){
+			object.move();
 		}
 		
 		// check if we need to create a new creature
