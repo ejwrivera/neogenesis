@@ -52,7 +52,7 @@ public class Creature extends GameObject implements Consumer, Consumable, Drawab
 	 * @param biomass the starting biomass
 	 */
 	public Creature(Vector2 startPos, int biomass){
-		super(new Visible(), new Audible2(), new Movable(startPos), new Collidable2(), new Living2());
+		super(new Visible(), new Audible2(), new Movable(startPos, new HerbivoreAI()), new Collidable2(), new Living2());
 		
 		this.biomass = biomass;
 		id = IDFactory.getNewID();
@@ -315,6 +315,7 @@ public class Creature extends GameObject implements Consumer, Consumable, Drawab
 	@Override
 	public boolean beIngested(Consumer consumer) {
 		inBellyOf = consumer;
+		((Movable)moveLogic).setInBellyOf(consumer);
 		return true;
 	}
 
@@ -383,7 +384,7 @@ public class Creature extends GameObject implements Consumer, Consumable, Drawab
 	 * Gets the drawable/collidable circle.
 	 * @return the circle
 	 */
-	private Circle getCircle() {
+	protected Circle getCircle() {
 		return new Circle(((Movable)moveLogic).getPosition(), biomass/2);
 	}
 }

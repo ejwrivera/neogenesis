@@ -20,8 +20,6 @@ public class GameWorld {
 	private Eve eve;
 	/** The living things. */
 	private ObjectMap<ID, Living> theLiving;
-	/** The mobile objects. */
-	private ObjectMap<ID, Mobile> mobs;	
 	/** Things to check for collision. */
 	private ObjectMap<ID, Collidable> collidables;
 	/** Things to draw. */
@@ -61,7 +59,6 @@ public class GameWorld {
 		
 		// initialize maps
 		theLiving = new ObjectMap<ID, Living>();
-		mobs = new ObjectMap<ID, Mobile>();
 		collidables = new ObjectMap<ID, Collidable>();
 		drawables = new ObjectMap<ID, Drawable>();
 		audibles = new ObjectMap<ID, Audible>();
@@ -114,13 +111,7 @@ public class GameWorld {
 	private void addToMaps(Creature creature) {
 		
 		ID id = creature.getID();
-		
-		if (creature instanceof Eve){
-			mobs.put(id, (Eve)creature);
-		}
-		else {
-			gameObjects.add(creature);
-		}
+		gameObjects.add(creature);
 		theLiving.put(id, creature);
 		collidables.put(id, creature);
 		drawables.put(id, creature);
@@ -134,10 +125,10 @@ public class GameWorld {
 	 */
 	private void addToMaps(Plant plant) {
 		ID id = plant.getID();
+		gameObjects.add(plant);
 		theLiving.put(id, plant);
 		collidables.put(id, plant);
 		drawables.put(id, plant);
-		mobs.put(id, plant);
 		destructibles.put(id, plant);
 	}
 	/**
@@ -157,9 +148,6 @@ public class GameWorld {
 	private void removeFromMaps(ID id) {
 		if (theLiving.containsKey(id)){
 			theLiving.remove(id);
-		}
-		if (mobs.containsKey(id)){
-			mobs.remove(id);
 		}
 		if (collidables.containsKey(id)){
 			collidables.remove(id);
@@ -292,11 +280,6 @@ public class GameWorld {
 				gameOver = true;
 			}
 			removeFromMaps(id);
-		}
-		
-		// move everything that moves
-		for (Mobile mob : mobs.values()) {
-			mob.move();
 		}
 		
 		for (GameObject object: gameObjects){

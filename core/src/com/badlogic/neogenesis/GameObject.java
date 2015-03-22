@@ -8,6 +8,7 @@ public class GameObject {
 	protected ICollidable collideLogic;
 	protected ILiving metabolicLogic;
 	
+	// this can probably be refactored to use builder, and then default implementations for each of these can be made for any new types
 	public GameObject(IDrawable drawLogic, IAudible soundLogic, IMobile moveLogic, ICollidable collideLogic, ILiving metabolicLogic) {
         this.drawLogic 		= drawLogic;
         this.soundLogic		= soundLogic;

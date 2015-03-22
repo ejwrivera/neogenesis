@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 public class Movable implements IMobile {
 
 	/** The position. */
-	private Vector2 position;
+	protected Vector2 position;
 	/** The ideal position. */
 	private Vector2 movingTowards;
 	/** The last movement, for momentum */
@@ -19,10 +19,10 @@ public class Movable implements IMobile {
 	private boolean hunting;
 	
 	
-	public Movable (Vector2 startPos){
+	public Movable (Vector2 startPos, AI temp){
 		this.position = startPos;
 		lastMovement = new Vector2(0, 0);
-		AI = new HerbivoreAI();
+		AI = temp;
 	}
 	
 	@Override

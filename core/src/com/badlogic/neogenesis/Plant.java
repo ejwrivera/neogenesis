@@ -1,26 +1,22 @@
 package com.badlogic.neogenesis;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 /**
- * The Class Food. For packaging together nutrition information of a given edible delight
+ * The Plant class. For non-motile organic stuff.
  */
-public class Plant implements Consumable, Drawable, Mobile, Living, Destructible {
+public class Plant extends GameObject implements Consumable, Drawable, Living, Destructible {
 	
 	/** The ID. */
 	private ID id;
 	/** The texture. */
 	private Texture texture;
-	/** The position. */
-	private Vector2 position;
 	/** The size. */
 	private float size;
 	/** The biomass. */
@@ -29,8 +25,6 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 	protected Consumer inBellyOf;
 	/** The alive. */
 	private boolean alive;
-	/** The last movement. */
-	private Vector2 lastMovement;
 	
 	/**
 	 * Instantiates a new plant.
@@ -39,13 +33,12 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 	 * @param position the position
 	 */
 	public Plant(int biomass, Circle position){
+		super(new Visible(), new Audible2(), new Movable(new Vector2(position.x, position.y), new PlantAITEMP()), new Collidable2(), new Living2());
 		this.biomass=biomass;
-		this.position=new Vector2(position.x, position.y);
 		this.size = position.radius;
 		id = IDFactory.getNewID();
 		texture = TextureMap.getTexture("food");
 		alive = true;
-		lastMovement=new Vector2(0,0);
 	}
 	
 	/**
@@ -116,33 +109,8 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 	 */
 	@Override
 	public void move() {
-		if (inBellyOf==null){
-			Vector2 oldPosition = new Vector2(position.x, position.y);
-			Vector2 movement = new Vector2(10 * Gdx.graphics.getDeltaTime(), 0);
-			movement = movement.rotate(MathUtils.random(1, 45));
-			Vector2 newPosition = new Vector2(oldPosition).add(movement);
-			position.x=newPosition.x;
-			position.y=newPosition.y;
-			lastMovement = newPosition.sub(oldPosition);
-		}
-		else {
-			Vector2 newPosition;
-			Vector2 bellyCenter = inBellyOf.getCenter();
-			Vector2 oldPosition = new Vector2(position.x, position.y);
-			if (Math.abs(position.x-bellyCenter.x)+Math.abs(position.y-bellyCenter.y)<6){
-				newPosition = bellyCenter;
-			}
-			else{
-				Vector2 movement = new Vector2(320 * Gdx.graphics.getDeltaTime(), 0);
-				// point towards center of inBellyOf
-				
-				movement = movement.rotate(bellyCenter.sub(oldPosition).angle());
-				newPosition = new Vector2(oldPosition).add(movement);
-			}
-			position.x = newPosition.x;
-			position.y = newPosition.y;
-			lastMovement = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
-		}
+		((Movable)moveLogic).setCircle(getCircle());
+		super.move();
 	}
 
 	/* (non-Javadoc)
@@ -211,12 +179,12 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 	 */
 	@Override
 	public void collidedWith(Rock rock) {
-		Vector2 oldPosition = new Vector2(position.x, position.y);
-		lastMovement = lastMovement.rotate(180);
-		Vector2 newPosition = new Vector2(oldPosition).add(lastMovement);
-		position.x=newPosition.x;
-		position.y=newPosition.y;
-		lastMovement = new Vector2(0,0);
+		Vector2 oldPosition = new Vector2(((Movable)moveLogic).getPosition().x, ((Movable)moveLogic).getPosition().y);
+		((Movable)moveLogic).lastMovement = ((Movable)moveLogic).lastMovement.rotate(180);
+		Vector2 newPosition = new Vector2(oldPosition).add(((Movable)moveLogic).lastMovement);
+		((Movable)moveLogic).getPosition().x=newPosition.x;
+		((Movable)moveLogic).getPosition().y=newPosition.y;
+		((Movable)moveLogic).lastMovement = new Vector2(0,0);
 	}
 	
 	/* (non-Javadoc)
@@ -275,21 +243,17 @@ public class Plant implements Consumable, Drawable, Mobile, Living, Destructible
 	public boolean isDestroyed() {
 		return isAlive();
 	}
-
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Collidable#getPosition()
-	 */
-	@Override
-	public Vector2 getPosition() {
-		return position;
-	}
-
+	
 	/**
 	 * Gets the circle.
 	 * @return the circle
 	 */
 	private Circle getCircle() {
-		return new Circle(position.x, position.y, size);
+		return new Circle(((Movable)moveLogic).getPosition().x, ((Movable)moveLogic).getPosition().y, size);
+	}
+	
+	public Vector2 getPosition() {
+		return ((Movable)moveLogic).getPosition();
 	}
 	
 }
