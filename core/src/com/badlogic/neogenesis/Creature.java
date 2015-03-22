@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 /**
  * The Class Creature. Base class of all critters, currently concrete, eventually abstract
  */
-public class Creature extends GameObject implements Consumer, Consumable, Living, Destructible, Audible {
+public class Creature extends GameObject implements Consumer, Consumable, Living, Destructible {
 	
 	/* properties */
 	
@@ -49,7 +49,7 @@ public class Creature extends GameObject implements Consumer, Consumable, Living
 	 * @param biomass the starting biomass
 	 */
 	public Creature(Vector2 startPos, int biomass){
-		super(new Visible(TextureMap.getTexture("creature")), new Audible2(), new Movable(startPos, new HerbivoreAI()), new Collidable2(), new Living2());
+		super(new Visible(TextureMap.getTexture("creature")), new Audible(), new Movable(startPos, new HerbivoreAI()), new Collidable2(), new Living2());
 		
 		this.biomass = biomass;
 		id = IDFactory.getNewID();
@@ -356,19 +356,6 @@ public class Creature extends GameObject implements Consumer, Consumable, Living
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Audible#emittingSound()
-	 */
-	@Override
-	public boolean emittingSound() {
-		return false;
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Audible#emitSound()
-	 */
-	@Override
-	public void emitSound() {}
 	/**
 	 * Gets the drawable/collidable circle.
 	 * @return the circle

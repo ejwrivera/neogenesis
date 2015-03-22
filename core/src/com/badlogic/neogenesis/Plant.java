@@ -30,7 +30,7 @@ public class Plant extends GameObject implements Consumable, Living, Destructibl
 	 * @param position the position
 	 */
 	public Plant(int biomass, Circle position){
-		super(new Visible(TextureMap.getTexture("food")), new Audible2(), new Movable(new Vector2(position.x, position.y), new PlantAITEMP()), new Collidable2(), new Living2());
+		super(new Visible(TextureMap.getTexture("food")), new Audible(), new Movable(new Vector2(position.x, position.y), new PlantAITEMP()), new Collidable2(), new Living2());
 		this.biomass=biomass;
 		this.size = position.radius;
 		id = IDFactory.getNewID();

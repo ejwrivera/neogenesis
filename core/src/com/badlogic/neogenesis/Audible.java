@@ -1,19 +1,24 @@
 package com.badlogic.neogenesis;
 
-/**
- * The Audible interface.  Used to determine what sounds something is trying to emit.
- */
-public interface Audible {
+public class Audible implements IAudible {
+
+	private boolean emitting;
 	
-	/**
-	 * Emitting sound.
-	 * @return true, if successful
-	 */
-	public boolean emittingSound();
+	public Audible(){
+		emitting = false;
+	}
 	
-	/**
-	 * Emit sound.
-	 */
-	public void emitSound();
+	@Override
+	public void emitSound() {
+		emitting = false;
+	}
+
+	public boolean emittingSound(){
+		return emitting;
+	}
+
+	public void setSound(boolean emitting) {
+		this.emitting = emitting;
+	}
 	
 }

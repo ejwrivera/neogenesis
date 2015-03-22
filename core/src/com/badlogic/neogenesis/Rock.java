@@ -19,7 +19,7 @@ public class Rock extends GameObject implements Collidable{
 	 * @param position the position
 	 */
 	public Rock(Rectangle position){
-		super(new Visible(TextureMap.getTexture("rock")), new Audible2(), new NonMovable(position), new Collidable2(), new Living2());
+		super(new Visible(TextureMap.getTexture("rock")), new Audible(), new NonMovable(position), new Collidable2(), new Living2());
 		((Visible)drawLogic).setShape(position);
 		
 		id = IDFactory.getNewID();

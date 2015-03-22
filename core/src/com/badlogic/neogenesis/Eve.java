@@ -16,8 +16,6 @@ public class Eve extends Creature {
 	private int protein;
 	/** The protein store, used instead of making protein a float. */
 	private int proteinStore;
-	/** Whether Eve is currently emitting sound. */
-	private boolean sound;
 	
 	/** The available abilities. */
 	public ObjectMap<String, Boolean> availableAbilities;
@@ -49,7 +47,6 @@ public class Eve extends Creature {
 		usedBiomass = 0;
 		protein = 0;
 		proteinStore = 0;
-		sound = false;
 	}
 	
 	/**
@@ -94,7 +91,7 @@ public class Eve extends Creature {
 	public void ingest (Consumable consumableToIngest){
 		if (!belly.contains(consumableToIngest)){
 			belly.add(consumableToIngest );
-			sound = true;
+			((Audible)soundLogic).setSound(true);
 		}
 	}
 	
@@ -151,20 +148,6 @@ public class Eve extends Creature {
 	 */
 	public int getProtein(){
 		return protein;
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Creature#emittingSound()
-	 */
-	public boolean emittingSound (){
-		return sound;
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Creature#emitSound()
-	 */
-	public void emitSound(){
-		sound = false;
 	}
 	
 	/* (non-Javadoc)

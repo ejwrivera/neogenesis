@@ -27,6 +27,10 @@ public class GameObject {
 		return drawLogic.getTexture();
 	}
 	
+	public boolean emittingSound() {
+		return soundLogic.emittingSound();
+	}
+	
 	public void emitSound() {
 		soundLogic.emitSound();
     }

@@ -22,8 +22,6 @@ public class GameWorld {
 	private ObjectMap<ID, Living> theLiving;
 	/** Things to check for collision. */
 	private ObjectMap<ID, Collidable> collidables;
-	/** Things to emit sound. */
-	private ObjectMap<ID, Audible> audibles;
 	/** Things to potentially clean up. */
 	private ObjectMap<ID, Destructible> destructibles;
 	
@@ -58,7 +56,6 @@ public class GameWorld {
 		// initialize maps
 		theLiving = new ObjectMap<ID, Living>();
 		collidables = new ObjectMap<ID, Collidable>();
-		audibles = new ObjectMap<ID, Audible>();
 		destructibles = new ObjectMap<ID, Destructible>();
 		
 		gameObjects = new Array<GameObject>();
@@ -112,7 +109,6 @@ public class GameWorld {
 		theLiving.put(id, creature);
 		collidables.put(id, creature);
 		destructibles.put(id, creature);
-		audibles.put(id, creature);
 	}
 	
 	/**
@@ -146,9 +142,6 @@ public class GameWorld {
 		}
 		if (collidables.containsKey(id)){
 			collidables.remove(id);
-		}
-		if (audibles.containsKey(id)){
-			audibles.remove(id);
 		}
 		if (destructibles.containsKey(id)){
 			destructibles.remove(id);
@@ -276,6 +269,11 @@ public class GameWorld {
 		
 		for (GameObject object: gameObjects){
 			object.move();
+			
+			if (object.emittingSound()){
+				soundStack++;
+				object.emitSound();
+			}
 		}
 		
 		// check if we need to create a new creature
@@ -304,13 +302,6 @@ public class GameWorld {
 				}
 				
 			}
-		}
-		
-		for (Audible audible: audibles.values()){
-			if (audible.emittingSound()){
-				soundStack++;
-				audible.emitSound();
-			}	
 		}
 	}
 
