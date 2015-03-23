@@ -25,6 +25,14 @@ public class Rock extends GameObject {
 		other.collidedWith((Rock)this);
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#collidedWith(com.badlogic.neogenesis.Collidable)
+	 */
+	@Override
+	public void collidedWith(GameObject other) {
+		other.collidedWith((Rock)this);
+	}
+	
 	public ICollidable getCollidable(){
 		return collideLogic;
 	}

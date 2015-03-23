@@ -36,12 +36,6 @@ public interface ICollidable {
 	public Vector2 getPosition();
 	
 	/**
-	 * Gets the magnitude to determine if the two things should collide at all
-	 * @return the magnitude
-	 */
-	public int getMagnitude();
-	
-	/**
 	 * Determines whether collision is possible
 	 * @return true, if this thing should still be colliding with other things
 	 */

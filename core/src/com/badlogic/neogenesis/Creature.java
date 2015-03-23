@@ -64,6 +64,7 @@ public class Creature extends GameObject {
 		((Movable)moveLogic).setCircle(getCircle());
 		super.move();
 		((Visible)drawLogic).setShape(getCircle());
+		((Collidable)collideLogic).position = getCircle();
 	}
 	
 	public Corpse getCorpse(){

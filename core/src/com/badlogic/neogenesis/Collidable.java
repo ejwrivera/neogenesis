@@ -9,17 +9,10 @@ import com.badlogic.gdx.utils.Array;
 
 public class Collidable implements ICollidable {
 
-	private Shape2D position;
+	public Shape2D position;
 	
 	public Collidable (Shape2D startPos){
 		this.position = startPos;
-	}
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Collidable#getMagnitude()
-	 */
-	@Override
-	public int getMagnitude() {
-		return 0;//biomass/500;
 	}
 	
 	/* (non-Javadoc)
