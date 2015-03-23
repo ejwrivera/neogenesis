@@ -10,8 +10,6 @@ public class Food implements Edible {
 	/** The ID. */
 	private int protein;
 	
-	/** The id. */
-	private ID id;
 	/** Whether or not this food has been consumed. */
 	private boolean consumed;
 	
@@ -22,7 +20,6 @@ public class Food implements Edible {
 	public Food(int nutrition, int protein){
 		this.nutrition = nutrition;
 		this.protein = protein;
-		id = IDFactory.getNewID();
 		consumed=false;
 	}
 	
@@ -40,14 +37,6 @@ public class Food implements Edible {
 	 */
 	public Food(Food food){
 		this(food.getNutrition(), food.getProtein());
-	}
-
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Identifiable#getID()
-	 */
-	@Override
-	public ID getID() {
-		return id;
 	}
 
 	/**

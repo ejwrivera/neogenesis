@@ -7,9 +7,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.TimeUtils;
 
 /**
@@ -18,20 +16,14 @@ import com.badlogic.gdx.utils.TimeUtils;
 public class GameWorld {
 	/** The eve. */
 	private Eve eve;
-	/** The living things. */
-	private ObjectMap<ID, Living> theLiving;
-	/** Things to check for collision. */
-	private ObjectMap<ID, Collidable> collidables;
-	/** Things to potentially clean up. */
-	private ObjectMap<ID, Destructible> destructibles;
 	
 	private Array<GameObject> gameObjects;
 	
 	/** The last spawn time. */
 	private long lastSpawnTime;
 	
-	/**  Toggles whether magnitude is checked for colliding. */
-	private boolean magnitudeColliding;
+	/**  Toggles whether magnitude is checked for colliding. 
+	private boolean magnitudeColliding;*/
 	/**  Toggles the display of the info at the top, biomass and location. */
 	public boolean displayHUD;
 	/** Toggles if the game paused. */
@@ -53,19 +45,13 @@ public class GameWorld {
 		DebugValues.debug=true; // set to true to use current debug values
 		DebugValues.populateDebugValues(2); // 1 = godzilla mode, 2 = quick start
 		
-		// initialize maps
-		theLiving = new ObjectMap<ID, Living>();
-		collidables = new ObjectMap<ID, Collidable>();
-		destructibles = new ObjectMap<ID, Destructible>();
-		
-		gameObjects = new Array<GameObject>();
-		
+		gameObjects = new Array<GameObject>();	
 		
 		// create Eve
 		int biomass = (Integer) (loadGame ? game.saveManager.loadDataValue("biomass",int.class) : DebugValues.getEveStartingBiomass());
 		
 		eve = new Eve(new Vector2(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2), biomass);
-		addToMaps(eve);	
+		gameObjects.add(eve);	
 	
 		// initialize flags
 		displayHUD = false;
@@ -73,7 +59,7 @@ public class GameWorld {
 		gameOver = false;
 		gameExit = false;
 		soundStack = 0;
-		magnitudeColliding = DebugValues.getMagnitudeColliding();
+		//magnitudeColliding = DebugValues.getMagnitudeColliding();
 		
 		int creatureAmount = DebugValues.getCreatureAmount();
 		int foodAmount = DebugValues.getFoodAmount();
@@ -95,57 +81,6 @@ public class GameWorld {
 		for (int ii = 0; ii < rockAmount; ii++){
 			spawnRock();
 		}
-	}
-	
-
-	/**
-	 * Adds a creature to the maps.
-	 * @param creature the creature
-	 */
-	private void addToMaps(Creature creature) {
-		
-		ID id = creature.getID();
-		gameObjects.add(creature);
-		theLiving.put(id, creature);
-		collidables.put(id, creature);
-		destructibles.put(id, creature);
-	}
-	
-	/**
-	 * Adds a plant to the maps.
-	 * @param plant the plant
-	 */
-	private void addToMaps(Plant plant) {
-		ID id = plant.getID();
-		gameObjects.add(plant);
-		theLiving.put(id, plant);
-		collidables.put(id, plant);
-		destructibles.put(id, plant);
-	}
-	/**
-	 * Adds a rock to the maps.
-	 * @param rock the rock
-	 */
-	private void addToMaps(Rock rock) {
-		ID id = rock.getID();
-		gameObjects.add(rock);
-		collidables.put(id, rock);
-	}
-	
-	/**
-	 * Removes something from all the appropriate maps
-	 * @param id the id of the thing
-	 */
-	private void removeFromMaps(ID id) {
-		if (theLiving.containsKey(id)){
-			theLiving.remove(id);
-		}
-		if (collidables.containsKey(id)){
-			collidables.remove(id);
-		}
-		if (destructibles.containsKey(id)){
-			destructibles.remove(id);
-		}	
 	}
 	
 	/**
@@ -178,8 +113,8 @@ public class GameWorld {
 	private boolean spawnCreature (int size){
 		boolean spawned = false;
 		Creature creature = new Creature(new Vector2(MathUtils.random(0, 9600), MathUtils.random(0, 7200)), size);
-		if (!creature.collidesWith((Collidable)eve)){
-			addToMaps(creature);
+		if (!creature.collidesWith(eve.getCollide())){
+			gameObjects.add(creature);
 			spawned = true;
 			lastSpawnTime = TimeUtils.nanoTime();
 		}
@@ -191,7 +126,7 @@ public class GameWorld {
 	 * @return true, if successful
 	 */
 	private boolean spawnPlant() {
-		addToMaps(new Plant(1, new Circle(MathUtils.random(0, 9600), MathUtils.random(0, 7200), 4)));
+		gameObjects.add(new Plant(1, new Circle(MathUtils.random(0, 9600), MathUtils.random(0, 7200), 4)));
 		return true;
 	}
 
@@ -202,8 +137,8 @@ public class GameWorld {
 	private boolean spawnRock() {
 		Rock rock = new Rock(new Rectangle(MathUtils.random(0, 9600), MathUtils.random(0, 7200), 15, 15));
 		boolean spawned=false;
-		if (!isCollision(rock)){
-			addToMaps(rock);
+		if (!isCollision(rock.getCollidable())){
+			gameObjects.add(rock);
 			spawned=true;
 		}
 		return spawned;
@@ -214,8 +149,8 @@ public class GameWorld {
 	 * @param collidableToCheck the collidable to check
 	 * @return true, if is collision
 	 */
-	private boolean isCollision(Collidable collidableToCheck){
-		for (Collidable collidable: collidables.values()){
+	private boolean isCollision(ICollidable collidableToCheck){
+		for (GameObject collidable: gameObjects){
 			if (collidableToCheck.collidesWith(collidable)){
 				return true;
 			}
@@ -246,29 +181,31 @@ public class GameWorld {
 	 */
 	public void gameIncrement(){
 		eve.setInput(Gdx.input);
-		ObjectSet<ID> toRemove = new ObjectSet<ID>();
+		Array<GameObject> toRemove = new Array<GameObject>();
 		// everything that lives must live
-		for (Living thing : theLiving.values()) {
-			thing.live();
-			if (!thing.isAlive()&&thing.getCorpse().plant!=null){
-				addToMaps(thing.getCorpse().plant);
-			}
-		}
-		for (Destructible thing: destructibles.values()){
-			if (!thing.isDestroyed()){
-				toRemove.add(thing.getID());
+		for (GameObject object: gameObjects){
+			object.live();
+			if (!object.isAlive()){
+				toRemove.add(object);
+				if (object instanceof Eve){
+					gameOver = true;
+				}
+				if (object.getCorpse().plant!=null){
+					gameObjects.add(object.getCorpse().plant);
+				}
 			}
 		}
 		
-		for (ID id: toRemove){
-			if (eve.getID()==id){
-				gameOver = true;
-			}
-			removeFromMaps(id);
-		}
+		gameObjects.removeAll(toRemove, true);
 		
+		Array<GameObject> collidablesToCheck = new Array<GameObject>(gameObjects);
 		for (GameObject object: gameObjects){
 			object.move();
+			
+			collidablesToCheck.removeValue(object, true);
+			if (object.stillCollidable()){
+				object.collidesWith(collidablesToCheck); 
+			}
 			
 			if (object.emittingSound()){
 				soundStack++;
@@ -276,39 +213,17 @@ public class GameWorld {
 			}
 		}
 		
+		
+		
 		// check if we need to create a new creature
 		if (TimeUtils.nanoTime()-lastSpawnTime > 200000000/DebugValues.getSpawnRate())
 			spawnCreature();
-		// check for collisions
-		if (magnitudeColliding){
-			IntMap<ObjectSet<Collidable>> magnitudeMap = generateCollidableMagnitudeMap();
-			for (Collidable collidable: collidables.values()){
-				if (collidable.stillCollidable()){
-					ObjectSet<Collidable> appropriatelySizedCollidables = new ObjectSet<Collidable>();
-					for (int ii = -1; ii <= 0; ii++){
-						if (magnitudeMap.containsKey(collidable.getMagnitude()+ii)){
-							appropriatelySizedCollidables.addAll(magnitudeMap.get(collidable.getMagnitude()+ii));
-						}
-					}
-				}
-			}
-		}
-		else {
-			Array<Collidable> collidablesToCheck = new Array<Collidable>(collidables.values().toArray());
-			for (Collidable collidable: collidables.values()){
-				collidablesToCheck.removeValue(collidable, true);
-				if (collidable.stillCollidable()){
-					collidable.collidesWith(collidablesToCheck); 
-				}
-				
-			}
-		}
 	}
 
 	/**
 	 * Generate consumable magnitude map.
 	 * @return the map of integer to collidables in that size class
-	 */
+	 *
 	private IntMap<ObjectSet<Collidable>> generateCollidableMagnitudeMap() {
 		IntMap<ObjectSet<Collidable>> magnitudeMap = new IntMap<ObjectSet<Collidable>>();
 		for (Collidable collidable: collidables.values()){
@@ -319,7 +234,7 @@ public class GameWorld {
 			magnitudeMap.get(magnitude).add(collidable);
 		}
 		return magnitudeMap;
-	}
+	}*/
 	
 	/**
 	 * Gets the drawables.

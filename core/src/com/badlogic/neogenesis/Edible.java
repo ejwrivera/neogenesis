@@ -3,7 +3,7 @@ package com.badlogic.neogenesis;
 /**
  * The Interface Edible.
  */
-public interface Edible extends Identifiable {
+public interface Edible {
 	
 	/**
 	 * Gets the nutrition.

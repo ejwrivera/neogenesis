@@ -1,75 +1,130 @@
 package com.badlogic.neogenesis;
 
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-/**
- * The Collidable interface.  Used for collision.
- */
-public interface Collidable extends Identifiable {
+public class Collidable implements ICollidable {
+
+	private Shape2D position;
 	
-	/**
-	 * Determines collision
-	 * @param other The other collidable
-	 * @return returns true if there is an overlap between this collidable's bounding box and the passed in box
+	public Collidable (Shape2D startPos){
+		this.position = startPos;
+	}
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#getMagnitude()
 	 */
-	public Boolean collidesWith(Collidable other);
+	@Override
+	public int getMagnitude() {
+		return 0;//biomass/500;
+	}
 	
-	/**
-	 * Determines collision in bulk
-	 * @param otherCollidables the other collidables
-	 * @return a list of all the collidables this collidable is colliding with, expected to utilize the boolean collidesWith method
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#stillCollidable()
 	 */
-	public Array<Collidable> collidesWith (Array<Collidable> otherCollidables);
+	@Override
+	public boolean stillCollidable() {
+		return true;
+	}
 	
-	/**
-	 * Gets the bounding shape to determine collision.
-	 * @return the shape
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#getPosition()
 	 */
-	public Shape2D getShape();
+	@Override
+	public Vector2 getPosition() {
+		try {
+			return new Vector2(((Circle)position).x, ((Circle)position).y);
+		}
+		catch (Exception ex){
+			return new Vector2(((Rectangle)position).x, ((Rectangle)position).y);
+		}
+	}
 	
-	/**
-	 * Returns an arbitrary point somewhere within the bounding shape, used for tracking
-	 * @return the position
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#collidesWith(com.badlogic.gdx.utils.Array)
 	 */
-	public Vector2 getPosition();
+	@Override
+	public Array<GameObject> collidesWith(Array<GameObject> otherCollidables) {
+		// this should be called internally to grab all the GameObject that have been collided with and perform some kind of triage for them
+		Array<GameObject> collidedWith = new Array<GameObject>();
+		for (GameObject collidable: otherCollidables){
+			if (collidable.stillCollidable() && collidesWith(collidable)){
+				collidedWith.add(collidable);
+				collidedWith(collidable);
+				
+			}
+		}
+		return collidedWith;
+	}
 	
-	/**
-	 * Gets the magnitude to determine if the two things should collide at all
-	 * @return the magnitude
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#collidesWith(com.badlogic.neogenesis.Collidable)
 	 */
-	public int getMagnitude();
+	@Override
+	public Boolean collidesWith(GameObject other) {
+		boolean overlaps;
+		if (position instanceof Circle){
+			if (other.getShape() instanceof Circle){
+				overlaps = ((Circle)position).overlaps((Circle)other.getShape());
+			}
+			else {
+				overlaps = Intersector.overlaps(((Circle)position), (Rectangle)other.getShape());
+			}
+		}
+		else {
+			if (other.getShape() instanceof Rectangle){
+				overlaps = ((Rectangle)position).overlaps((Rectangle)other.getShape());
+			}
+			else {
+				overlaps = Intersector.overlaps((Circle)other.getShape(), ((Rectangle)position));
+			}
+		}
+		
+		return overlaps && other.stillCollidable();
+	}
 	
-	/**
-	 * Determines whether collision is possible
-	 * @return true, if this thing should still be colliding with other things
-	 */
-	public boolean stillCollidable();
+	@Override
+	public boolean collidesWith(ICollidable other) {
+		boolean overlaps;
+		if (position instanceof Circle){
+			if (other.getShape() instanceof Circle){
+				overlaps = ((Circle)position).overlaps((Circle)other.getShape());
+			}
+			else {
+				overlaps = Intersector.overlaps(((Circle)position), (Rectangle)other.getShape());
+			}
+		}
+		else {
+			if (other.getShape() instanceof Rectangle){
+				overlaps = ((Rectangle)position).overlaps((Rectangle)other.getShape());
+			}
+			else {
+				overlaps = Intersector.overlaps((Circle)other.getShape(), ((Rectangle)position));
+			}
+		}
+		
+		return overlaps && other.stillCollidable();
+	}
 	
-	/**
-	 * Invoked from the colliding collidable to allow what it collided with an opportunity to respond.  For implementing Visitor pattern.
-	 * @param collidable this 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#collidedWith(com.badlogic.neogenesis.Rock)
 	 */
-	public void collidedWith(Collidable collidable);
+	@Override
+	public void collidedWith(Rock rock) {
+	}
+	@Override
+	public Shape2D getShape() {
+		return position;
+	}
+	@Override
+	public void collidedWith(ICollidable collidable) {
+	}
 	
-	/**
-	 * Invoked from the colliding collidable if it is a consumer to allow what it collided with an opportunity to respond.  For implementing Visitor pattern.
-	 * @param consumer this
-	 */
-	public void collidedWith(Consumer consumer);
-	
-	/**
-	 * Invoked from the colliding collidable if it is a consumable to allow what it collided with an opportunity to respond.  For implementing Visitor pattern.
-	 * @param consumable this
-	 */
-	public void collidedWith(Consumable consumable);
-	
-	/**
-	 * Invoked from the colliding collidable if it is an obstruction to allow what it collided with an opportunity to respond.  For implementing Visitor pattern.
-	 *
-	 * @param rock this
-	 */
-	public void collidedWith(Rock rock);
+	@Override
+	public void collidedWith(GameObject object) {	
+	}
 	
 }

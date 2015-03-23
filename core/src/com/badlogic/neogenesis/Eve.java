@@ -85,16 +85,6 @@ public class Eve extends Creature {
 		}
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Creature#ingest(com.badlogic.neogenesis.Consumable)
-	 */
-	public void ingest (Consumable consumableToIngest){
-		if (!belly.contains(consumableToIngest)){
-			belly.add(consumableToIngest );
-			((Audible)soundLogic).setSound(true);
-		}
-	}
-	
 	/**
 	 * Checks for sense.
 	 * @return true, if the sense ability has been procured
@@ -165,10 +155,14 @@ public class Eve extends Creature {
 			((MovableEVETEMP)moveLogic).getPosition().y=newPosition.y;
 		}
 		// squeezes the stuck thing out the right side of the rock, needs to properly squeeze out depending on direction of rock collision
-		if (collidesWith(rock)){
+		if (collidesWith(rock.getCollidable())){
 			((MovableEVETEMP)moveLogic).getPosition().x++;
 			((MovableEVETEMP)moveLogic).lastMovement = new Vector2(1,0);
 		}	
+	}
+	
+	public ICollidable getCollide(){
+		return collideLogic;
 	}
 	
 }

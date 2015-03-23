@@ -16,7 +16,7 @@ public class MovableEVETEMP extends Movable implements IMobile {
 	public void move(){
 		// needs to be refactored to remove this branching.  Also it might be possible to have a super() call handle most of the logic if the impetus force is added, but this would
 		// require that AI creatures determine their movement and similarly make a super() call
-		if (inBellyOf==null){
+		if (true){
 			// process user input
 			float oldX = position.x;
 			float oldY = position.y;
@@ -49,7 +49,7 @@ public class MovableEVETEMP extends Movable implements IMobile {
 		}
 		else {
 			Vector2 newPosition;
-			Vector2 bellyCenter = inBellyOf.getCenter();
+			Vector2 bellyCenter = new Vector2(0,0); //= inBellyOf.getCenter();
 			Vector2 oldPosition = new Vector2(position.x, position.y);
 			if (Math.abs(position.x-bellyCenter.x)+Math.abs(position.y-bellyCenter.y)<6){
 				newPosition = bellyCenter;
@@ -66,12 +66,6 @@ public class MovableEVETEMP extends Movable implements IMobile {
 			position.y = newPosition.y;
 			lastMovement = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
 		}
-	}
-	
-	private Consumer inBellyOf;
-	
-	public void setInBellyOf(Consumer consumer){
-		this.inBellyOf = consumer;
 	}
 	
 	public Vector2 getPosition(){

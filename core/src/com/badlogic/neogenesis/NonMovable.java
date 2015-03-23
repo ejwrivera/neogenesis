@@ -1,5 +1,6 @@
 package com.badlogic.neogenesis;
 
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 
 public class NonMovable implements IMobile {
@@ -8,6 +9,9 @@ public class NonMovable implements IMobile {
 	
 	public NonMovable (Rectangle position){
 		this.position = position;
+	}
+	
+	public NonMovable (Circle position){
 	}
 	
 	@Override
