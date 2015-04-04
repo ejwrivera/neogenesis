@@ -47,15 +47,17 @@ public class Movable implements IMobile {
 				//velocity = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);	
 			}
 			else{
+				Vector2 amble;
 				if (MathUtils.random(1,50)==50){
-					velocity = AI.amble(getCircle());
-					position.x+=velocity.x;
-					position.y+=velocity.y;
+					amble = AI.amble(getCircle());
+					//position.x+=velocity.x;
+					//position.y+=velocity.y;
 				} else {
-					velocity = AI.forage(getCircle());
-					position.x+=velocity.x;
-					position.y+=velocity.y;
+					amble = AI.forage(getCircle());
+					//position.x+=velocity.x;
+					//position.y+=velocity.y;
 				}
+				forces.add(amble);
 			}
 		}
 		else {
@@ -78,6 +80,8 @@ public class Movable implements IMobile {
 			//position.y = newPosition.y;
 			//velocity = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
 		}
+		
+		velocity = new Vector2(velocity.x / 2, velocity.y / 2);
 		
 		for (Vector2 force: forces){
 			velocity.add(force);
