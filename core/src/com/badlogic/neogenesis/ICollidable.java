@@ -23,6 +23,8 @@ public interface ICollidable {
 	 */
 	public Array<GameObject> collidesWith (Array<GameObject> otherCollidables);
 	
+	public Vector2 getForce();
+	
 	/**
 	 * Gets the bounding shape to determine collision.
 	 * @return the shape

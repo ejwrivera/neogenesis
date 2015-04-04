@@ -73,4 +73,9 @@ public class NonCollidable implements ICollidable {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public Vector2 getForce() {
+		return new Vector2 (0, 0);
+	}
 }

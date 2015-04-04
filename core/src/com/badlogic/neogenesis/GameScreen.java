@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Shape2D;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -39,7 +40,9 @@ public class GameScreen implements Screen {
 	/** The camera. */
 	private OrthographicCamera camera;
 	/** The eve. */
-	private Eve eve;	
+	private Eve eve;
+	/** Last position. */
+	private Vector2 lastPosition;
 	/** The skin. */
 	private Skin skin = new Skin(Gdx.files.internal("uiskin.json"), new TextureAtlas(Gdx.files.internal("uiskin.atlas")));
 	/** The buttons to select upgrades. */
@@ -74,6 +77,7 @@ public class GameScreen implements Screen {
 		
 		world = new GameWorld(game, loadGame);
 		eve = world.getEve();
+		lastPosition = eve.getPosition();
 		
 		// load the sound effect and music
 		sound = Gdx.audio.newSound(Gdx.files.internal("sound.wav"));
@@ -278,7 +282,8 @@ public class GameScreen implements Screen {
 	/**
 	 * Orient camera.
 	 */
-	public void orientCamera(){
+	private void orientCamera(){
+		
 		while (zoomLevel < (int)((Circle)eve.getShape()).radius/16){
 			zoomCamera+=5*zoomSpeed;
 			zoomLevel++;
@@ -287,7 +292,10 @@ public class GameScreen implements Screen {
 			camera.zoom+=.1/zoomSpeed;
 			zoomCamera--;
 		}
-		camera.translate(eve.getLastMovement());
+		Vector2 newMovement = new Vector2(eve.getPosition());
+		newMovement.sub(lastPosition);
+		lastPosition = new Vector2(eve.getPosition());
+		camera.translate(newMovement);
 	}
 	
 	/* (non-Javadoc)

@@ -125,6 +125,12 @@ public class Collidable implements ICollidable {
 	
 	@Override
 	public void collidedWith(Devourable devourable) {
+	}
+
+	@Override
+	public Vector2 getForce() {
+		// TODO Auto-generated method stub
+		return null;
 	}	
 	
 }
