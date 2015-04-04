@@ -102,12 +102,7 @@ public class Collidable implements ICollidable {
 		return overlaps && other.stillCollidable();
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Collidable#collidedWith(com.badlogic.neogenesis.Rock)
-	 */
-	@Override
-	public void collidedWith(Rock rock) {
-	}
+	
 	@Override
 	public Shape2D getShape() {
 		return position;
@@ -119,5 +114,17 @@ public class Collidable implements ICollidable {
 	@Override
 	public void collidedWith(GameObject object) {	
 	}
+	
+	@Override
+	public void collidedWith(Rock rock) {
+	}
+	
+	@Override
+	public void collidedWith(Devourer devourer) {
+	}
+	
+	@Override
+	public void collidedWith(Devourable devourable) {
+	}	
 	
 }

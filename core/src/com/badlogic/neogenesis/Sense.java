@@ -19,7 +19,7 @@ public class Sense extends GameObject {
 	int size;
 	
 	/** The sensed prey. */
-	Prey sensed;
+	Devourable sensed;
 	
 	/**
 	 * Instantiates a new sense.
@@ -37,7 +37,7 @@ public class Sense extends GameObject {
 	 * Gets the sensed prey.
 	 * @return the sensed
 	 */
-	public Prey getSensed(){
+	public Devourable getSensed(){
 		return sensed;
 	}
 	
@@ -63,7 +63,7 @@ public class Sense extends GameObject {
 		return new Circle(position.x, position.y, size);
 	}
 	
-	public void collidedWith(Prey prey) {
+	public void collidedWith(Devourable prey) {
 		//super.collidedWith(consumable);
 		sensed = prey;
 	}

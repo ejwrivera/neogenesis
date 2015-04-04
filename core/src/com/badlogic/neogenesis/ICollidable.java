@@ -52,10 +52,15 @@ public interface ICollidable {
 	 *
 	 * @param rock this
 	 */
-	public void collidedWith(Rock rock);
 	
 	public void collidedWith(GameObject object);
 
+	public void collidedWith(Rock rock);
+	
+	public void collidedWith(Devourer devourer);
+
+	public void collidedWith(Devourable devourable);
+	
 	public boolean collidesWith(ICollidable collidable);
 	
 }

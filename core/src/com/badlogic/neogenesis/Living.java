@@ -45,6 +45,8 @@ public class Living implements ILiving {
 		if (health <= 0){
 			die();
 		}
+		
+		if (clocktick%1000==0);
 		//if (abilities.get("photosynthesis") && clocktick%25==0){
 		//	digest(new Food(1));
 		//}

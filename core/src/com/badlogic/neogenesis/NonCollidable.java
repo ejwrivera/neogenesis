@@ -61,4 +61,16 @@ public class NonCollidable implements ICollidable {
 	public boolean collidesWith(ICollidable collidable) {
 		return false;
 	}
+
+	@Override
+	public void collidedWith(Devourer devourer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void collidedWith(Devourable devourable) {
+		// TODO Auto-generated method stub
+		
+	}
 }

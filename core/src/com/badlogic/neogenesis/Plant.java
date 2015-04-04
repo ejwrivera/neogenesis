@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 /**
  * The Plant class. For non-motile organic stuff.
  */
-public class Plant extends GameObject {
+public class Plant extends GameObject implements Devourable {
 	
 	/** The size. */
 	private float size;
@@ -15,6 +15,9 @@ public class Plant extends GameObject {
 	private int biomass;
 	/** The alive. */
 	private boolean alive;
+	
+	/** The in belly of. */
+	protected Devourer inBellyOf;
 	
 	/**
 	 * Instantiates a new plant.
@@ -119,6 +122,44 @@ public class Plant extends GameObject {
 	
 	public Vector2 getPosition() {
 		return ((Movable)moveLogic).getPosition();
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Collidable#collidedWith(com.badlogic.neogenesis.Collidable)
+	 */
+	@Override
+	public void collidedWith(GameObject other){
+		super.collidedWith(other);
+		other.collidedWith((Devourable)this);
+	}
+
+	@Override
+	public Food beDigested() {
+		die();
+		int digestedBiomass = biomass;
+		biomass=0;
+		return new Food(digestedBiomass);
+	}
+
+	@Override
+	public Food beBitten() {
+		if (biomass <= 1){
+			return beDigested();
+		}
+		biomass-=2;
+		return new Food(1, 1);
+	}
+
+	@Override
+	public boolean beIngested(Devourer devourer) {
+		inBellyOf = devourer;
+		((Movable)moveLogic).inBellyOf = devourer;
+		return true;
+	}
+
+	@Override
+	public int getBiomass() {
+		return biomass;
 	}
 	
 }

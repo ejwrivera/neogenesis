@@ -63,6 +63,14 @@ public class GameObject {
 	public void collidedWith(Rock rock) {
 		collideLogic.collidedWith(rock);
 	}
+	
+	public void collidedWith(Devourer devourer) {
+		collideLogic.collidedWith(devourer);
+	}
+	
+	public void collidedWith(Devourable devourable) {
+		collideLogic.collidedWith(devourable);
+	}
     
     public void live() {
     	metabolicLogic.live();

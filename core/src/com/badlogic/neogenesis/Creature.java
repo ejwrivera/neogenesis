@@ -5,11 +5,12 @@ import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
 
 /**
  * The Class Creature. Base class of all critters, currently concrete, eventually abstract
  */
-public class Creature extends GameObject {
+public class Creature extends GameObject implements Devourable, Devourer {
 	
 	/* properties */
 	
@@ -32,6 +33,10 @@ public class Creature extends GameObject {
 
 	/** The impetus amount. */
 	protected int impetusAmount;
+	/** The in belly of. */
+	protected Devourer inBellyOf;
+	/** The things in the creature's belly. */
+	protected ObjectSet<Devourable> belly;
 	
 	/**
 	 * Instantiates a new creature.
@@ -53,6 +58,8 @@ public class Creature extends GameObject {
 		abilities.put("impetus", false);
 		
 		sense = new Sense (startPos, 200);
+		
+		belly = new ObjectSet<Devourable>();
 	}
 	
 	/* (non-Javadoc)
@@ -107,7 +114,7 @@ public class Creature extends GameObject {
 	
 	public Array<GameObject> collidesWith(Array<GameObject> otherCollidables) {
 		Array<GameObject> collidedWith = super.collidesWith(otherCollidables);
-		Prey potentialPrey=null;
+		Devourable potentialPrey=null;
 		Vector2 potentialDirection=null;
 		for (GameObject collidable: otherCollidables){
 			// have the collidable collide with the sense and have the sense sniff it out
@@ -161,6 +168,102 @@ public class Creature extends GameObject {
 	@Override
 	public void collidedWith(GameObject other){
 		super.collidedWith(other);
+		other.collidedWith((Devourer)this);
+		other.collidedWith((Devourable)this);
 	}
+	
+	/* (non-Javadoc)		
+	 * @see com.badlogic.neogenesis.Collidable#collidedWith(com.badlogic.neogenesis.Consumable)		
+	 */		
+	@Override		
+	public void collidedWith(Devourable consumable) {		
+		if (inBellyOf==null && consumable.getBiomass()<biomass && consumable.beIngested(this)){		
+				ingest(consumable);		
+		}		
+		((Movable)moveLogic).setHunting(false);		
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Consumable#beIngested(com.badlogic.neogenesis.Consumer)
+	 */
+	@Override
+	public boolean beIngested(Devourer consumer) {
+		inBellyOf = consumer;
+		((Movable)moveLogic).inBellyOf = consumer;
+		return true;
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Consumable#beDigested()
+	 */
+	@Override
+	public Food beDigested() {
+		((Living)metabolicLogic).die();
+		int digestedBiomass = biomass;
+		biomass=0;
+		return new Food(digestedBiomass, 1);
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Consumable#beDigested()
+	 */
+	@Override
+	public Food beBitten() {
+		if (biomass <= 1){
+			return beDigested();
+		}
+		biomass-=2;
+		return new Food(1, 1);
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Consumer#consume(com.badlogic.gdx.utils.ObjectSet)
+	 */
+	@Override
+	public void ingest (Devourable consumableToIngest){
+		if (!belly.contains(consumableToIngest)){
+			belly.add(consumableToIngest);
+		}
+	}
+
+	/**
+	 * Digest, 'bites' a consumable to get some food to actually digest
+	 * @param consumableToDigest the consumable to digest
+	 */
+	public void digest(Devourable consumableToDigest){
+		digest(consumableToDigest.beBitten());
+	}
+	
+	
+	@Override
+	public Vector2 getCenter() {
+		return new Vector2(((Movable)moveLogic).getPosition());
+	}
+
+	@Override
+	public Vector2 getPosition() {
+		return new Vector2(((Movable)moveLogic).getPosition());
+	}
+	
+	public void live(){
+		super.live();
+		clocktick++;
+		if (clocktick%4==0){
+			if (belly.size>0){
+				ObjectSet<Devourable> toRemove = new ObjectSet<Devourable>();
+				for (Devourable consumableToDigest: belly){
+					digest(consumableToDigest);
+					if (consumableToDigest.getBiomass()<=0){
+						toRemove.add(consumableToDigest); 
+					}
+				}
+				for (Devourable needsRemoving: toRemove){
+					belly.remove(needsRemoving);
+				}
+			}
+		}
+	}
+	
+	
 	
 }
