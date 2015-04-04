@@ -15,10 +15,7 @@ public class Plant extends GameObject implements Devourable {
 	private int biomass;
 	/** The alive. */
 	private boolean alive;
-	
-	/** The in belly of. */
-	protected Devourer inBellyOf;
-	
+		
 	/**
 	 * Instantiates a new plant.
 	 *
@@ -26,10 +23,9 @@ public class Plant extends GameObject implements Devourable {
 	 * @param position the position
 	 */
 	public Plant(int biomass, Circle position){
-		super(new Visible(TextureMap.getTexture("food")), new Audible(), new Movable(new Vector2(position.x, position.y), new PlantAITEMP()), new Collidable(position), new Living());
+		super(new Visible(TextureMap.getTexture("food")), new Audible(), new Movable(new Vector2(position.x, position.y)), new Collidable(position), new Living());
 		this.biomass=biomass;
 		this.size = position.radius;
-		;
 		alive = true;
 	}
 	
@@ -46,7 +42,6 @@ public class Plant extends GameObject implements Devourable {
 	 */
 	@Override
 	public void move() {
-		((Movable)moveLogic).setCircle(getCircle());
 		super.move();
 	}
 
@@ -150,16 +145,30 @@ public class Plant extends GameObject implements Devourable {
 		return new Food(1, 1);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.badlogic.neogenesis.Consumable#beIngested(com.badlogic.neogenesis.Consumer)
+	 */
 	@Override
-	public boolean beIngested(Devourer devourer) {
-		inBellyOf = devourer;
-		((Movable)moveLogic).inBellyOf = devourer;
-		return true;
+	public void beIngested(Vector2 bellyDirection, float pullStrength) {
+		//inBellyOf = consumer;
+		//((Movable)moveLogic).inBellyOf = consumer;
+		
+		
+		Vector2 swallowForce = new Vector2(pullStrength, 0);
+		// point towards center of inBellyOf
+		
+		swallowForce = swallowForce.rotate(bellyDirection.sub(moveLogic.getPosition()).angle());
+		moveLogic.addForce(swallowForce);
 	}
 
 	@Override
 	public int getBiomass() {
 		return biomass;
+	}
+
+	@Override
+	public boolean isDevoured() {
+		return biomass > 0;
 	}
 	
 }

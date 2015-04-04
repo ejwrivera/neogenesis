@@ -1,7 +1,10 @@
 package com.badlogic.neogenesis;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 
@@ -22,6 +25,10 @@ public class Eve extends Creature {
 	/** The available abilities cost. */
 	public ObjectMap<String, Integer> availableAbilitiesCost;
 	
+	public Input input;
+	public int impetusAmount;
+	
+	
 	/**
 	 * Instantiates a new eve.  It begins.
 	 *
@@ -30,8 +37,8 @@ public class Eve extends Creature {
 	 */
 	public Eve(Vector2 startPos, int biomass){
 		super(startPos, biomass);
-		moveLogic = new MovableEVETEMP(startPos);
-		((MovableEVETEMP)moveLogic).abilities = abilities;
+		moveLogic = new Movable(startPos);
+		((Movable)moveLogic).abilities = abilities;
 		drawLogic = new Visible(TextureMap.getTexture("eve"));
 		
 		availableAbilities = new ObjectMap<String, Boolean>();
@@ -49,12 +56,8 @@ public class Eve extends Creature {
 		proteinStore = 0;
 	}
 	
-	/**
-	 * Sets the input.
-	 * @param input the new input
-	 */
 	public void setInput(Input input){
-		((MovableEVETEMP)moveLogic).input = input;
+		this.input = input;
 	}
 	
 	/**
@@ -62,7 +65,7 @@ public class Eve extends Creature {
 	 * @return the last movement
 	 */
 	public Vector2 getvelocity(){
-		return ((MovableEVETEMP)moveLogic).velocity;
+		return ((Movable)moveLogic).velocity;
 	}
 
 	/* (non-Javadoc)
@@ -145,24 +148,52 @@ public class Eve extends Creature {
 	 */
 	@Override
 	public void collidedWith(Rock rock) {
-		// this needs to be changed so that force is applied
 		
-		Vector2 oldPosition = new Vector2(((MovableEVETEMP)moveLogic).getPosition().x, ((MovableEVETEMP)moveLogic).getPosition().y);
-		if ( (((MovableEVETEMP)moveLogic).velocity.x > 1 || ((MovableEVETEMP)moveLogic).velocity .x < -1) || (((MovableEVETEMP)moveLogic).velocity.y > 1 || ((MovableEVETEMP)moveLogic).velocity.y < -1)){
-			((MovableEVETEMP)moveLogic).velocity = ((MovableEVETEMP)moveLogic).velocity.rotate(180);
-			Vector2 newPosition = new Vector2(oldPosition).add(((MovableEVETEMP)moveLogic).velocity);
-			((MovableEVETEMP)moveLogic).getPosition().x=newPosition.x;
-			((MovableEVETEMP)moveLogic).getPosition().y=newPosition.y;
+		Vector2 velocity = new Vector2 (moveLogic.getVelocity());
+		Vector2 crash;
+		if (velocity.x < 1 && velocity.y < 1){
+			crash = new Vector2(rock.getCollidable().getPosition());
+			crash.sub(moveLogic.getPosition());
+			crash.rotate(180);
 		}
-		// squeezes the stuck thing out the right side of the rock, needs to properly squeeze out depending on direction of rock collision
-		if (collidesWith(rock.getCollidable())){
-			((MovableEVETEMP)moveLogic).getPosition().x++;
-			((MovableEVETEMP)moveLogic).velocity = new Vector2(1,0);
-		}	
+		else {
+			crash = new Vector2(velocity.x*2, velocity.y*2);
+			crash.rotate(180);
+		}
+		moveLogic.addForce(crash);
 	}
 	
 	public ICollidable getCollide(){
 		return collideLogic;
 	}
+	
+	public void move(){
+		Vector2 position = moveLogic.getPosition();
+		
+		Vector3 mousePosition = CameraHandler.camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
+		
+		boolean left = input.isKeyPressed(Keys.LEFT) || (mousePosition.x < position.x && Gdx.input.isTouched());
+		boolean right = input.isKeyPressed(Keys.RIGHT) || (mousePosition.x > position.x && Gdx.input.isTouched());
+		boolean up = input.isKeyPressed(Keys.UP) || (mousePosition.y > position.y && Gdx.input.isTouched());
+		boolean down = 	input.isKeyPressed(Keys.DOWN) || (mousePosition.y < position.y && Gdx.input.isTouched());
+		
+		if (impetusAmount > 0){
+			impetusAmount++;
+		}
+		if (impetusAmount==32){
+			impetusAmount=0;
+		}
+		
+		if (input.isKeyPressed(Keys.CONTROL_LEFT) && impetusAmount==0 && abilities.get("impetus")){
+			impetusAmount = 1;
+		}
+		
+		int impetus = input.isKeyPressed(Keys.SHIFT_LEFT)&&abilities.get("boost") ? 10 : 5;
+		
+		moveLogic.addForce(new Vector2 ((right ? impetus : left ? -impetus : 0), (up ? impetus : down ? -impetus : 0)));
+		
+		super.move();
+	}
+	
 	
 }

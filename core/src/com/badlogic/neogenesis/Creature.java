@@ -1,11 +1,12 @@
 package com.badlogic.neogenesis;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectSet;
 
 /**
  * The Class Creature. Base class of all critters, currently concrete, eventually abstract
@@ -29,14 +30,18 @@ public class Creature extends GameObject implements Devourable, Devourer {
 	
 	private Sense sense;	
 	
+	/** The ideal position. */
+	private Vector2 movingTowards;
+	/** The last movement, for momentum */
+	/** The ai. */
+	private AI AI;
+	/** The hunting. */
+	private boolean hunting;
+	
 	/* temporary properties */
 
 	/** The impetus amount. */
 	protected int impetusAmount;
-	/** The in belly of. */
-	protected Devourer inBellyOf;
-	/** The things in the creature's belly. */
-	protected ObjectSet<Devourable> belly;
 	
 	/**
 	 * Instantiates a new creature.
@@ -44,7 +49,8 @@ public class Creature extends GameObject implements Devourable, Devourer {
 	 * @param biomass the starting biomass
 	 */
 	public Creature(Vector2 startPos, int biomass){
-		super(new Visible(TextureMap.getTexture("creature")), new Audible(), new Movable(startPos, new HerbivoreAI()), new Collidable(new Circle(startPos, biomass/2)), new Living());
+		super(new Visible(TextureMap.getTexture("creature")), new Audible(), new Movable(startPos), new Collidable(new Circle(startPos, biomass/2)), new Living());
+		AI = new HerbivoreAI();
 		
 		this.biomass = biomass;
 		
@@ -59,19 +65,6 @@ public class Creature extends GameObject implements Devourable, Devourer {
 		
 		sense = new Sense (startPos, 200);
 		
-		belly = new ObjectSet<Devourable>();
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Mobile#move()
-	 * This needs a major overhaul; this should be at most fifteen lines without branching
-	 */
-	@Override
-	public void move() {
-		((Movable)moveLogic).setCircle(getCircle());
-		super.move();
-		((Visible)drawLogic).setShape(getCircle());
-		((Collidable)collideLogic).position = getCircle();
 	}
 	
 	public Corpse getCorpse(){
@@ -109,7 +102,7 @@ public class Creature extends GameObject implements Devourable, Devourer {
 	 * @return the circle
 	 */
 	protected Circle getCircle() {
-		return new Circle(((Movable)moveLogic).getPosition(), biomass/2);
+		return new Circle(moveLogic.getPosition(), biomass/2);
 	}
 	
 	public Array<GameObject> collidesWith(Array<GameObject> otherCollidables) {
@@ -123,12 +116,12 @@ public class Creature extends GameObject implements Devourable, Devourer {
 				potentialPrey=sense.getSensed();
 				if (potentialDirection==null){
 					potentialDirection = potentialPrey.getPosition(); 
-					((Movable)moveLogic).setHunting(true);
+					hunting = true;
 				}
 				else {
 					if (((Movable)moveLogic).getPosition().dst(potentialDirection)>((Movable)moveLogic).getPosition().dst(potentialPrey.getPosition())){
 						potentialDirection=potentialPrey.getPosition();
-						((Movable)moveLogic).setHunting(true);
+						hunting = true;
 					}
 				}
 			}
@@ -138,7 +131,7 @@ public class Creature extends GameObject implements Devourable, Devourer {
 				collidable.collidedWith((GameObject)this);
 			}
 		}
-		((Movable)moveLogic).setMovingTowards(potentialDirection);
+		movingTowards = potentialDirection;
 		return collidedWith;
 	}
 	
@@ -177,20 +170,32 @@ public class Creature extends GameObject implements Devourable, Devourer {
 	 */		
 	@Override		
 	public void collidedWith(Devourable consumable) {		
-		if (inBellyOf==null && consumable.getBiomass()<biomass && consumable.beIngested(this)){		
-				ingest(consumable);		
+		if (consumable.getBiomass()<biomass){		
+			consumable.beIngested(getCenter(), getBellyForce());
+			if (clocktick%4==0){
+				digest(consumable);	
+				if (consumable.isDevoured()){
+					hunting = true;
+				}
+			}
 		}		
-		((Movable)moveLogic).setHunting(false);		
+	}
+	
+	private float getBellyForce(){
+		return 320 * Gdx.graphics.getDeltaTime();
 	}
 	
 	/* (non-Javadoc)
 	 * @see com.badlogic.neogenesis.Consumable#beIngested(com.badlogic.neogenesis.Consumer)
 	 */
 	@Override
-	public boolean beIngested(Devourer consumer) {
-		inBellyOf = consumer;
-		((Movable)moveLogic).inBellyOf = consumer;
-		return true;
+	public void beIngested(Vector2 bellyDirection, float pullStrength) {
+		
+		
+		Vector2 swallowForce = new Vector2(pullStrength, 0);
+		// point towards center thing devouring		
+		swallowForce = swallowForce.rotate(bellyDirection.sub(moveLogic.getPosition()).angle());
+		moveLogic.addForce(swallowForce);
 	}
 	
 	/* (non-Javadoc)
@@ -216,16 +221,6 @@ public class Creature extends GameObject implements Devourable, Devourer {
 		return new Food(1, 1);
 	}
 	
-	/* (non-Javadoc)
-	 * @see com.badlogic.neogenesis.Consumer#consume(com.badlogic.gdx.utils.ObjectSet)
-	 */
-	@Override
-	public void ingest (Devourable consumableToIngest){
-		if (!belly.contains(consumableToIngest)){
-			belly.add(consumableToIngest);
-		}
-	}
-
 	/**
 	 * Digest, 'bites' a consumable to get some food to actually digest
 	 * @param consumableToDigest the consumable to digest
@@ -234,9 +229,7 @@ public class Creature extends GameObject implements Devourable, Devourer {
 		digest(consumableToDigest.beBitten());
 	}
 	
-	
-	@Override
-	public Vector2 getCenter() {
+	private Vector2 getCenter() {
 		return new Vector2(((Movable)moveLogic).getPosition());
 	}
 
@@ -248,22 +241,37 @@ public class Creature extends GameObject implements Devourable, Devourer {
 	public void live(){
 		super.live();
 		clocktick++;
-		if (clocktick%4==0){
-			if (belly.size>0){
-				ObjectSet<Devourable> toRemove = new ObjectSet<Devourable>();
-				for (Devourable consumableToDigest: belly){
-					digest(consumableToDigest);
-					if (consumableToDigest.getBiomass()<=0){
-						toRemove.add(consumableToDigest); 
-					}
-				}
-				for (Devourable needsRemoving: toRemove){
-					belly.remove(needsRemoving);
-				}
-			}
-		}
+	}
+
+	@Override
+	public boolean isDevoured() {
+		return biomass > 0;
 	}
 	
-	
+	public void move() {
+
+		// movingTowards should be set to a random nearby location if nothing is to be hunted, generated by AI; no branching
+		
+		if (hunting&&movingTowards!=null){
+			Vector2 oldPosition = new Vector2(moveLogic.getPosition().x, moveLogic.getPosition().y);
+			Vector2 movement = new Vector2(50 * Gdx.graphics.getDeltaTime(), 0);
+			Vector2 temp = new Vector2(movingTowards);
+			movement = movement.rotate(temp.sub(oldPosition).angle());
+			moveLogic.addForce(movement);
+		}
+		else{
+			Vector2 amble;
+			if (MathUtils.random(1,50)==50){
+				amble = AI.amble(getCircle());
+			} else {
+				amble = AI.forage(getCircle());
+			}
+			moveLogic.addForce(amble);
+		}
+		
+		super.move();
+		((Visible)drawLogic).setShape(getCircle());
+		((Collidable)collideLogic).position = getCircle();
+	}
 	
 }

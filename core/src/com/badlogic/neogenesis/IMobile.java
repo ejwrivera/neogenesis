@@ -6,4 +6,6 @@ public interface IMobile {
 
 	void move();
 	void addForce(Vector2 force);
+	Vector2 getPosition();
+	Vector2 getVelocity();
 }

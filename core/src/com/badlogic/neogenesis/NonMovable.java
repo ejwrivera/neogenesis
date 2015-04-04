@@ -24,4 +24,14 @@ public class NonMovable implements IMobile {
 		
 	}
 
+	@Override
+	public Vector2 getPosition() {
+		return new Vector2 (position.x, position.y);
+	}
+
+	@Override
+	public Vector2 getVelocity() {
+		return new Vector2 (0, 0);
+	}
+
 }
