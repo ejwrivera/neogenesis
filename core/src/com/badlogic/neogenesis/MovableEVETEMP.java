@@ -41,11 +41,11 @@ public class MovableEVETEMP extends Movable implements IMobile {
 			
 			int movement = impetusAmount+(input.isKeyPressed(Keys.SHIFT_LEFT)&&abilities.get("boost") ? 10 : 5);
 			// calculate the change in X
-			position.x += delta(movement, lastMovement.x, left ? "DECREASE" : right ? "INCREASE" : "NONE" );
+			position.x += delta(movement, velocity.x, left ? "DECREASE" : right ? "INCREASE" : "NONE" );
 			// calculate the change in Y
-			position.y += delta(movement, lastMovement.y, down ? "DECREASE" : up ? "INCREASE" : "NONE");
+			position.y += delta(movement, velocity.y, down ? "DECREASE" : up ? "INCREASE" : "NONE");
 
-			lastMovement = new Vector2(position.x-oldX, position.y-oldY);
+			velocity = new Vector2(position.x-oldX, position.y-oldY);
 		}
 		else {
 			Vector2 newPosition;
@@ -64,7 +64,7 @@ public class MovableEVETEMP extends Movable implements IMobile {
 			}
 			position.x = newPosition.x;
 			position.y = newPosition.y;
-			lastMovement = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
+			velocity = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
 		}
 	}
 	

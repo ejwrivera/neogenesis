@@ -64,11 +64,11 @@ public class Plant extends GameObject implements Devourable {
 	@Override
 	public void collidedWith(Rock rock) {
 		Vector2 oldPosition = new Vector2(((Movable)moveLogic).getPosition().x, ((Movable)moveLogic).getPosition().y);
-		((Movable)moveLogic).lastMovement = ((Movable)moveLogic).lastMovement.rotate(180);
-		Vector2 newPosition = new Vector2(oldPosition).add(((Movable)moveLogic).lastMovement);
+		((Movable)moveLogic).velocity = ((Movable)moveLogic).velocity.rotate(180);
+		Vector2 newPosition = new Vector2(oldPosition).add(((Movable)moveLogic).velocity);
 		((Movable)moveLogic).getPosition().x=newPosition.x;
 		((Movable)moveLogic).getPosition().y=newPosition.y;
-		((Movable)moveLogic).lastMovement = new Vector2(0,0);
+		((Movable)moveLogic).velocity = new Vector2(0,0);
 	}
 	
 	/* (non-Javadoc)

@@ -61,8 +61,8 @@ public class Eve extends Creature {
 	 * Gets the last movement so that camera can be oriented properly.
 	 * @return the last movement
 	 */
-	public Vector2 getLastMovement(){
-		return ((MovableEVETEMP)moveLogic).lastMovement;
+	public Vector2 getvelocity(){
+		return ((MovableEVETEMP)moveLogic).velocity;
 	}
 
 	/* (non-Javadoc)
@@ -148,16 +148,16 @@ public class Eve extends Creature {
 		// this needs to be changed so that force is applied
 		
 		Vector2 oldPosition = new Vector2(((MovableEVETEMP)moveLogic).getPosition().x, ((MovableEVETEMP)moveLogic).getPosition().y);
-		if ( (((MovableEVETEMP)moveLogic).lastMovement.x > 1 || ((MovableEVETEMP)moveLogic).lastMovement .x < -1) || (((MovableEVETEMP)moveLogic).lastMovement.y > 1 || ((MovableEVETEMP)moveLogic).lastMovement.y < -1)){
-			((MovableEVETEMP)moveLogic).lastMovement = ((MovableEVETEMP)moveLogic).lastMovement.rotate(180);
-			Vector2 newPosition = new Vector2(oldPosition).add(((MovableEVETEMP)moveLogic).lastMovement);
+		if ( (((MovableEVETEMP)moveLogic).velocity.x > 1 || ((MovableEVETEMP)moveLogic).velocity .x < -1) || (((MovableEVETEMP)moveLogic).velocity.y > 1 || ((MovableEVETEMP)moveLogic).velocity.y < -1)){
+			((MovableEVETEMP)moveLogic).velocity = ((MovableEVETEMP)moveLogic).velocity.rotate(180);
+			Vector2 newPosition = new Vector2(oldPosition).add(((MovableEVETEMP)moveLogic).velocity);
 			((MovableEVETEMP)moveLogic).getPosition().x=newPosition.x;
 			((MovableEVETEMP)moveLogic).getPosition().y=newPosition.y;
 		}
 		// squeezes the stuck thing out the right side of the rock, needs to properly squeeze out depending on direction of rock collision
 		if (collidesWith(rock.getCollidable())){
 			((MovableEVETEMP)moveLogic).getPosition().x++;
-			((MovableEVETEMP)moveLogic).lastMovement = new Vector2(1,0);
+			((MovableEVETEMP)moveLogic).velocity = new Vector2(1,0);
 		}	
 	}
 	

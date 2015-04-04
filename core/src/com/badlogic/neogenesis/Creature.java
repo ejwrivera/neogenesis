@@ -149,16 +149,16 @@ public class Creature extends GameObject implements Devourable, Devourer {
 		Vector2 position = ((Movable)moveLogic).getPosition();
 		
 		Vector2 oldPosition = new Vector2(position.x, position.y);
-		if ( (((Movable)moveLogic).lastMovement.x > 1 || ((Movable)moveLogic).lastMovement .x < -1) || (((Movable)moveLogic).lastMovement.y > 1 || ((Movable)moveLogic).lastMovement.y < -1)){
-			((Movable)moveLogic).lastMovement = ((Movable)moveLogic).lastMovement.rotate(180);
-			Vector2 newPosition = new Vector2(oldPosition).add(((Movable)moveLogic).lastMovement);
+		if ( (((Movable)moveLogic).velocity.x > 1 || ((Movable)moveLogic).velocity .x < -1) || (((Movable)moveLogic).velocity.y > 1 || ((Movable)moveLogic).velocity.y < -1)){
+			((Movable)moveLogic).velocity = ((Movable)moveLogic).velocity.rotate(180);
+			Vector2 newPosition = new Vector2(oldPosition).add(((Movable)moveLogic).velocity);
 			position.x=newPosition.x;
 			position.y=newPosition.y;
 		}
 		// squeezes the stuck thing out the right side of the rock, needs to properly squeeze out depending on direction of rock collision
 		if (collidesWith(rock.getCollidable())){
 			position.x++;
-			((Movable)moveLogic).lastMovement = new Vector2(1,0);
+			((Movable)moveLogic).velocity = new Vector2(1,0);
 		}	
 	}
 	

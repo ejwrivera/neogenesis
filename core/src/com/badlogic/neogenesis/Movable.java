@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 public class Movable implements IMobile {
 
@@ -12,7 +13,7 @@ public class Movable implements IMobile {
 	/** The ideal position. */
 	private Vector2 movingTowards;
 	/** The last movement, for momentum */
-	public Vector2 lastMovement;
+	public Vector2 velocity;
 	/** The ai. */
 	private AI AI;
 	/** The hunting. */
@@ -20,11 +21,13 @@ public class Movable implements IMobile {
 	
 	public Devourer inBellyOf;
 	
+	public Array<Vector2> forces;
 	
 	public Movable (Vector2 startPos, AI temp){
 		this.position = startPos;
-		lastMovement = new Vector2(0, 0);
+		velocity = new Vector2(0, 0);
 		AI = temp;
+		forces = new Array<Vector2>();
 	}
 	
 	@Override
@@ -37,41 +40,50 @@ public class Movable implements IMobile {
 				Vector2 movement = new Vector2(50 * Gdx.graphics.getDeltaTime(), 0);
 				Vector2 temp = new Vector2(movingTowards);
 				movement = movement.rotate(temp.sub(oldPosition).angle());
-				Vector2 newPosition = new Vector2(oldPosition).add(movement);
-				position.x = newPosition.x;
-				position.y = newPosition.y;
-				lastMovement = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);	
+				forces.add(movement);
+				//Vector2 newPosition = new Vector2(oldPosition).add(movement);
+				//position.x = newPosition.x;
+				//position.y = newPosition.y;
+				//velocity = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);	
 			}
 			else{
 				if (MathUtils.random(1,50)==50){
-					lastMovement = AI.amble(getCircle());
-					position.x+=lastMovement.x;
-					position.y+=lastMovement.y;
+					velocity = AI.amble(getCircle());
+					position.x+=velocity.x;
+					position.y+=velocity.y;
 				} else {
-					lastMovement = AI.forage(getCircle());
-					position.x+=lastMovement.x;
-					position.y+=lastMovement.y;
+					velocity = AI.forage(getCircle());
+					position.x+=velocity.x;
+					position.y+=velocity.y;
 				}
 			}
 		}
 		else {
-			Vector2 newPosition;
+			// Vector2 newPosition;
 			Vector2 bellyCenter = inBellyOf.getCenter();
 			Vector2 oldPosition = new Vector2(position.x, position.y);
 			if (Math.abs(position.x-bellyCenter.x)+Math.abs(position.y-bellyCenter.y)<6){
-				newPosition = bellyCenter;
+				//newPosition = bellyCenter;
+				position = bellyCenter;
 			}
 			else{
 				Vector2 movement = new Vector2(320 * Gdx.graphics.getDeltaTime(), 0);
 				// point towards center of inBellyOf
 				
 				movement = movement.rotate(bellyCenter.sub(oldPosition).angle());
-				newPosition = new Vector2(oldPosition).add(movement);
+				forces.add(movement);
+				//newPosition = new Vector2(oldPosition).add(movement);
 			}
-			position.x = newPosition.x;
-			position.y = newPosition.y;
-			lastMovement = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
+			//position.x = newPosition.x;
+			//position.y = newPosition.y;
+			//velocity = new Vector2(position.x-oldPosition.x, position.y-oldPosition.y);
 		}
+		
+		for (Vector2 force: forces){
+			velocity.add(force);
+		}
+		position.add(velocity);
+		forces.clear();
 	}
 	
 	public void setMovingTowards(Vector2 idealPosition){
@@ -92,6 +104,11 @@ public class Movable implements IMobile {
 	
 	public Vector2 getPosition(){
 		return position;
+	}
+
+	@Override
+	public void addForce(Vector2 force) {
+		forces.add(force);
 	}
 	
 	
